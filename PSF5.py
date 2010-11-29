@@ -10,7 +10,6 @@ class Game(object):
     """Main game application"""
     def __init__(self):
         super(Game, self).__init__()
-        pygame.init()
         self.config = {}
         if sys.platform == "darwin" and release_build:
             self.app_path = '../../../'
@@ -29,6 +28,9 @@ class Game(object):
                 else:
                     self.config[command[0]] = command[1]
         configfile.close()
+	pygame.display.init()
+	pygame.font.init()
+	pygame.mixer.init()
         self.SCREEN_WIDTH = 1024
         self.SCREEN_HEIGHT = 768
         self.WORLD_WIDTH = 710
