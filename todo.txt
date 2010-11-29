@@ -1,0 +1,11 @@
+SF1 checkbox
+make outer hex shrink based on performance
+add AX-CPT to fortress?
+EEG friendly (GameEventList -> TCP/IP)
+set the n of the n-back for the bonuses
+!constant # of bonus opportunities for each S
+actually type symbol that was n-back ago? say yes or no for it, with possible penalty
+better reward for finer-grained control
+mines - both IFF and non-IFF for MOT - just have some be a particular color
+paramaterizable standard deviation and range for mine movement
+mines bounce off each other?
