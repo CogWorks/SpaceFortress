@@ -114,6 +114,9 @@ hex_shrink_radius 150
 #Does the fortress exist? Set to f to turn the fortress off
 fortress_exists t
 
+#Can the fortress be hit if there's a mine onscreen? Default is f
+hit_fortress_while_mine f
+
 #Fortress x position. Default is 355
 fortress_pos_x 355
 
@@ -136,7 +139,8 @@ fortress_lock_time 1000
 vlner_time 250
 
 #Minimum vulnerability before you can destroy the fortress with a double shot.
-#Default is 10
+#Note - keep in mind that the first shot of a "double shot" will increase VLNER
+#Default is 10, meaning that a double shot fired at VLNER 9 will destroy the fortress
 vlner_threshold 10
 
 ### SHELL CONSTANTS ###
@@ -181,16 +185,25 @@ symbol_up_time 2500
 ### MINE CONSTANTS ###
 
 #Do mines exists? Set to f to turn mines off
-mine_exists f
+mine_exists t
 
 #Set mine behavior to standard or MOT
-mine_mode standard
+mine_mode MOT
+
+#Number of foe mines. Default is 3
+num_foes 3
 
 #Mine collision radius. Default is 20
 mine_radius 20
 
 #Mine speed. Default is 5
-mine_speed 5
+mine_speed 3
+
+#Minimum spawn distance. Mine will never appear closer than this distance to the ship
+minimum_spawn_distance 200
+
+#Maximum spawn distance. Mine will never appear farther away than this distance to the ship
+maximum_spawn_distance 700
 
 #Minimum time between double-clicks to identify foe mine. Default is 250
 intrvl_min 250
@@ -207,8 +220,36 @@ mine_timeout 10000
 #Time in milliseconds for a mine to spawn. Default is 5000 (5 sec)
 mine_spawn 5000
 
-#Number of foe mines to memorize at the beginning of each game. Default is 3
-num_foes 3
+#Does destroying the fortress reset the mine timer? Default is t.
+fortress_resets_mine t
+
+### MOT mines
+#Number of mines
+MOT_count 5
+
+#Time in between MOT "cycles"
+MOT_off_time 5000
+
+#Time to display "frozen" MOT mines on onset
+MOT_onset_time 3000
+
+#Time to move mines with IFF info hidden
+MOT_move_time 5000
+
+#Time in between direction changes while MOT mines are moving
+MOT_switch_time 1000
+
+#Angle in degrees for the maximum amount a mine can change direction
+MOT_max_deflection 15
+
+#Do MOT mines bounce off walls or warp around edges?
+MOT_movement_style bounce
+
+#Time to allow for MOT identification
+MOT_identification_time 5000
+
+#MOT identification through shots or ship? (i.e., fly into the mine)
+MOT_identification_type shots
 
 ### SCORE CONSTANTS ###
 #Use the new scoring system for Flight, Fortress, and Mines? (instead of PNTS, CNTRL, VLCTY and SPEED)
@@ -279,10 +320,10 @@ destroy_foe 30
 destroy_fortress 100
 
 #Coefficient to formula to award extra points for destroying fortress quickly 100 - 10 * (math.floor(fortresstimer/1000) - 5)
-fortress_kill_coeff 10
+#fortress_kill_coeff 10
 
 #Coefficient to formula to award extra points for destroying mines quickly 100 - 10 * (math.floor(minetimer/1000) - 5)
-mine_kill_coeff 10
+#mine_kill_coeff 10
 
 #Points added for selecting points bonus
 bonus_points 100
@@ -291,7 +332,7 @@ bonus_points 100
 bonus_missiles 50
 
 #Multiplier for successive points captures
-point_mult 1.5
+#point_mult 1.5
 
 #Multiplier for successive missile captures
-missiles_mult 1.5
+#missiles_mult 1.5

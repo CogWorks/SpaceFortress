@@ -9,3 +9,34 @@ better reward for finer-grained control
 mines - both IFF and non-IFF for MOT - just have some be a particular color
 paramaterizable standard deviation and range for mine movement
 mines bounce off each other?
+
+ToDo
+----------
+5. Better logging / EEG events
+6. EEG Friendly / SSVEP
+7. Consistent bonuses
+8. Flight score based on inner hex distance
+9. MOT (IFF and No-IFF versions)
+10. MOT motion
+10a. border reflections vs warping
+10b. straight trajectory vs. random direction changes
+       To make random motion every N-ms add to the direction a value
+sampled from a normal distribution with a mean of 0. The larger the
+stdev, the more random the motion.
+       To make smooth direction changes cap the range of possible
+directions and make more frequent smaller changes.
+       Can also change make N random...
+10c. occlusion or bouncing
+13. Set N-back value for bonus symbols
+
+
+Maybe
+-----------
+11. Expanding inner hex
+12. Vary both inner and outer hex over course of game
+14. Continuous n-back (same-as... yes or no)
+
+What if destroying the fortress at 11 (best possible) was worth 200
+points, destroying the fortress at 12 worth 150 and >12 worth the
+normal 100?
+> No need to stop at 12. How about a continuous function down to about 50 points?

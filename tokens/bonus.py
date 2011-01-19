@@ -23,9 +23,9 @@ class Bonus(object):
         self.visible = False
         self.font = pygame.font.Font("fonts/freesansbold.ttf", 28)
         self.bonus_symbol = app.config["bonus_symbol"]
-        self.current_symbol = ''
-        self.prior_symbol = ''
-        self.flag = True
+        self.current_symbol = None
+        self.prior_symbol = None
+        self.flag = False
         self.probability = float(app.config["bonus_probability"])
         self.timer = Timer()
         
@@ -35,6 +35,7 @@ class Bonus(object):
     
     def get_new_symbol(self):
         """assigns new bonus symbol"""
+        self.prior_symbol = self.current_symbol
         if random.random() < self.probability:
             self.current_symbol = self.bonus_symbol
         else:

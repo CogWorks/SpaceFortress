@@ -11,56 +11,31 @@ import token
 import string
 import random
 import pygame
+import timer
+
 #from frame import Frame
 
 class Mine(token.Token):
     """represents the friend or foe mine object"""
     def __init__(self, app):
         super(Mine, self).__init__()
-        self.position.x = 600
-        self.position.y = 400
+        self.position.x = 0 #600
+        self.position.y = 0 #400
         self.app = app
-        self.speed = 10
+        #set random pos
+        self.speed = int(self.app.config["mine_speed"])
         self.health = 1
-        self.timeout = 15000 #milliseconds after destruction when mine "gives up"
-        self.reset_time = 5000 #milliseconds after destruction when mine "respawns"
-        self.alive = False
-        self.collision_radius = 20
-        self.foe_probability = 0.3
-        self.life_span = 160
-        self.sleep_span = 200
-        self.minimum_spawn_distance = 320
-        self.maximum_spawn_distance = 640
-        self.iff_lower_bound = 100
-        self.iff_upper_bound = 300
-        self.speed = 2
-        self.num_foes = 3
-        self.letters = list(string.letters[26:]) #list of uppercase letters
-        self.letters.remove("T") #Screws up Lisp's read-from-string
-        self.exists = True
-    
-    def generate_foes(self, num):
-        """determine which mine designations are 'foes'"""
-        self.foe_letters = random.sample(self.letters, num)
-        self.foe_letters.sort()
-        for each in self.foe_letters:
-            self.letters.remove(each)
-            
+        self.alive = True
+        self.collision_radius = int(self.app.config["mine_radius"])
+        self.foe_probability = float(self.app.config["mine_probability"])
+        self.iff = None
+        self.tagged = "untagged"
+        self.color = (0, 255, 255)
+                
     def generate_new_position(self):
         """chooses random location to place mine"""
         self.position.x = random.random() * (self.app.WORLD_WIDTH - 40) + 20
         self.position.y = random.random() * (self.app.WORLD_HEIGHT - 40) + 20
-            
-    def reset(self):
-        """resets mine - makes alive, places it a distance away from the ship, gets IFF tag"""
-        self.alive = True
-        if random.random() < self.foe_probability:
-            self.app.score.iff = random.sample(self.foe_letters, 1)[0]
-        else:
-            self.app.score.iff = random.sample(self.letters, 1)[0]
-        self.generate_new_position()
-        while self.get_distance_to_object(self.app.ship) < 400:
-            self.generate_new_position()
         
     def compute(self):
         """calculates new position of mine"""
@@ -71,15 +46,155 @@ class Mine(token.Token):
         
     def draw(self, worldsurf):
         """draws mine to worldsurf"""
-        pygame.draw.line(worldsurf, (0,255,255), (self.position.x - 16, self.position.y), (self.position.x, self.position.y - 24), self.app.linewidth)
-        pygame.draw.line(worldsurf, (0,255,255), (self.position.x, self.position.y - 24), (self.position.x + 16, self.position.y), self.app.linewidth)
-        pygame.draw.line(worldsurf, (0,255,255), (self.position.x + 16, self.position.y), (self.position.x, self.position.y + 24), self.app.linewidth)
-        pygame.draw.line(worldsurf, (0,255,255), (self.position.x, self.position.y + 24), (self.position.x - 16, self.position.y), self.app.linewidth)
+        pygame.draw.line(worldsurf, self.color, (self.position.x - 16, self.position.y), (self.position.x, self.position.y - 24), self.app.linewidth)
+        pygame.draw.line(worldsurf, self.color, (self.position.x, self.position.y - 24), (self.position.x + 16, self.position.y), self.app.linewidth)
+        pygame.draw.line(worldsurf, self.color, (self.position.x + 16, self.position.y), (self.position.x, self.position.y + 24), self.app.linewidth)
+        pygame.draw.line(worldsurf, self.color, (self.position.x, self.position.y + 24), (self.position.x - 16, self.position.y), self.app.linewidth)
         
+        
+class MineList(list):
+    """extension of list to contain properties for mine subsystem"""
+    def __init__(self, app):
+        super(MineList, self).__init__()
+        self.app = app
+        self.mine_mode = self.app.config["mine_mode"]
+        self.minimum_spawn_distance = int(self.app.config["minimum_spawn_distance"])
+        self.maximum_spawn_distance = int(self.app.config["maximum_spawn_distance"])
+        self.iff_lower_bound = int(self.app.config["intrvl_min"])
+        self.iff_upper_bound = int(self.app.config["intrvl_max"])
+        self.num_foes = int(self.app.config["num_foes"])
+        self.letters = list(string.letters[26:]) #list of uppercase letters
+        self.letters.remove("T") #Screws up Lisp's read-from-string
+        self.generate_foes(self.num_foes)
+        self.timeout = int(self.app.config["mine_timeout"]) #milliseconds after spawn when mine "gives up"
+        self.spawn_time = int(self.app.config["mine_spawn"]) #milliseconds after destruction when mine "respawns"
+        self.timer = timer.Timer()
+        self.flag = False #for timer, to determine state of standard mine
+        self.iff_timer = timer.Timer()
+        self.iff_flag = False #are we in the middle of trying to identify a foe mine?
+        #MOT constants
+        self.f = pygame.font.Font(None, 24)
+        self.MOT_count = int(self.app.config["MOT_count"])
+        self.MOT_state = "off" #states are off, onset, move, identify
+        self.MOT_off_time = int(self.app.config["MOT_off_time"])
+        self.MOT_onset_time = int(self.app.config["MOT_onset_time"])
+        self.MOT_move_time = int(self.app.config["MOT_move_time"])     
+        self.MOT_switch_time = int(self.app.config["MOT_switch_time"])
+        self.MOT_max_deflection = int(self.app.config["MOT_max_deflection"])
+        self.MOT_movement_style = self.app.config["MOT_movement_style"]
+        self.MOT_identification_time = int(self.app.config["MOT_identification_time"])
+        self.MOT_identification_type = self.app.config["MOT_identification_type"]
+        self.MOT_timer = timer.Timer() #determines when MOT mines change state
+        self.MOT_switch_timer = timer.Timer() #determine when moving MOT mine changes direction
+        
+    def generate_foes(self, num):
+        """determine which mine designations are 'foes'"""
+        self.foe_letters = random.sample(self.letters, num)
+        self.foe_letters.sort()
+        for foe_letter in self.foe_letters:
+            self.letters.remove(foe_letter)
+            
+    def add(self):
+        """adds new mine to list"""
+        if self.mine_mode == "standard":
+            mine = Mine(self.app)
+        else:
+            mine = MOTMine(self.app)
+        mine.generate_new_position()
+        while (mine.get_distance_to_object(self.app.ship) < self.minimum_spawn_distance) or (mine.get_distance_to_object(self.app.ship) > self.maximum_spawn_distance):
+            mine.generate_new_position()
+        if random.random() < mine.foe_probability:
+            mine.iff = random.sample(self.foe_letters, 1)[0]
+        else:
+            mine.iff = random.sample(self.letters, 1)[0]
+        if self.mine_mode == "standard":
+            self.app.score.iff = mine.iff
+        self.append(mine)
+        
+    def compute(self):
+        """computes all mines"""
+        if self.mine_mode == "standard":
+            for mine in self:
+                mine.compute()
+        elif self.mine_mode == "MOT":
+            #check state and timer and act accordingly. States are off, onset, move, identify
+            if self.MOT_state == "off" and self.MOT_timer.elapsed() > self.MOT_off_time:
+                self.MOT_state = "onset"
+                self.color = (0, 255, 255)
+                for i in range(self.MOT_count - 1):
+                    self.add()
+                self.MOT_timer.reset()
+            if self.MOT_state == "onset" and self.MOT_timer.elapsed() > self.MOT_onset_time:
+                self.MOT_state = "moving"
+                self.MOT_timer.reset()
+                self.MOT_switch_timer.reset()
+            if self.MOT_state == "moving" and self.MOT_timer.elapsed() < self.MOT_move_time:
+                for i, mine in enumerate(self):
+                    mine.compute()
+                    if self.MOT_movement_style == "warp":
+                        if mine.position.x > self.app.WORLD_WIDTH:
+                            mine.position.x = 0
+                            mine.app.gameevents.add("mine%d_warp"%i, "right")
+                        if mine.position.x < 0:
+                            mine.position.x = self.app.WORLD_WIDTH
+                            mine.app.gameevents.add("mine%d_warp"%i, "left")
+                        if mine.position.y > self.app.WORLD_HEIGHT:
+                            mine.position.y = 0
+                            mine.app.gameevents.add("mine%d_warp"%i, "down")
+                        if mine.position.y < 0:
+                            mine.position.y = self.app.WORLD_HEIGHT
+                            mine.app.gameevents.add("mine%d_warp"%i, "up")
+                    elif self.MOT_movement_style == "bounce":
+                        if mine.position.x > self.app.WORLD_WIDTH - 10:
+                            mine.vec.x *= -1
+                            mine.app.gameevents.add("mine%d_bounce"%i, "right")
+                        if mine.position.x < 10:
+                            mine.vec.x *= -1
+                            mine.app.gameevents.add("mine%d_bounce"%i, "left")
+                        if mine.position.y > self.app.WORLD_HEIGHT - 10:
+                            mine.vec.y *= -1
+                            mine.app.gameevents.add("mine%d_bounce"%i, "down")
+                        if mine.position.y < 10:
+                            mine.vec.y *= -1
+                            mine.app.gameevents.add("mine%d_bounce"%i, "up")
+            if self.MOT_state == "moving" and self.MOT_timer.elapsed() > self.MOT_move_time:
+                self.MOT_state = "identify"
+                self.MOT_timer.reset()
+                #change some to red
+                numred = random.randint(1, self.MOT_count)
+                seq = range(self.MOT_count)
+                sample = random.sample(seq, numred)
+                for index in sample:
+                    self[index].color = (255,0,0)
+                
+            if self.MOT_state == "identify" and self.MOT_timer.elapsed() > self.MOT_identification_time:
+                self.MOT_state = "off"
+                for i, item in enumerate(self):
+                    del self[i]
+            
+    def draw(self):
+        """draws all mines"""
+        for mine in self:
+            mine.draw(self.app.worldsurf)
+            if self.MOT_state == "onset":
+                tag = self.f.render(mine.iff, 0, (255,255,0))
+                tag_rect = tag.get_rect()
+                tag_rect.centerx = mine.position.x
+                tag_rect.centery = mine.position.y
+                self.app.worldsurf.blit(tag, tag_rect)
+
 class MOTMine(Mine):
     """A mine that moves in a MOT paradigm"""
     def __init__(self, app):
-        super(MOTMine, self).__init__()
+        super(MOTMine, self).__init__(app)
         self.app = app
+        #set trajectory to random normal vector and scale to speed
         self.vec = Vector2D.random2D()
-        #scalar it
+        self.vec.scalar_product(self.speed)
+        
+    def compute(self):
+        """calculates new position of mine"""
+        self.position.x += self.vec.x
+        self.position.y += self.vec.y
+        
+        

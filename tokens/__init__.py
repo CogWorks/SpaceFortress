@@ -15,3 +15,4 @@ import frame
 import bonus
 import vector2D
 import score
+import sounds

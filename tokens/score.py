@@ -1,3 +1,4 @@
+#KNOWN BUG - scores "line up" properly with either new scoring + new positions OR old scoring + old positions, but not intermixed
 #score.py
 #Space Fortress 5
 #Marc Destefano

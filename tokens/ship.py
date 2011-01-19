@@ -65,16 +65,16 @@ class Ship(token.Token):
         self.position.y -= self.velocity.y
         if self.position.x > self.app.WORLD_WIDTH:
             self.position.x = 0
-            self.app.gameevents.append(GameEvent("warp", "right"))
+            self.app.gameevents.add("warp", "right")
         if self.position.x < 0:
             self.position.x = self.app.WORLD_WIDTH
-            self.app.gameevents.append(GameEvent("warp", "left"))
+            self.app.gameevents.add("warp", "left")
         if self.position.y > self.app.WORLD_HEIGHT:
             self.position.y = 0
-            self.app.gameevents.append(GameEvent("warp", "down"))
+            self.app.gameevents.add("warp", "down")
         if self.position.y < 0:
             self.position.y = self.app.WORLD_HEIGHT
-            self.app.gameevents.append(GameEvent("warp", "up"))
+            self.app.gameevents.addt("warp", "up")
             
     def fire(self):
         """fires missile"""
