@@ -28,9 +28,8 @@ class Game(object):
                 else:
                     self.config[command[0]] = command[1]
         configfile.close()
-	pygame.display.init()
-	pygame.font.init()
-	pygame.mixer.init()
+        pygame.display.init()
+        pygame.font.init()
         self.SCREEN_WIDTH = 1024
         self.SCREEN_HEIGHT = 768
         self.WORLD_WIDTH = 710
@@ -52,7 +51,7 @@ class Game(object):
         self.vector_explosion = pygame.image.load("gfx/exp.png")
         self.vector_explosion.set_colorkey((0, 0, 0))
         self.vector_explosion_rect = self.vector_explosion.get_rect()
-        self.sounds = tokens.sounds.Sounds()
+        self.sounds = tokens.sounds.Sounds(self)
         self.screen = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
         self.clock = pygame.time.Clock()
         self.gametimer = tokens.timer.Timer()

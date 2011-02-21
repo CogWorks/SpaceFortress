@@ -336,3 +336,11 @@ bonus_missiles 50
 
 #Multiplier for successive missile captures
 #missiles_mult 1.5
+
+
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# Features added by Ryan
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+# Enable/disable sound
+sound t
