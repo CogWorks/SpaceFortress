@@ -346,4 +346,4 @@ bonus_missiles 50
 sound t
 
 # Enable/disable event logging to stdout
-print_events t
+print_events f

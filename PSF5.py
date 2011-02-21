@@ -187,8 +187,8 @@ class Game(object):
             command = currentevent.command
             obj = currentevent.obj
             target = currentevent.target
-            if self.config["print_events"] == "f": return
-            print "time %d, command %s, object %s, target %s"%(pygame.time.get_ticks(), command, obj, target)
+            if self.config["print_events"] == "t":
+                print "time %d, command %s, object %s, target %s"%(pygame.time.get_ticks(), command, obj, target)
             if command == "press":    
                 if obj == "quit":
                     sys.exit(0)
@@ -483,7 +483,8 @@ class Game(object):
     
     def display_foe_mines(self):
         """before game begins, present the list of IFF letters to target"""
-        print int(self.config["num_foes"]), self.mine_list.foe_letters
+        if self.config["print_events"] == "t":
+            print int(self.config["num_foes"]), self.mine_list.foe_letters
         self.screen.fill((0,0,0))
         top = self.f24.render("The Type-2 mines for this session are:", True, (255,255,0))
         top_rect = top.get_rect()
