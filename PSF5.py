@@ -187,6 +187,7 @@ class Game(object):
             command = currentevent.command
             obj = currentevent.obj
             target = currentevent.target
+            if self.config["print_events"] == "f": return
             print "time %d, command %s, object %s, target %s"%(pygame.time.get_ticks(), command, obj, target)
             if command == "press":    
                 if obj == "quit":

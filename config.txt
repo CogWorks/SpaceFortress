@@ -344,3 +344,6 @@ bonus_missiles 50
 
 # Enable/disable sound
 sound t
+
+# Enable/disable event logging to stdout
+print_events t
