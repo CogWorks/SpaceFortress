@@ -401,22 +401,16 @@ class Game(object):
                 self.gameevents.add("collide", "shell", i)
         #need to treat this carefully - the mine can overlap the fortress, so we don't want to remove the same missile twice
         for i, missile in enumerate(self.missile_list):
-            if len(self.mine_list) == 0:
-                if missile.collide(self.fortress):
-                    self.gameevents.add("collide", "missile_"+str(i), "fortress")
-                    del self.missile_list[i]
-            else:
-                for j, mine in enumerate(self.mine_list):
-                    if missile.collide(mine) and missile.collide(self.fortress):
-                        self.gameevents.add("collide", "missile_"+str(i), "fortress")
-                        self.gameevents.add("collide", "missile_"+str(i), "mine_"+str(j))
-                        del self.missile_list[i]
-                    if missile.collide(mine) and not missile.collide(self.fortress):
-                        self.gameevents.add("collide", "missile_"+str(i), "mine_"+str(j))
-                        del self.missile_list[i]
-                    if missile.collide(self.fortress) and not missile.collide(mine):
-                        self.gameevents.add("collide", "missile_"+str(i), "fortress")
-                        del self.missile_list[i]
+            del_missile = False
+            if missile.collide(self.fortress):
+                self.gameevents.add("collide", "missile_"+str(i), "fortress")
+                del_missile = True
+            for j, mine in enumerate(self.mine_list):
+                if missile.collide(mine) and not missile.collide(self.fortress):
+                    self.gameevents.add("collide", "missile_"+str(i), "mine_"+str(j))
+                    del_missile = True
+            if del_missile:
+                del self.missile_list[i]
         for i, mine in enumerate(self.mine_list):
             if mine.collide(self.ship):
                 self.gameevents.add("collide", "mine_"+str(i), "ship")
