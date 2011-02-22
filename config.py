@@ -265,3 +265,13 @@ def load_config(config_file):
     except IOError:
         pass
     return config
+
+def gen_config(config_file):
+    ret = True
+    config = get_default_config()
+    try:
+        with open(config_file, 'w+') as f:
+            json.dump(config, f, separators=(',',': '), indent=4, sort_keys=True)
+    except IOError:
+        ret = False
+    return ret

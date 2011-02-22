@@ -3,14 +3,21 @@ import tokens
 from tokens.gameevent import *
 import sys, os
 import pygame
+import argparse
 from config import *
+from pycogworld import *
+
+def get_psf_version_string():
+    return "SpaceFortress 5.0"
 
 release_build = False
 
 class Game(object):
     """Main game application"""
-    def __init__(self):
+    def __init__(self, cogworld, condition):
         super(Game, self).__init__()
+        self.cw = cogworld
+        self.cond = condition
         if sys.platform == "darwin" and release_build:
             self.app_path = '../../../'
         else:
@@ -502,16 +509,49 @@ class Game(object):
                 if event.type == pygame.KEYDOWN:
                     return
     
+
+def main(cogworld, condition):
+    
+    g = Game(cogworld, condition)
+    if g.mine_exists:
+        g.display_foe_mines()
+    g.setup_world()
+    while True:
+        g.clock.tick(30)
+        g.process_input()
+        g.process_game_logic()
+        g.process_events()              
+        g.draw()
+        if g.ship.alive == False:
+            g.reset_position()
+
+if __name__ == '__main__':
+    
+    parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('--version', action='version', version=get_psf_version_string())
+    parser.add_argument('--generate-config', action="store_true", dest="genconfig", help='Generate a full default config file.', default=argparse.SUPPRESS)
+    parser.add_argument('--condition', action="store", dest="condition", help='Task Condition', metavar='COND')
+    parser.add_argument('--port', action="store", dest="port", help='CogWorld RPC port')
+    args = parser.parse_args()
+
+    cogworld = None
+    
+    try:
+        if args.genconfig:
+            if gen_config("config.txt.new"):
+                print 'The new config file "config.txt.new" needs to be renamed before it can be used.'
+            else:
+                print 'Error creating config file.'
+            sys.exit(0)
+        elif args.port:
+            cogworld = CogWorld('localhost', args.port, 'SpaceFortress')
+            ret = cogworld.connect()
+            if (ret!=None):
+                print 'Failed connecting to CogWorld: %s' % (ret)
+                sys.exit()
+    except AttributeError:
+        pass
+            
+    main(cogworld, args.condition)
         
-g = Game()
-if g.mine_exists:
-    g.display_foe_mines()
-g.setup_world()
-while True:
-    g.clock.tick(30)
-    g.process_input()
-    g.process_game_logic()
-    g.process_events()              
-    g.draw()
-    if g.ship.alive == False:
-        g.reset_position()
+
