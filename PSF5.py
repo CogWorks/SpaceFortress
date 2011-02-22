@@ -3,6 +3,7 @@ import tokens
 from tokens.gameevent import *
 import sys, os
 import pygame
+from config import *
 
 release_build = False
 
@@ -10,24 +11,12 @@ class Game(object):
     """Main game application"""
     def __init__(self):
         super(Game, self).__init__()
-        self.config = {}
         if sys.platform == "darwin" and release_build:
             self.app_path = '../../../'
         else:
             self.app_path = '.'
         self.datapath = os.path.join(self.app_path, "data/")
-        configfile = open(os.path.join(self.app_path, "config.txt"))
-        configlog = configfile.readlines()
-        for line in configlog:
-            if line[0] in ["#", "\n"]:
-                pass
-            else:
-                command = line.rstrip().split()
-                if len(command) > 2:
-                    self.config[command[0]] = command[1:]
-                else:
-                    self.config[command[0]] = command[1]
-        configfile.close()
+        self.config = load_config("config.txt")
         pygame.display.init()
         pygame.font.init()
         self.SCREEN_WIDTH = 1024
