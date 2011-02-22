@@ -19,7 +19,7 @@ class Frame(object):
         positions[int(config["IFF_pos"])] = "IFF"
         positions[int(config["INTRVL_pos"])] = "INTRVL"
         positions[int(config["SHOTS_pos"])] = "SHOTS"
-        if config["new_scoring"] == "f":
+        if not config["new_scoring"]:
             positions[int(config["PNTS_pos"])] = "PNTS"
             positions[int(config["CNTRL_pos"])] = "CNTRL"
             positions[int(config["VLCTY_pos"])] = "VLCTY"
@@ -62,7 +62,7 @@ class Frame(object):
         self.p8_rect = self.p8_surf.get_rect()
         self.p8_rect.centery = 16
         self.p8_rect.centerx = 668
-        if config["new_scoring_pos"] == "t":
+        if config["new_scoring_pos"]:
             self.p1_rect.centery = 15
             self.p1_rect.centerx = 320
             self.p2_rect.centery = 15
@@ -86,7 +86,7 @@ class Frame(object):
         worldsurf.fill((0,0,0))
         scoresurf.fill((0,0,0))
         pygame.draw.rect(worldsurf, (0,255,0), (0,0, 710, 625), self.linewidth) #outer 'world' boundary
-        if self.config["new_scoring_pos"] == "f": #draw frame along bottom of gameworld
+        if not self.config["new_scoring_pos"]: #draw frame along bottom of gameworld
             pygame.draw.rect(scoresurf, (0,255,0), (0,0,710, 63), self.linewidth) #bottom box to hold scores
             pygame.draw.line(scoresurf, (0,255,0), (0,32),(709,32), self.linewidth) #divides bottom box horizontally into two rows
             #the following seven lines divides the bottom box vertically into 8 columns

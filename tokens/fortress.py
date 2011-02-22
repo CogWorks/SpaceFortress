@@ -23,7 +23,7 @@ class Fortress(token.Token):
         self.position.y = int(app.config["fortress_pos_y"])
         self.collision_radius = int(app.config["fortress_radius"]) 
         self.last_orientation = self.orientation 
-        if self.app.config["human"] == "f":
+        if not self.app.config["human"]:
             self.timer = frame_timer(self.app)
         else:
             self.timer = clock_timer()

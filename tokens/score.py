@@ -35,8 +35,8 @@ class Score(object):
             self.position_map[key] = int(self.config[key])
         num_positions = max(self.position_map.values()) + 1
         self.positions = [0] * num_positions
-        self.old_positions = (self.config['new_scoring_pos'] == 'f')
-        if config["new_scoring_pos"] == "f":
+        self.old_positions = not self.config['new_scoring_pos']
+        if self.old_positions:
             self.f = pygame.font.Font("fonts/freesansbold.ttf", 14)
         else:
             self.f = pygame.font.Font("fonts/freesansbold.ttf", 28)
@@ -96,7 +96,7 @@ class Score(object):
         self.p8_rect = self.p8_surf.get_rect()
         self.p8_rect.centery = 48
         self.p8_rect.centerx = 668
-        if self.config["new_scoring_pos"] == "t":
+        if self.config["new_scoring_pos"]:
             self.p1_rect.centery = 40
             self.p1_rect.centerx = 320
             self.p2_rect.centery = 40

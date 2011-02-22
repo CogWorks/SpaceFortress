@@ -7,13 +7,13 @@ def get_default_config():
         
         #Will this game be played by a human or a cognitive model?
         #Set to f to disable human control, enabling ACT-R
-        'human': 't',     
+        'human': True,     
         #Run at full screen? Set to f to run in a window
-        'fullscreen': 'f',
+        'fullscreen': False,
         #Width of lines drawn on screen. Increase for a more "projector-friendly" game
         'linewidth': 1,
         #Original PSF (SF4) settings? If t, *ALL* further values are ignored
-        'psf': 'f',
+        'psf': False,
         #Time in milliseconds for a game.
         #NOTE! If you escape in the middle of a game, the log will have
         #"short" prepended to the name
@@ -30,9 +30,9 @@ def get_default_config():
         'shots_key': 'k',
         'pnts_key': 'l',
         #Print events to stdout
-        'print_events': 'f',
+        'print_events': False,
         #Enable/disable sound
-        'sound': 't',
+        'sound': True,
         
         
         ### SHIP CONSTANTS ###
@@ -84,7 +84,7 @@ def get_default_config():
         #"Radius" of small hexagon.
         'small_hex': 40,
         #Does the outer hex shrink over time?
-        'hex_shrink': 't',
+        'hex_shrink': True,
         #If hex shrinks, to what minimum radius?
         'hex_shrink_radius': 150,
         
@@ -92,7 +92,7 @@ def get_default_config():
         ### FORTRESS CONSTANTS ###
         
         #Does the fortress exist?
-        'fortress_exists': 't',
+        'fortress_exists': True,
         #Time in milliseconds it takes the fortress to lock on to the ship before firing.**
         'fortress_lock_time': 1000,
         #Fortress x position.
@@ -105,7 +105,7 @@ def get_default_config():
         #Bigger means fortress fires more often.
         'fortress_sector_size': 10,
         #Can the fortress be hit if there's a mine onscreen?
-        'hit_fortress_while_mine': 'f',
+        'hit_fortress_while_mine': False,
         #Minimum vulnerability before you can destroy the fortress with a double shot.
         #Note - keep in mind that the first shot of a "double shot" will increase VLNER
         'vlner_threshold': 10,
@@ -125,9 +125,9 @@ def get_default_config():
         ### BONUS SYMBOL CONSTANTS ###
         
         #Do bonuses exist? 
-        'bonus_exists': 't',
+        'bonus_exists': True,
         #Randomize bonus position?
-        'randomize_bonus_pos': 't',
+        'randomize_bonus_pos': True,
         #Bonus x position.
         'bonus_pos_x': 355,
         #Bonus y position.
@@ -149,7 +149,7 @@ def get_default_config():
         ### MINE CONSTANTS ###
         
         #Do mines exists?
-        'mine_exists': 't',
+        'mine_exists': True,
         #Set mine behavior to standard or MOT
         'mine_mode': 'MOT',
         #Number of foe mines.
@@ -173,7 +173,7 @@ def get_default_config():
         #Time in milliseconds for a mine to spawn.
         'mine_spawn': 5000,
         #Does destroying the fortress reset the mine timer?
-        'fortress_resets_mine': 't',      
+        'fortress_resets_mine': True,      
         
         
         ### MOT mines
@@ -201,10 +201,10 @@ def get_default_config():
         ### SCORE CONSTANTS ###
         
         #Use the new scoring system for Flight, Fortress, and Mines? (instead of PNTS, CNTRL, VLCTY and SPEED)
-        'new_scoring': 't',
+        'new_scoring': True,
         #New scoring position is a more "eye-tracker friendly" format that places the scores around the
         #perimeter of the gameworld, rather than just all along the bottom. Set to f for default positioning
-        'new_scoring_pos': 't',        
+        'new_scoring_pos': True,        
         #Set positions for the display elements. 1 = leftmost for original scoring position
         #for new scoring position, 1 = left item on top row, proceeds clockwise
         #PNTS position(or Flight, for new)

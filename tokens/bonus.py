@@ -14,7 +14,7 @@ class Bonus(object):
         super(Bonus, self).__init__()
         self.app = app
         self.symbols = app.config["non_bonus_symbols"]
-        if app.config["randomize_bonus_pos"] == "f":
+        if not app.config["randomize_bonus_pos"]:
             self.x = int(app.config["bonus_pos_x"])
             self.y = int(app.config["bonus_pos_y"])
         else:
@@ -41,7 +41,7 @@ class Bonus(object):
         else:
             self.current_symbol = random.sample(self.symbols, 1)[0]
             self.flag = True
-        if self.app.config["randomize_bonus_pos"] == "t":
+        if self.app.config["randomize_bonus_pos"]:
             self.x = random.randint(30, self.app.WORLD_WIDTH - 30)
             self.y = random.randint(30, self.app.WORLD_HEIGHT - 30)
             

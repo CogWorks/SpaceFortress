@@ -41,7 +41,7 @@ class Game(object):
         self.vector_explosion.set_colorkey((0, 0, 0))
         self.vector_explosion_rect = self.vector_explosion.get_rect()
         self.sounds = tokens.sounds.Sounds(self)
-        if self.config["fullscreen"] == "t":
+        if self.config["fullscreen"]:
             self.screen = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT), pygame.FULLSCREEN)
         else:
             self.screen = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
@@ -51,7 +51,7 @@ class Game(object):
         self.worldsurf = pygame.Surface((self.WORLD_WIDTH, self.WORLD_HEIGHT))
         self.worldrect = self.worldsurf.get_rect()
         self.worldrect.centerx = self.SCREEN_WIDTH/2
-        if self.config["new_scoring_pos"] == "f":
+        if not self.config["new_scoring_pos"]:
             self.worldrect.top = 5
             self.scoresurf = pygame.Surface((self.WORLD_WIDTH, 64))
             self.scorerect = self.scoresurf.get_rect()
@@ -64,7 +64,7 @@ class Game(object):
             #self.scorerect.top = 5
         self.bighex = tokens.hexagon.Hex(self, int(self.config["big_hex"]))
         self.smallhex = tokens.hexagon.Hex(self,int(self.config["small_hex"])) 
-        if self.config["mine_exists"] == 't':
+        if self.config["mine_exists"]:
             self.mine_exists = True
         else:
             self.mine_exists = False
@@ -76,12 +76,12 @@ class Game(object):
         self.missile_list = []
         self.shell_list = []
         self.ship = tokens.ship.Ship(self)
-        if self.config["bonus_exists"] == "t":
+        if self.config["bonus_exists"]:
             self.bonus = tokens.bonus.Bonus(self)
             self.bonus_exists = True
         else:
             self.bonus_exists = False
-        if self.config["fortress_exists"] == "t":
+        if self.config["fortress_exists"]:
             self.fortress = tokens.fortress.Fortress(self)
             self.fortress_exists = True
         else:
@@ -138,7 +138,7 @@ class Game(object):
             self.fortress.compute()
         for shell in self.shell_list:
             shell.compute()
-        if self.config["hex_shrink"] == "t":
+        if self.config["hex_shrink"]:
             self.bighex.compute()
         if self.mine_exists:
             if self.mine_list.flag == False and self.mine_list.timer.elapsed() > self.mine_list.spawn_time:
@@ -176,7 +176,7 @@ class Game(object):
             command = currentevent.command
             obj = currentevent.obj
             target = currentevent.target
-            if self.config["print_events"] == "t":
+            if self.config["print_events"]:
                 print "time %d, command %s, object %s, target %s"%(pygame.time.get_ticks(), command, obj, target)
             if command == "press":    
                 if obj == "quit":
@@ -315,7 +315,7 @@ class Game(object):
                 self.gameevents.add("score-", "fortress", int(self.config["ship_death_penalty"]))
         elif obj.startswith("missile_"):
             #if missile hits fortress, need to check if it takes damage when mine is onscreen
-            if target == "fortress" and (len(self.mine_list) == 0 or self.config["hit_fortress_while_mine"] == 't'):
+            if target == "fortress" and (len(self.mine_list) == 0 or self.config["hit_fortress_while_mine"]):
                 if self.ship.shot_timer.elapsed() >= int(self.config["vlner_time"]):
                     self.gameevents.add("score+", "vlner", 1)
                 if self.ship.shot_timer.elapsed() < int(self.config["vlner_time"]) and self.score.vlner >= int(self.config["vlner_threshold"]):
@@ -327,7 +327,7 @@ class Game(object):
                     self.gameevents.add("score+", "fortress", int(self.config["destroy_fortress"]))
                     self.score.vlner = 0
                     #do we reset the mine timer?
-                    if self.config["fortress_resets_mine"] == 't':
+                    if self.config["fortress_resets_mine"]:
                         self.mine_list.timer.reset()
                         self.mine_list.flag = False
                 if self.ship.shot_timer.elapsed() < int(self.config["vlner_time"]) and self.score.vlner < int(self.config["vlner_threshold"]):
@@ -472,7 +472,7 @@ class Game(object):
     
     def display_foe_mines(self):
         """before game begins, present the list of IFF letters to target"""
-        if self.config["print_events"] == "t":
+        if self.config["print_events"]:
             print int(self.config["num_foes"]), self.mine_list.foe_letters
         self.screen.fill((0,0,0))
         top = self.f24.render("The Type-2 mines for this session are:", True, (255,255,0))
