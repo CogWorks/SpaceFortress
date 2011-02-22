@@ -1,0 +1,3 @@
+[submodule "pycogworld"]
+	path = pycogworld
+	url = git@cwl.cogsci.rpi.edu:pycogworld.git
