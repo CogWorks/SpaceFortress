@@ -161,11 +161,9 @@ class MineList(list):
                 self.MOT_state = "identify"
                 self.MOT_timer.reset()
                 #change some to red
-                numred = random.randint(1, self.MOT_count)
-                seq = range(self.MOT_count)
-                sample = random.sample(seq, numred)
-                for index in sample:
-                    self[index].color = (255,0,0)
+                for i, item in enumerate(self):
+                    if (random.randint(0,1)):
+                        self[i].color = (255,0,0)
                 
             if self.MOT_state == "identify" and self.MOT_timer.elapsed() > self.MOT_identification_time:
                 self.MOT_state = "off"
