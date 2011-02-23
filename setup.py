@@ -8,8 +8,8 @@ Usage:
 from setuptools import setup
 
 NAME = 'psf'
-VERSION = '1.3'
-APP = ['PSF.py']
+VERSION = '5.0'
+APP = ['PSF5.py']
 DATA_FILES = ['gfx', 'sounds', 'fonts']
 OPTIONS = {'iconfile': 'psf.icns', 'argv_emulation': True}
 
