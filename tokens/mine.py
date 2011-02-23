@@ -73,7 +73,7 @@ class MineList(list):
         self.iff_timer = timer.Timer()
         self.iff_flag = False #are we in the middle of trying to identify a foe mine?
         #MOT constants
-        self.f = pygame.font.Font(None, 24)
+        self.f = pygame.font.Font("fonts/freesansbold.ttf", 14)
         self.MOT_count = int(self.app.config["MOT_count"])
         self.MOT_state = "off" #states are off, onset, move, identify
         self.MOT_off_time = int(self.app.config["MOT_off_time"])
