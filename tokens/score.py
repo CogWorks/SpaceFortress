@@ -97,22 +97,31 @@ class Score(object):
         self.p8_rect.centery = 48
         self.p8_rect.centerx = 668
         if self.config["new_scoring_pos"]:
+            # Bottom Left
             self.p1_rect.centery = 40
             self.p1_rect.centerx = 320
+            # Bottom Right
             self.p2_rect.centery = 40
             self.p2_rect.centerx = 660
-            self.p3_rect.centery = 113
+            # Right Bottom
+            self.p3_rect.centery = 213
             self.p3_rect.centerx = 940
-            self.p4_rect.centery = 445
+            # Right Top
+            self.p4_rect.centery = 545
             self.p4_rect.centerx = 940
+            # Top Right
             self.p5_rect.centery = 745
             self.p5_rect.centerx = 660
+            # Top Left
             self.p6_rect.centery = 745
             self.p6_rect.centerx = 320
-            self.p7_rect.centery = 445
+            # Left Top
+            self.p7_rect.centery = 545
             self.p7_rect.centerx = 80
-            self.p8_rect.centery = 113
+            # Left Bottom
+            self.p8_rect.centery = 213
             self.p8_rect.centerx = 80
+        
         if not(int(self.config["INTRVL_pos"]) == 1 and self.intrvl == 0):
             scoresurf.blit(self.p1_surf, self.p1_rect)
         if not(int(self.config["INTRVL_pos"]) == 2 and self.intrvl == 0):
