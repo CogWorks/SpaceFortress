@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 from __future__ import division
 import tokens
 from tokens.gameevent import *
@@ -5,7 +7,7 @@ import sys, os
 import pygame
 import argparse
 from config import *
-from pycogworld import *
+from pycogworks.cogworld import *
 
 def get_psf_version_string():
     return "SpaceFortress 5.0"
