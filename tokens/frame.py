@@ -67,17 +67,17 @@ class Frame(object):
             self.p1_rect.centerx = 320
             self.p2_rect.centery = 15
             self.p2_rect.centerx = 660
-            self.p3_rect.centery = 88
+            self.p3_rect.centery = 188
             self.p3_rect.centerx = 940
-            self.p4_rect.centery = 420
+            self.p4_rect.centery = 520
             self.p4_rect.centerx = 940
             self.p5_rect.centery = 720
             self.p5_rect.centerx = 660
             self.p6_rect.centery = 720
             self.p6_rect.centerx = 320
-            self.p7_rect.centery = 420
+            self.p7_rect.centery = 520
             self.p7_rect.centerx = 80
-            self.p8_rect.centery = 88
+            self.p8_rect.centery = 188
             self.p8_rect.centerx = 80
             
         

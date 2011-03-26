@@ -25,7 +25,7 @@ class Game(object):
         else:
             self.app_path = '.'
         self.datapath = os.path.join(self.app_path, "data/")
-        self.config = load_config("config.txt")
+        self.config = load_config(os.path.join(self.app_path,"config.txt"))
         pygame.display.init()
         pygame.font.init()
         self.SCREEN_WIDTH = 1024
