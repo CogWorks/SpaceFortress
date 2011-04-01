@@ -23,3 +23,5 @@ class Sounds(object):
         self.explosion = SFSound(app, "sounds/ExpFort.wav")
         self.collision = SFSound(app, "sounds/Collision.wav")
         self.vlner_reset = SFSound(app, "sounds/VulnerZeroed.wav")
+        self.bonus_success = SFSound(app, "sounds/bonus_success.wav")
+        self.bonus_fail = SFSound(app, "sounds/bonus_fail.wav")

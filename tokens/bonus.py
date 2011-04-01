@@ -28,6 +28,23 @@ class Bonus(object):
         self.flag = False
         self.probability = float(app.config["bonus_probability"])
         self.timer = Timer()
+        #new attributes for AX-CPT
+        self.cue_time = 250 #time cue is visible
+        self.target_time = 250 #time target is visible
+        self.isi_time = 800 #time between cue and target (variable)
+        self.iti_time = 800 #time between target and cue
+        self.state = "iti" #either iti, cue, isi, or target
+        self.ax_prob = .4 #probability that next pair will be correct cue followed by correct target
+        self.ay_prob = .2
+        self.bx_prob = .2
+        self.by_prob = .2
+        self.a_symbols = ["A"] #symbols to draw for correct cues
+        self.b_symbols = ["B"]
+        self.x_symbols = ["X"]
+        self.y_symbols = ["Y"]
+        self.current_pair = "nothing" #either "ax", "ay", "bx", or "by"
+        self.current_symbols = self.pick_next_pair()
+        self.axcpt_flag = False #bonus is capturable        
         
     def draw(self, worldsurf):
         """draws bonus symbol to screen"""
@@ -44,5 +61,48 @@ class Bonus(object):
         if self.app.config["randomize_bonus_pos"]:
             self.x = random.randint(30, self.app.WORLD_WIDTH - 30)
             self.y = random.randint(30, self.app.WORLD_HEIGHT - 30)
+            
+    def pick_next_pair(self):
+        """picks next cue and target for ax-cpt task"""
+        chance = random.random()
+        if chance < self.ax_prob:
+            self.current_pair = "ax"
+            return([random.choice(self.a_symbols), random.choice(self.x_symbols)])
+        elif chance < (self.ax_prob + self.ay_prob):
+            self.current_pair = "ay"
+            return([random.choice(self.a_symbols), random.choice(self.y_symbols)])
+        elif chance < (self.ax_prob + self.ay_prob + self.bx_prob):
+            self.current_pair = "bx"
+            return([random.choice(self.b_symbols), random.choice(self.x_symbols)])
+        else: 
+            self.current_pair = "by"
+            return([random.choice(self.b_symbols), random.choice(self.y_symbols)])
+            
+    def axcpt_update(self):
+        """check what to do with ax-cpt task based on state and timer"""
+        if self.state == "iti" and self.timer.elapsed() > self.iti_time: #time for a new pair, make cue visible
+            self.timer.reset()
+            self.state = "cue"
+            self.current_symbols = self.pick_next_pair()
+            self.axcpt_flag = True
+            self.current_symbol = self.current_symbols[0]
+            self.visible = True
+        elif self.state == "cue" and self.timer.elapsed() > self.cue_time: #make cue disappear
+            self.timer.reset()
+            self.state = "isi"
+            self.visible = False
+        elif self.state == "isi" and self.timer.elapsed() > self.isi_time: #make target appear
+            self.timer.reset()
+            if self.isi_time == 800:
+                self.isi_time = 4000
+            else:
+                self.isi_time = 800
+            self.state = "target"
+            self.current_symbol = self.current_symbols[1]
+            self.visible = True
+        elif self.state == "target" and self.timer.elapsed() > self.target_time: #make target disappear
+            self.timer.reset()
+            self.state = "iti"
+            self.visible = False
             
         

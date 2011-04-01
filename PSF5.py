@@ -173,10 +173,13 @@ class Game(object):
                 self.gameevents.add("score+", "cntrl", int(self.config["CNTRL_increment"])/2)
                 self.gameevents.add("score+", "flight", int(self.config["CNTRL_increment"])/2)
         if self.bonus_exists:
-            if self.bonus.visible == False and self.bonus.timer.elapsed() > int(self.config["symbol_down_time"]):
-                self.gameevents.add("activate", "bonus")
-            elif self.bonus.visible == True and self.bonus.timer.elapsed() >= int(self.config["symbol_up_time"]):
-                self.gameevents.add("deactivate", "bonus", self.bonus.current_symbol)
+            if self.config['bonus_system'] == "AX-CPT":
+                self.bonus.axcpt_update()
+            else:
+                if self.bonus.visible == False and self.bonus.timer.elapsed() > int(self.config["symbol_down_time"]):
+                    self.gameevents.add("activate", "bonus")
+                elif self.bonus.visible == True and self.bonus.timer.elapsed() >= int(self.config["symbol_up_time"]):
+                    self.gameevents.add("deactivate", "bonus", self.bonus.current_symbol)
     
     def process_events(self):
         """processes internal list of game events for this frame"""
@@ -221,32 +224,46 @@ class Game(object):
                         else:
                             self.gameevents.add("second_tag", "out_of_bounds")
                 elif obj == "shots":
-                    #if current symbol is bonus but previous wasn't, set flag to deny bonus if next symbol happens to be the bonus symbol
-                    if (self.bonus.current_symbol == self.bonus.bonus_symbol) and (self.bonus.prior_symbol != self.bonus.bonus_symbol):
-                        self.bonus.flag = True
-                        self.gameevents.add("flagged_for_first_bonus")
-                    if (self.bonus.current_symbol == self.bonus.bonus_symbol) and (self.bonus.prior_symbol == self.bonus.bonus_symbol):
-                        #bonus available, check flag to award or deny bonus
-                        if self.bonus.flag:
-                            self.gameevents.add("attempt_to_capture_flagged_bonus")
-                        else:
-                            self.gameevents.add("shots_bonus_capture")
-                            self.gameevents.add("score++", "shots", int(self.config["bonus_missiles"]))
+                    if self.config["bonus_system"] == "standard":
+                        #if current symbol is bonus but previous wasn't, set flag to deny bonus if next symbol happens to be the bonus symbol
+                        if (self.bonus.current_symbol == self.bonus.bonus_symbol) and (self.bonus.prior_symbol != self.bonus.bonus_symbol):
                             self.bonus.flag = True
+                            self.gameevents.add("flagged_for_first_bonus")
+                        if (self.bonus.current_symbol == self.bonus.bonus_symbol) and (self.bonus.prior_symbol == self.bonus.bonus_symbol):
+                            #bonus available, check flag to award or deny bonus
+                            if self.bonus.flag:
+                                self.gameevents.add("attempt_to_capture_flagged_bonus")
+                            else:
+                                self.gameevents.add("shots_bonus_capture")
+                                self.gameevents.add("score++", "shots", int(self.config["bonus_missiles"]))
+                                self.bonus.flag = True
+                    else: #AX-CPT
+                        if self.bonus.axcpt_flag == True and (self.bonus.state == "iti" or self.bonus.state == "target") and self.bonus.current_pair == "ax":
+                            self.sounds.bonus_success.play()
+                        elif self.bonus.axcpt_flag:
+                            self.bonus.axcpt_flag = False
+                            self.sounds.bonus_fail.play()
                 elif obj == "pnts":
+                    if self.config["bonus_system"] == "standard":
                     #if current symbol is bonus but previous wasn't, set flag to deny bonus if next symbol happens to be the bonus symbol
-                    if (self.bonus.current_symbol == self.bonus.bonus_symbol) and (self.bonus.prior_symbol != self.bonus.bonus_symbol):
-                        self.bonus.flag = True
-                        self.gameevents.add("flagged_for_first_bonus")
-                    if (self.bonus.current_symbol == self.bonus.bonus_symbol) and (self.bonus.prior_symbol == self.bonus.bonus_symbol):
-                        #bonus available, check flag to award or deny bonus
-                        if self.bonus.flag:
-                            self.gameevents.add("attempt_to_capture_flagged_bonus")
-                        else:
-                            self.gameevents.add("shots_pnts_capture")
-                            self.gameevents.add("score++", "bonus", int(self.config["bonus_missiles"]))
-                            self.gameevents.add("score++", "pnts", int(self.config["bonus_missiles"]))
+                        if (self.bonus.current_symbol == self.bonus.bonus_symbol) and (self.bonus.prior_symbol != self.bonus.bonus_symbol):
                             self.bonus.flag = True
+                            self.gameevents.add("flagged_for_first_bonus")
+                        if (self.bonus.current_symbol == self.bonus.bonus_symbol) and (self.bonus.prior_symbol == self.bonus.bonus_symbol):
+                            #bonus available, check flag to award or deny bonus
+                            if self.bonus.flag:
+                                self.gameevents.add("attempt_to_capture_flagged_bonus")
+                            else:
+                                self.gameevents.add("shots_pnts_capture")
+                                self.gameevents.add("score++", "bonus", int(self.config["bonus_missiles"]))
+                                self.gameevents.add("score++", "pnts", int(self.config["bonus_missiles"]))
+                                self.bonus.flag = True
+                    else: #AX-CPT
+                        if self.bonus.axcpt_flag == True and (self.bonus.state == "iti" or self.bonus.state == "target") and self.bonus.current_pair == "ax":
+                            self.sounds.bonus_success.play()
+                        elif self.bonus.axcpt_flag:
+                            self.bonus.axcpt_flag = False
+                            self.sounds.bonus_fail.play()
             elif command == "first_tag":
                 if obj == "foe":
                     self.mine_list.iff_flag = True

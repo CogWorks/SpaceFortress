@@ -84,7 +84,7 @@ def get_default_config():
         #"Radius" of small hexagon.
         'small_hex': 40,
         #Does the outer hex shrink over time?
-        'hex_shrink': True,
+        'hex_shrink': False,
         #If hex shrinks, to what minimum radius?
         'hex_shrink_radius': 150,
         
@@ -126,8 +126,10 @@ def get_default_config():
         
         #Do bonuses exist? 
         'bonus_exists': True,
+        #Bonus system standard or AX-CPT?
+        'bonus_system': "AX-CPT",
         #Randomize bonus position?
-        'randomize_bonus_pos': True,
+        'randomize_bonus_pos': False,
         #Bonus x position.
         'bonus_pos_x': 355,
         #Bonus y position.
@@ -149,9 +151,9 @@ def get_default_config():
         ### MINE CONSTANTS ###
         
         #Do mines exists?
-        'mine_exists': True,
+        'mine_exists': False,
         #Set mine behavior to standard or MOT
-        'mine_mode': 'MOT',
+        'mine_mode': 'standard',
         #Number of foe mines.
         'num_foes': 3,
         #Mine collision radius.
@@ -201,7 +203,7 @@ def get_default_config():
         ### SCORE CONSTANTS ###
         
         #Use the new scoring system for Flight, Fortress, and Mines? (instead of PNTS, CNTRL, VLCTY and SPEED)
-        'new_scoring': True,
+        'new_scoring': False,
         #New scoring position is a more "eye-tracker friendly" format that places the scores around the
         #perimeter of the gameworld, rather than just all along the bottom. Set to f for default positioning
         'new_scoring_pos': True,        
