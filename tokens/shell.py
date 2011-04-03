@@ -19,7 +19,7 @@ class Shell(token.Token):
         self.orientation = orientation
         self.position.x = self.app.fortress.position.x
         self.position.y = self.app.fortress.position.y
-        self.speed = int(app.config["shell_speed"])
+        self.speed = self.app.config.get_setting('Shell','shell_speed')
         self.collision_radius = 3
         self.velocity.x = math.cos(math.radians((self.orientation) % 360)) * self.speed
         self.velocity.y = -math.sin(math.radians((self.orientation) % 360)) * self.speed

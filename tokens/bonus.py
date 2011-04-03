@@ -13,20 +13,20 @@ class Bonus(object):
     def __init__(self, app):
         super(Bonus, self).__init__()
         self.app = app
-        self.symbols = app.config["non_bonus_symbols"]
-        if not app.config["randomize_bonus_pos"]:
-            self.x = int(app.config["bonus_pos_x"])
-            self.y = int(app.config["bonus_pos_y"])
+        self.symbols = self.app.config.get_setting('Bonus','non_bonus_symbols')
+        if not self.app.config.get_setting('Bonus','randomize_bonus_pos'):
+            self.x = self.app.config.get_setting('Bonus','bonus_pos_x')
+            self.y = self.app.config.get_setting('Bonus','bonus_pos_y')
         else:
             self.x = random.randint(20, app.WORLD_WIDTH - 10)
             self.y = random.randint(20, app.WORLD_HEIGHT - 20)
         self.visible = False
         self.font = pygame.font.Font("fonts/freesansbold.ttf", 28)
-        self.bonus_symbol = app.config["bonus_symbol"]
+        self.bonus_symbol = self.app.config.get_setting('Bonus','bonus_symbol')
         self.current_symbol = None
         self.prior_symbol = None
         self.flag = False
-        self.probability = float(app.config["bonus_probability"])
+        self.probability = self.app.config.get_setting('Bonus','bonus_probability')
         self.timer = Timer()
         #new attributes for AX-CPT
         self.cue_time = 250 #time cue is visible
@@ -58,7 +58,7 @@ class Bonus(object):
         else:
             self.current_symbol = random.sample(self.symbols, 1)[0]
             self.flag = True
-        if self.app.config["randomize_bonus_pos"]:
+        if self.app.config.get_setting('Bonus','randomize_bonus_pos'):
             self.x = random.randint(30, self.app.WORLD_WIDTH - 30)
             self.y = random.randint(30, self.app.WORLD_HEIGHT - 30)
             

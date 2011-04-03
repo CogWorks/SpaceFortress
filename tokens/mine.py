@@ -23,11 +23,11 @@ class Mine(token.Token):
         self.position.y = 0 #400
         self.app = app
         #set random pos
-        self.speed = int(self.app.config["mine_speed"])
+        self.speed = self.app.config.get_setting('Mine','mine_speed')
         self.health = 1
         self.alive = True
-        self.collision_radius = int(self.app.config["mine_radius"])
-        self.foe_probability = float(self.app.config["mine_probability"])
+        self.collision_radius = self.app.config.get_setting('Mine','mine_radius')
+        self.foe_probability = self.app.config.get_setting('Mine','mine_probability')
         self.iff = None
         self.tagged = "untagged"
         self.color = (0, 255, 255)
@@ -57,33 +57,33 @@ class MineList(list):
     def __init__(self, app):
         super(MineList, self).__init__()
         self.app = app
-        self.mine_mode = self.app.config["mine_mode"]
-        self.minimum_spawn_distance = int(self.app.config["minimum_spawn_distance"])
-        self.maximum_spawn_distance = int(self.app.config["maximum_spawn_distance"])
-        self.iff_lower_bound = int(self.app.config["intrvl_min"])
-        self.iff_upper_bound = int(self.app.config["intrvl_max"])
-        self.num_foes = int(self.app.config["num_foes"])
+        self.mine_mode = self.app.config.get_setting('Mine','mine_mode')
+        self.minimum_spawn_distance = self.app.config.get_setting('Mine','minimum_spawn_distance')
+        self.maximum_spawn_distance = self.app.config.get_setting('Mine','maximum_spawn_distance')
+        self.iff_lower_bound = self.app.config.get_setting('Mine','intrvl_min')
+        self.iff_upper_bound = self.app.config.get_setting('Mine','intrvl_max')
+        self.num_foes = self.app.config.get_setting('Mine','num_foes')
         self.letters = list(string.letters[26:]) #list of uppercase letters
         self.letters.remove("T") #Screws up Lisp's read-from-string
         self.generate_foes(self.num_foes)
-        self.timeout = int(self.app.config["mine_timeout"]) #milliseconds after spawn when mine "gives up"
-        self.spawn_time = int(self.app.config["mine_spawn"]) #milliseconds after destruction when mine "respawns"
+        self.timeout = self.app.config.get_setting('Mine','mine_timeout') #milliseconds after spawn when mine "gives up"
+        self.spawn_time = self.app.config.get_setting('Mine','mine_spawn') #milliseconds after destruction when mine "respawns"
         self.timer = timer.Timer()
         self.flag = False #for timer, to determine state of standard mine
         self.iff_timer = timer.Timer()
         self.iff_flag = False #are we in the middle of trying to identify a foe mine?
         #MOT constants
         self.f = pygame.font.Font("fonts/freesansbold.ttf", 14)
-        self.MOT_count = int(self.app.config["MOT_count"])
+        self.MOT_count = self.app.config.get_setting('MOT','MOT_count')
         self.MOT_state = "off" #states are off, onset, move, identify
-        self.MOT_off_time = int(self.app.config["MOT_off_time"])
-        self.MOT_onset_time = int(self.app.config["MOT_onset_time"])
-        self.MOT_move_time = int(self.app.config["MOT_move_time"])     
-        self.MOT_switch_time = int(self.app.config["MOT_switch_time"])
-        self.MOT_max_deflection = int(self.app.config["MOT_max_deflection"])
-        self.MOT_movement_style = self.app.config["MOT_movement_style"]
-        self.MOT_identification_time = int(self.app.config["MOT_identification_time"])
-        self.MOT_identification_type = self.app.config["MOT_identification_type"]
+        self.MOT_off_time = self.app.config.get_setting('MOT','MOT_off_time')
+        self.MOT_onset_time = self.app.config.get_setting('MOT','MOT_onset_time')
+        self.MOT_move_time = self.app.config.get_setting('MOT','MOT_move_time')     
+        self.MOT_switch_time = self.app.config.get_setting('MOT','MOT_switch_time')
+        self.MOT_max_deflection = self.app.config.get_setting('MOT','MOT_max_deflection')
+        self.MOT_movement_style = self.app.config.get_setting('MOT','MOT_movement_style')
+        self.MOT_identification_time = self.app.config.get_setting('MOT','MOT_identification_time')
+        self.MOT_identification_type = self.app.config.get_setting('MOT','MOT_identification_type')
         self.MOT_timer = timer.Timer() #determines when MOT mines change state
         self.MOT_switch_timer = timer.Timer() #determine when moving MOT mine changes direction
         

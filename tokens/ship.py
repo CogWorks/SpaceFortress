@@ -16,24 +16,24 @@ class Ship(token.Token):
     def __init__(self, app):
         super(Ship, self).__init__()
         self.app = app
-        self.collision_radius = int(app.config["ship_radius"])
-        self.position.x = int(app.config["ship_pos_x"])
-        self.position.y = int(app.config["ship_pos_y"])
-        self.velocity.x = int(app.config["ship_vel_x"])
-        self.velocity.y = int(app.config["ship_vel_y"])
-        self.orientation = int(app.config["ship_orientation"])
-        self.missile_capacity = int(app.config["missile_max"])
-        self.missile_count = int(app.config["missile_num"])
+        self.collision_radius = self.app.config.get_setting('Ship','ship_radius')
+        self.position.x = self.app.config.get_setting('Ship','ship_pos_x')
+        self.position.y = self.app.config.get_setting('Ship','ship_pos_y')
+        self.velocity.x = self.app.config.get_setting('Ship','ship_vel_x')
+        self.velocity.y = self.app.config.get_setting('Ship','ship_vel_y')
+        self.orientation = self.app.config.get_setting('Ship','ship_orientation')
+        self.missile_capacity = self.app.config.get_setting('Missle','missile_max')
+        self.missile_count = self.app.config.get_setting('Missle','missile_num')
         self.thrust_flag = False
         self.thrust = 0
         self.turn_flag = False
         self.fire_flag = False
-        self.turn_speed = int(app.config["ship_turn_speed"])
+        self.turn_speed = self.app.config.get_setting('Ship','ship_turn_speed')
         self.acceleration = 0
-        self.acceleration_factor = float(app.config["ship_acceleration"])
-        self.start_health = int(app.config["ship_hit_points"])
-        self.health = int(app.config["ship_hit_points"])
-        self.max_vel = int(app.config["ship_max_vel"])
+        self.acceleration_factor = self.app.config.get_setting('Ship','ship_acceleration')
+        self.start_health = self.app.config.get_setting('Ship','ship_hit_points')
+        self.health = self.app.config.get_setting('Ship','ship_hit_points')
+        self.max_vel = self.app.config.get_setting('Ship','ship_max_vel')
         self.alive = True
         self.small_hex_flag = False #did we hit the small hex?
         self.shot_timer = Timer() #time between shots, for VLNER assessment
@@ -83,8 +83,8 @@ class Ship(token.Token):
         if self.app.score.shots > 0:
             self.app.score.shots -= 1
         else:
-            self.app.score.pnts -= int(self.app.config["missile_penalty"])
-            self.app.score.bonus -= int(self.app.config["missile_penalty"])
+            self.app.score.pnts -= self.app.config.get_setting('Missle','missile_penalty')
+            self.app.score.bonus -= self.app.config.get_setting('Missle','missile_penalty')
             
     def draw(self, worldsurf):
         """draw ship to worldsurf"""

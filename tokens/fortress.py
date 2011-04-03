@@ -19,16 +19,16 @@ class Fortress(token.Token):
     def __init__(self, app):
         super(Fortress, self).__init__()
         self.app = app
-        self.position.x = int(app.config["fortress_pos_x"])
-        self.position.y = int(app.config["fortress_pos_y"])
-        self.collision_radius = int(app.config["fortress_radius"]) 
+        self.position.x = self.app.config.get_setting('Fortress','fortress_pos_x')
+        self.position.y = self.app.config.get_setting('Fortress','fortress_pos_y')
+        self.collision_radius = self.app.config.get_setting('Fortress','fortress_radius') 
         self.last_orientation = self.orientation 
-        if not self.app.config["human"]:
+        if not self.app.config.get_setting('General','human'):
             self.timer = frame_timer(self.app)
         else:
             self.timer = clock_timer()
-        self.sector_size = int(app.config["fortress_sector_size"])
-        self.lock_time = int(app.config["fortress_lock_time"])
+        self.sector_size = self.app.config.get_setting('Fortress','fortress_sector_size')
+        self.lock_time = self.app.config.get_setting('Fortress','fortress_lock_time')
         self.reset_timer = clock_timer()
         self.alive = True
         

@@ -25,32 +25,33 @@ class Game(object):
         else:
             self.app_path = '.'
         self.datapath = os.path.join(self.app_path, "data/")
-        self.config = load_config(os.path.join(self.app_path,"config.txt"))
+        #self.config = load_config(os.path.join(self.app_path,"config.txt"))
+        self.config = Config()
         pygame.display.init()
         pygame.font.init()
         self.SCREEN_WIDTH = 1024
         self.SCREEN_HEIGHT = 768
         self.WORLD_WIDTH = 710
         self.WORLD_HEIGHT = 626
-        self.linewidth = int(self.config["linewidth"])
+        self.linewidth = self.config.get_setting('General','linewidth')
         self.frame = tokens.frame.Frame(self.config)
         self.score = tokens.score.Score(self.config)
         self.f = pygame.font.Font("fonts/freesansbold.ttf", 14)
         self.f24 = pygame.font.Font("fonts/freesansbold.ttf", 20)
         self.f96 = pygame.font.Font("fonts/freesansbold.ttf", 72)
         self.f36 = pygame.font.Font("fonts/freesansbold.ttf", 36)
-        self.thrust_key = eval("pygame.K_%s"%self.config["thrust_key"])
-        self.left_turn_key = eval("pygame.K_%s"%self.config["left_turn_key"])
-        self.right_turn_key = eval("pygame.K_%s"%self.config["right_turn_key"])
-        self.fire_key = eval("pygame.K_%s"%self.config["fire_key"])
-        self.IFF_key = eval("pygame.K_%s"%self.config["IFF_key"])
-        self.shots_key = eval("pygame.K_%s"%self.config["shots_key"])
-        self.pnts_key = eval("pygame.K_%s"%self.config["pnts_key"])
+        self.thrust_key = eval("pygame.K_%s" % self.config.get_setting('Keybindings','thrust_key'))
+        self.left_turn_key = eval("pygame.K_%s" % self.config.get_setting('Keybindings','left_turn_key'))
+        self.right_turn_key = eval("pygame.K_%s" % self.config.get_setting('Keybindings','right_turn_key'))
+        self.fire_key = eval("pygame.K_%s" % self.config.get_setting('Keybindings','fire_key'))
+        self.IFF_key = eval("pygame.K_%s" % self.config.get_setting('Keybindings','IFF_key'))
+        self.shots_key = eval("pygame.K_%s" % self.config.get_setting('Keybindings','shots_key'))
+        self.pnts_key = eval("pygame.K_%s" % self.config.get_setting('Keybindings','pnts_key'))
         self.vector_explosion = pygame.image.load("gfx/exp.png")
         self.vector_explosion.set_colorkey((0, 0, 0))
         self.vector_explosion_rect = self.vector_explosion.get_rect()
         self.sounds = tokens.sounds.Sounds(self)
-        if self.config["fullscreen"]:
+        if self.config.get_setting('General','fullscreen'):
             self.screen = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT), pygame.FULLSCREEN)
         else:
             self.screen = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
@@ -60,7 +61,7 @@ class Game(object):
         self.worldsurf = pygame.Surface((self.WORLD_WIDTH, self.WORLD_HEIGHT))
         self.worldrect = self.worldsurf.get_rect()
         self.worldrect.centerx = self.SCREEN_WIDTH/2
-        if not self.config["new_scoring_pos"]:
+        if not self.config.get_setting('Score','new_scoring_pos'):
             self.worldrect.top = 5
             self.scoresurf = pygame.Surface((self.WORLD_WIDTH, 64))
             self.scorerect = self.scoresurf.get_rect()
@@ -71,9 +72,9 @@ class Game(object):
             self.scoresurf = pygame.Surface.copy(self.screen)
             self.scorerect = self.screen.get_rect()
             #self.scorerect.top = 5
-        self.bighex = tokens.hexagon.Hex(self, int(self.config["big_hex"]))
-        self.smallhex = tokens.hexagon.Hex(self,int(self.config["small_hex"])) 
-        if self.config["mine_exists"]:
+        self.bighex = tokens.hexagon.Hex(self, self.config.get_setting('Hexagon','big_hex'))
+        self.smallhex = tokens.hexagon.Hex(self, self.config.get_setting('Hexagon','small_hex')) 
+        if self.config.get_setting('Mine','mine_exists'):
             self.mine_exists = True
         else:
             self.mine_exists = False
@@ -85,12 +86,12 @@ class Game(object):
         self.missile_list = []
         self.shell_list = []
         self.ship = tokens.ship.Ship(self)
-        if self.config["bonus_exists"]:
+        if self.config.get_setting('Bonus','bonus_exists'):
             self.bonus = tokens.bonus.Bonus(self)
             self.bonus_exists = True
         else:
             self.bonus_exists = False
-        if self.config["fortress_exists"]:
+        if self.config.get_setting('Fortress','fortress_exists'):
             self.fortress = tokens.fortress.Fortress(self)
             self.fortress_exists = True
         else:
@@ -147,7 +148,7 @@ class Game(object):
             self.fortress.compute()
         for shell in self.shell_list:
             shell.compute()
-        if self.config["hex_shrink"]:
+        if self.config.get_setting('Hexagon','hex_shrink'):
             self.bighex.compute()
         if self.mine_exists:
             if self.mine_list.flag == False and self.mine_list.timer.elapsed() > self.mine_list.spawn_time:
@@ -158,27 +159,27 @@ class Game(object):
         self.check_bounds()
         #test collisions to generate game events
         self.test_collisions()
-        if self.flighttimer.elapsed() > int(self.config["update_timer"]):
+        if self.flighttimer.elapsed() > self.config.get_setting('Score','update_timer'):
             self.flighttimer.reset()
-            if (self.ship.velocity.x **2 + self.ship.velocity.y **2)**0.5 < int(self.config["speed_threshold"]):
-                self.gameevents.add("score+", "vlcty", int(self.config["VLCTY_increment"]))
-                self.gameevents.add("score+", "flight", int(self.config["VLCTY_increment"]))
+            if (self.ship.velocity.x **2 + self.ship.velocity.y **2)**0.5 < self.config.get_setting('Score','speed_threshold'):
+                self.gameevents.add("score+", "vlcty", self.config.get_setting('Score','VLCTY_increment'))
+                self.gameevents.add("score+", "flight", self.config.get_setting('Score','VLCTY_increment'))
             else:
-                self.gameevents.add("score-", "vlcty", int(self.config["VLCTY_increment"]))
-                self.gameevents.add("score-", "flight", int(self.config["VLCTY_increment"]))
+                self.gameevents.add("score-", "vlcty", self.config.get_setting('Score','VLCTY_increment'))
+                self.gameevents.add("score-", "flight", self.config.get_setting('Score','VLCTY_increment'))
             if self.bighex.collide(self.ship):
-                self.gameevents.add("score+", "cntrl", int(self.config["CNTRL_increment"]))
-                self.gameevents.add("score+", "flight", int(self.config["CNTRL_increment"]))
+                self.gameevents.add("score+", "cntrl", self.config.get_setting('Score','CNTRL_increment'))
+                self.gameevents.add("score+", "flight", self.config.get_setting('Score','CNTRL_increment'))
             else:
-                self.gameevents.add("score+", "cntrl", int(self.config["CNTRL_increment"])/2)
-                self.gameevents.add("score+", "flight", int(self.config["CNTRL_increment"])/2)
+                self.gameevents.add("score+", "cntrl", self.config.get_setting('Score','CNTRL_increment')/2)
+                self.gameevents.add("score+", "flight", self.config.get_setting('Score','CNTRL_increment')/2)
         if self.bonus_exists:
-            if self.config['bonus_system'] == "AX-CPT":
+            if self.config.get_setting('Bonus','bonus_system') == "AX-CPT":
                 self.bonus.axcpt_update()
             else:
-                if self.bonus.visible == False and self.bonus.timer.elapsed() > int(self.config["symbol_down_time"]):
+                if self.bonus.visible == False and self.bonus.timer.elapsed() > self.config.get_setting('Bonus','symbol_down_time'):
                     self.gameevents.add("activate", "bonus")
-                elif self.bonus.visible == True and self.bonus.timer.elapsed() >= int(self.config["symbol_up_time"]):
+                elif self.bonus.visible == True and self.bonus.timer.elapsed() >= self.config.get_setting('Bonus','symbol_up_time'):
                     self.gameevents.add("deactivate", "bonus", self.bonus.current_symbol)
     
     def process_events(self):
@@ -188,7 +189,7 @@ class Game(object):
             command = currentevent.command
             obj = currentevent.obj
             target = currentevent.target
-            if self.config["print_events"]:
+            if self.config.get_setting('General','print_events'):
                 print "time %d, command %s, object %s, target %s"%(pygame.time.get_ticks(), command, obj, target)
             if command == "press":    
                 if obj == "quit":
@@ -219,12 +220,12 @@ class Game(object):
                     #if the mine is a foe, untagged, and this is the second tap, check timer, set intrvl
                     elif self.mine_list[0].tagged == "untagged" and self.mine_list.iff_flag:
                         self.score.intrvl = self.mine_list.iff_timer.elapsed()
-                        if (self.mine_list.iff_timer.elapsed() > int(self.config["intrvl_min"])) and (self.mine_list.iff_timer.elapsed() < int(self.config["intrvl_max"])):
+                        if (self.mine_list.iff_timer.elapsed() > self.config.get_setting('Mine','intrvl_min')) and (self.mine_list.iff_timer.elapsed() < self.config.get_setting('Mine','intrvl_max')):
                             self.gameevents.add("second_tag", "foe")
                         else:
                             self.gameevents.add("second_tag", "out_of_bounds")
                 elif obj == "shots":
-                    if self.config["bonus_system"] == "standard":
+                    if self.config.get_setting('Bonus','bonus_system') == "standard":
                         #if current symbol is bonus but previous wasn't, set flag to deny bonus if next symbol happens to be the bonus symbol
                         if (self.bonus.current_symbol == self.bonus.bonus_symbol) and (self.bonus.prior_symbol != self.bonus.bonus_symbol):
                             self.bonus.flag = True
@@ -235,7 +236,7 @@ class Game(object):
                                 self.gameevents.add("attempt_to_capture_flagged_bonus")
                             else:
                                 self.gameevents.add("shots_bonus_capture")
-                                self.gameevents.add("score++", "shots", int(self.config["bonus_missiles"]))
+                                self.gameevents.add("score++", "shots", self.config.get_setting('Score','bonus_missiles'))
                                 self.bonus.flag = True
                     else: #AX-CPT
                         if self.bonus.axcpt_flag == True and (self.bonus.state == "iti" or self.bonus.state == "target") and self.bonus.current_pair == "ax":
@@ -244,7 +245,7 @@ class Game(object):
                             self.bonus.axcpt_flag = False
                             self.sounds.bonus_fail.play()
                 elif obj == "pnts":
-                    if self.config["bonus_system"] == "standard":
+                    if self.config.get_setting('Bonus','bonus_system') == "standard":
                     #if current symbol is bonus but previous wasn't, set flag to deny bonus if next symbol happens to be the bonus symbol
                         if (self.bonus.current_symbol == self.bonus.bonus_symbol) and (self.bonus.prior_symbol != self.bonus.bonus_symbol):
                             self.bonus.flag = True
@@ -280,8 +281,8 @@ class Game(object):
                 elif obj == "thrust":
                     self.ship.thrust_flag = False
             elif command == "warp":
-                self.gameevents.add("score-", "pnts", int(self.config["warp_penalty"]))
-                self.gameevents.add("score-", "flight", int(self.config["warp_penalty"])) 
+                self.gameevents.add("score-", "pnts", self.config.get_setting('Score','warp_penalty'))
+                self.gameevents.add("score-", "flight", self.config.get_setting('Score','warp_penalty')) 
             elif command == "activate":
                 if obj == "bonus":
                     self.bonus.visible = True
@@ -312,7 +313,7 @@ class Game(object):
                     del self.mine_list[0]
                 self.score.iff = ''
                 self.score.intrvl = 0
-                self.gameevents.add("score-", "mines", int(self.config["mine_timeout_penalty"]))
+                self.gameevents.add("score-", "mines", self.config.get_setting('Score','mine_timeout_penalty'))
             elif command == "score+":
                 self.score.__setattr__(obj, self.score.__getattribute__(obj) + target)
             elif command == "score-":
@@ -326,37 +327,37 @@ class Game(object):
         if obj == "small_hex" and not self.smallhex.small_hex_flag:
             self.ship.velocity.x = -self.ship.velocity.x
             self.ship.velocity.y = -self.ship.velocity.y
-            self.gameevents.add("score-", "pnts", int(self.config["small_hex_penalty"]))
-            self.gameevents.add("score-", "flight", int(self.config["small_hex_penalty"]))
+            self.gameevents.add("score-", "pnts", self.config.get_setting('Score','small_hex_penalty'))
+            self.gameevents.add("score-", "flight", self.config.get_setting('Score','small_hex_penalty'))
             self.smallhex.small_hex_flag = True
         elif obj == "shell":
             #remove shell, target is index of shell in shell_list
             del self.shell_list[target]
-            self.gameevents.add("score-", "pnts", int(self.config["shell_hit_penalty"]))
-            self.gameevents.add("score-", "fortress", int(self.config["shell_hit_penalty"]))
+            self.gameevents.add("score-", "pnts", self.config.get_setting('Score','shell_hit_penalty'))
+            self.gameevents.add("score-", "fortress", self.config.get_setting('Score','shell_hit_penalty'))
             self.ship.take_damage()
             if not self.ship.alive:
                 self.gameevents.add("destroyed", "ship", "shell")
-                self.gameevents.add("score-", "pnts", int(self.config["ship_death_penalty"]))
-                self.gameevents.add("score-", "fortress", int(self.config["ship_death_penalty"]))
+                self.gameevents.add("score-", "pnts", self.config.get_setting('Score','ship_death_penalty'))
+                self.gameevents.add("score-", "fortress", self.config.get_setting('Score','ship_death_penalty'))
         elif obj.startswith("missile_"):
             #if missile hits fortress, need to check if it takes damage when mine is onscreen
-            if target == "fortress" and (len(self.mine_list) == 0 or self.config["hit_fortress_while_mine"]):
-                if self.ship.shot_timer.elapsed() >= int(self.config["vlner_time"]):
+            if target == "fortress" and (len(self.mine_list) == 0 or self.config.get_setting('Fortress','hit_fortress_while_mine')):
+                if self.ship.shot_timer.elapsed() >= self.config.get_setting('Fortress','vlner_time'):
                     self.gameevents.add("score+", "vlner", 1)
-                if self.ship.shot_timer.elapsed() < int(self.config["vlner_time"]) and self.score.vlner >= int(self.config["vlner_threshold"]):
+                if self.ship.shot_timer.elapsed() < self.config.get_setting('Fortress','vlner_time') and self.score.vlner >= self.config.get_setting('Fortress','vlner_threshold'):
                     self.gameevents.add("destroyed", "fortress")
                     self.fortress.alive = False
                     self.fortress.reset_timer.reset()
                     self.sounds.explosion.play()
-                    self.gameevents.add("score+", "pnts", int(self.config["destroy_fortress"]))
-                    self.gameevents.add("score+", "fortress", int(self.config["destroy_fortress"]))
+                    self.gameevents.add("score+", "pnts", self.config.get_setting('Score','destroy_fortress'))
+                    self.gameevents.add("score+", "fortress", self.config.get_setting('Score','destroy_fortress'))
                     self.score.vlner = 0
                     #do we reset the mine timer?
-                    if self.config["fortress_resets_mine"]:
+                    if self.config.get_setting('Mine','fortress_resets_mine'):
                         self.mine_list.timer.reset()
                         self.mine_list.flag = False
-                if self.ship.shot_timer.elapsed() < int(self.config["vlner_time"]) and self.score.vlner < int(self.config["vlner_threshold"]):
+                if self.ship.shot_timer.elapsed() < self.config.get_setting('Fortress','vlner_time') and self.score.vlner < self.config.get_setting('Fortress','vlner_threshold'):
                     self.gameevents.add("reset", "VLNER")
                     self.score.vlner = 0
                     self.sounds.vlner_reset.play()
@@ -381,18 +382,18 @@ class Game(object):
             self.score.intrvl = 0
             self.mine_list.flag = False
             self.mine_list.timer.reset()
-            self.gameevents.add("score-", "pnts", int(self.config["mine_hit_penalty"]))
-            self.gameevents.add("score-", "mines", int(self.config["mine_hit_penalty"]))
+            self.gameevents.add("score-", "pnts", self.config.get_setting('Score','mine_hit_penalty'))
+            self.gameevents.add("score-", "mines", self.config.get_setting('Score','mine_hit_penalty'))
             self.ship.take_damage()
             if not self.ship.alive:
                 self.gameevents.add("destroyed", "ship", "shell")
-                self.gameevents.add("score-", "pnts", int(self.config["ship_death_penalty"]))
-                self.gameevents.add("score-", "mines", int(self.config["ship_death_penalty"]))
+                self.gameevents.add("score-", "pnts", self.config.get_setting('Score','ship_death_penalty'))
+                self.gameevents.add("score-", "mines", self.config.get_setting('Score','ship_death_penalty'))
         elif obj == "friend_mine":
             #get rid of mine
             self.mine_list.flag = False
             self.mine_list.timer.reset()
-            self.gameevents.add("score+", "mines", int(self.config["energize_friend"]))
+            self.gameevents.add("score+", "mines", self.config.get_setting('Score','energize_friend'))
             #amazingly, missile can hit the mine in the same frame as the mine hits the ship
             if len(self.mine_list) > 0:
                 del self.mine_list[0]
@@ -402,7 +403,7 @@ class Game(object):
             #get rid of mine
             self.mine_list.flag = False
             self.mine_list.timer.reset()
-            self.gameevents.add("score+", "mines", int(self.config["destroy_foe"]))
+            self.gameevents.add("score+", "mines", self.config.get_setting('Score','destroy_foe'))
             if len(self.mine_list) > 0:
                 del self.mine_list[0]
             self.score.iff = ''
@@ -454,11 +455,11 @@ class Game(object):
         pygame.time.delay(1000)
         self.score.iff = ""
         self.ship.alive = True
-        self.ship.position.x = int(self.config["ship_pos_x"])
-        self.ship.position.y = int(self.config["ship_pos_y"])
-        self.ship.velocity.x = int(self.config["ship_vel_x"])
-        self.ship.velocity.y = int(self.config["ship_vel_y"])
-        self.ship.orientation = int(self.config["ship_orientation"])
+        self.ship.position.x = self.config.get_setting('Ship','ship_pos_x')
+        self.ship.position.y = self.config.get_setting('Ship','ship_pos_y')
+        self.ship.velocity.x = self.config.get_setting('Ship','ship_vel_x')
+        self.ship.velocity.y = self.config.get_setting('Ship','ship_vel_y')
+        self.ship.orientation = self.config.get_setting('Ship','ship_orientation')
     
     def draw(self):
         """draws the world"""
@@ -492,8 +493,8 @@ class Game(object):
     
     def display_foe_mines(self):
         """before game begins, present the list of IFF letters to target"""
-        if self.config["print_events"]:
-            print int(self.config["num_foes"]), self.mine_list.foe_letters
+        if self.config.get_setting('General','print_events'):
+            print self.config.get_setting('Mine','num_foes'), self.mine_list.foe_letters
         self.screen.fill((0,0,0))
         top = self.f24.render("The Type-2 mines for this session are:", True, (255,255,0))
         top_rect = top.get_rect()
