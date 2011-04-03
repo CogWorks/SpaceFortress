@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import sys, json, copy
+import sys, os, platform, json, copy
 from pythonutils.odict import OrderedDict
 from PySide.QtCore import *
 from PySide.QtGui import *
@@ -19,6 +19,20 @@ PYGAME_KEYS = ['1','2','3','4','5','6','7','8','9','0',
                'SLASH','SEMICOLON','QUOTE','LEFTBRACKET','RIGHTBRACKET',
                'BACKSLASH','EQUALS','BACKQUOTE','UP','DOWN','RIGHT','LEFT']
 
+def get_config_home():
+    _home = os.environ.get('HOME', '/')
+    if platform.system() == 'Windows':
+        config_home = os.path.join(os.environ['APPDATA'], 'SpaceFortress')
+    elif platform.system() == 'Linux':
+        config_home = os.path.join(os.environ.get('XDG_CONFIG_HOME', os.path.join(_home, '.config')), 'spacefortress')
+    elif platform.system() == 'Darwin':
+        config_home = os.path.join(_home, 'Library', 'Application Support', 'SpaceFortress')
+    else:
+        config_home = os.path.join(_home, '.spacefortress')
+    if not os.path.exists(config_home):
+        os.makedirs(config_home)
+    return config_home
+
 class Config():
     
     config = OrderedDict()
@@ -33,7 +47,7 @@ class Config():
         assert value!=None, 'Must specify a value'
         self.add_category(category)
         if not self.config[category].has_key(setting):
-            self.config[category][setting] = {}
+            self.config[category][setting] = OrderedDict()
         self.config[category][setting]['value'] = value
         self.config[category][setting]['about'] = about
         self.config[category][setting]['type'] = type
@@ -50,6 +64,14 @@ class Config():
             return self.config[category][setting]
         else:
             return self.config[category][setting]['value']
+        
+    def update_setting_value(self, category, setting, value):
+        assert category!=None, 'Must specify a category'
+        assert setting!=None, 'Must specify a setting'
+        assert value!=None, 'Must specify a value'
+        if self.config.has_key(category):
+            if self.config[category].has_key(setting):
+                self.config[category][setting]['value'] = value
     
     def get_settings(self, category):
         assert category!=None, 'Must specify a category'
@@ -176,24 +198,25 @@ class Config():
         self.add_setting('Score', 'bonus_points', 100, 'Points added for selecting points bonus')
         self.add_setting('Score', 'bonus_missiles', 50, 'Missiles added for selecting missile bonus')
         
-def load_config(config_file):
-    config = get_default_config()
-    try:
-        with open(config_file, 'r') as f:
-            config.update(json.load(f))
-    except IOError:
-        pass
-    return config
+        config_file = os.path.join(get_config_home(),'config')
+        if os.path.isfile(config_file):
+            with open(config_file, 'r') as f:
+                config = json.load(f)
+                for c in config.keys():
+                    for s in config[c].keys():
+                        self.update_setting_value(c,s,config[c][s]['value'])
+                
+def save_config(config):
+    config_file = os.path.join(get_config_home(),'config')
+    with open(config_file, 'w+') as f:
+        json.dump(config, f, separators=(',',': '), indent=4, sort_keys=True)
 
-def gen_config(config_file):
-    ret = True
-    config = Config().config
-    try:
-        with open(config_file, 'w+') as f:
-            json.dump(config, f, separators=(',',': '), indent=4, sort_keys=True)
-    except IOError:
-        ret = False
-    return ret
+def gen_config():
+    config = Config()
+    for c in config.config.keys():
+        for s in config.config[c].keys():
+            config.config[c][s] = {'value': config.config[c][s]['value']}
+    save_config(config.config)
     
 class ConfigEditor(QMainWindow):
     
@@ -226,7 +249,6 @@ class ConfigEditor(QMainWindow):
                     w.setText(str(info['value']))
                     if info.has_key('n'):
                         w.setMaxLength(info['n'])
-                        print w.minimumSizeHint()
                         w.setFixedWidth(info['n']*w.minimumSizeHint().height())
                 elif info['type'] == CT_CHECKBOX:
                     w = QCheckBox()
@@ -236,6 +258,7 @@ class ConfigEditor(QMainWindow):
                         w.setCheckState(Qt.Unchecked)
                 elif info['type'] == CT_SPINBOX:
                     w = QSpinBox()
+                    w.setMaximum(1000000)
                     w.setValue(info['value'])
                 elif info['type'] == CT_COMBO:
                     w = QComboBox()
@@ -269,6 +292,17 @@ class ConfigEditor(QMainWindow):
         
         self.categories.setCurrentItem(self.categories.item(0))
         
+        self.menuBar = QMenuBar()
+        self.filemenu = QMenu('&File')
+        self.quitAction = QAction(self)
+        self.quitAction.setText('&Quit')
+        if platform.system() != 'Darwin':
+            self.quitAction.setShortcut(QKeySequence(Qt.CTRL + Qt.Key_Q))
+        QObject.connect(self.quitAction, SIGNAL('triggered()'), self.quitApp)
+        self.filemenu.addAction(self.quitAction)
+        self.menuBar.addMenu(self.filemenu)
+        self.setMenuBar(self.menuBar)
+        
         self.show()
         self.activateWindow()
         self.raise_()
@@ -279,7 +313,15 @@ class ConfigEditor(QMainWindow):
         
     def category_selected(self):
         self.settings.setCurrentIndex(self.config.config.index(self.categories.selectedItems()[0].text()))
-
+        
+    def quitApp(self):
+        app.closeAllWindows()
+        
+        
+    def closeEvent(self, event=None):
+        print 'quit'
+        self.quitApp()
+    
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     editor = ConfigEditor()
