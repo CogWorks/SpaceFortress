@@ -205,28 +205,26 @@ class Config():
             config_file = os.path.join(get_config_home(),'config')
             if os.path.isfile(config_file):
                 with open(config_file, 'r') as f:
-                    config = json.load(f)
-                    for c in config.keys():
-                        for s in config[c].keys():
-                            self.update_setting_value(c,s,config[c][s]['value'])
-                
-def save_config(config, partial=True):
-    defC = Config(load=False)
+                    s = f.read()
+                    if s:
+                        config = json.loads(s)
+                        for c in config.keys():
+                            for s in config[c].keys():
+                                self.update_setting_value(c,s,config[c][s]['value'])
+                            
+def diff_config(config):
+    defC=Config(load=False)
     newC = Config(defaults=False, load=False)
     config_file = os.path.join(get_config_home(),'config')
     for c in config.keys():
         for s in config[c].keys():
-            if partial:
-                if config[c][s]['value'] != defC.config[c][s]['value']:
-                    newC.add_setting(c, s, config[c][s]['value'])
-            else:
-                config[c][s] = {'value': config[c][s]['value']}
+            if config[c][s]['value'] != defC.config[c][s]['value']:
+                newC.add_setting(c, s, config[c][s]['value'])
+    return newC.config
+                
+def save_config(config):
     with open(config_file, 'w+') as f:
-        if partial:
-            if newC.config:
-                json.dump(newC.config, f, separators=(',',': '), indent=4, sort_keys=True)
-        else:
-            json.dump(config, f, separators=(',',': '), indent=4, sort_keys=True)
+        json.dump(config, f, separators=(',',': '), indent=4, sort_keys=True)
 
 def gen_config():
     config = Config()
@@ -332,7 +330,10 @@ class ConfigEditor(QMainWindow):
         app.closeAllWindows()
         
     def closeEvent(self, event=None):
-        save_config(self.config.config)
+        config = diff_config(self.config.config)
+        if config:
+            print 'settings have changed'
+            save_config(config)
         self.quitApp()
     
 if __name__ == '__main__':
