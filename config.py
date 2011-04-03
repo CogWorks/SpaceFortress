@@ -203,7 +203,6 @@ class ConfigEditor(QMainWindow):
         self.config = Config()
         
         self.categories = QListWidget()
-        self.categories.setFocusPolicy(Qt.NoFocus)
         self.settings = QStackedWidget()
         
         self.setFixedSize(640,420)
