@@ -115,7 +115,10 @@ class ConfigEditor(QMainWindow):
                 s = QWidget()
                 sl = QVBoxLayout()
                 sl.setAlignment(Qt.AlignLeft)
-                sl.addWidget(QLabel(setting))
+                label = QLabel(setting)
+                if info.has_key('about'):
+                    label.setToolTip(info['about'])
+                sl.addWidget(label)
                 if info['type'] == CT_LINEEDIT:
                     w = LineEdit(self.cfg,cat,setting,info)
                 elif info['type'] == CT_CHECKBOX:
@@ -123,7 +126,7 @@ class ConfigEditor(QMainWindow):
                 elif info['type'] == CT_SPINBOX:
                     w = SpinBox(self.cfg,cat,setting,info)
                 elif info['type'] == CT_COMBO:
-                    w = ComboBox(self.cfg,cat,setting,info)
+                    w = ComboBox(self.cfg,cat,setting,info)                    
                 sl.addWidget(w)
                 s.setLayout(sl)
                 c = self.cfg.config[cat].index(setting) % 2
