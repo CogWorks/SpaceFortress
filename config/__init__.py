@@ -12,7 +12,7 @@ class Config():
         if not self.config.has_key(category):
             self.config[category] = OrderedDict()
             
-    def add_setting(self, category, setting, value, about='', type=CT_SPINBOX, stub=False, **kwargs):
+    def add_setting(self, category, setting, value, about='', type=0, stub=False, **kwargs):
         assert category!=None, 'Must specify a category'
         assert setting!=None, 'Must specify a setting'
         assert value!=None, 'Must specify a value'
@@ -58,8 +58,12 @@ class Config():
         for c in config.keys():
             for s in config[c].keys():
                 self.update_setting_value(c,s,config[c][s]['value'])
+                
+    def save_config(config_file):
+        with open(config_file, 'w+') as f:
+            json.dump(self.config, f, separators=(',',': '), indent=4, sort_keys=True)
                             
-                            
+"""                            
 os.path.join(get_config_home(),'config')
         if os.path.isfile(config_file):
             with open(config_file, 'r') as f:
@@ -81,10 +85,7 @@ def diff_config(config):
     else:
         return None
                 
-def save_config(config):
-    config_file = os.path.join(get_config_home(),'config')
-    with open(config_file, 'w+') as f:
-        json.dump(config, f, separators=(',',': '), indent=4, sort_keys=True)
+
         
 def delete_config():
     config_file = os.path.join(get_config_home(),'config')
@@ -94,3 +95,4 @@ def delete_config():
 def gen_config():
     config = Config()
     save_config(config.config)
+"""
