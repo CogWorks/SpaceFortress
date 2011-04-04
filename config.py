@@ -147,7 +147,7 @@ class Config():
             self.add_setting('Bonus', 'bonus_pos_y', 390, 'Bonus y position')
             self.add_setting('Bonus', 'bonus_probability', 0.3, 'Probability that next symbol will be the bonus symbol')
             self.add_setting('Bonus', 'bonus_symbol', '$', type=CT_LINEEDIT, about='Bonus symbol')
-            self.add_setting('Bonus', 'non_bonus_symbols', ['!', '&', '*', '%', '@'], type=CT_LINEEDIT, about="Non-bonus symbols. Defaults are # & * % @. Don't use '-', because that's used in the log file to represent that there's no symbol present")
+            self.add_setting('Bonus', 'non_bonus_symbols', '!&*%@', type=CT_LINEEDIT, about="Non-bonus symbols. Defaults are # & * % @. Don't use '-', because that's used in the log file to represent that there's no symbol present")
             self.add_setting('Bonus', 'symbol_down_time', 833, '"Blank time" between symbol appearances in milliseconds**. (Seems like a weird number, but it\'s to sync with the frame-based original)')
             self.add_setting('Bonus', 'symbol_up_time', 2500, 'Time in milliseconds each symbol is visible**')
     
@@ -297,6 +297,23 @@ class SFCheckBox(QCheckBox):
             self.config.update_setting_value(self.category, self.setting, True)
         else:
             self.config.update_setting_value(self.category, self.setting, False)
+            
+class SFLineEdit(QLineEdit):
+    
+    def __init__(self, config, category, setting, info):
+        super(SFLineEdit, self).__init__()
+        self.config = config
+        self.category = category
+        self.setting = setting
+        self.info = info
+        self.setText(str(info['value']))
+        if info.has_key('n'):
+            self.setMaxLength(info['n'])
+            self.setFixedWidth(info['n']*self.minimumSizeHint().height())
+        QObject.connect(self, SIGNAL('textChanged(QString)'), self.stateChangeHandler)
+            
+    def stateChangeHandler(self, newVal):
+        self.config.update_setting_value(self.category, self.setting, newVal)
     
 class ConfigEditor(QMainWindow):
     
@@ -325,11 +342,7 @@ class ConfigEditor(QMainWindow):
                 sl.setAlignment(Qt.AlignLeft)
                 sl.addWidget(QLabel(setting))
                 if info['type'] == CT_LINEEDIT:
-                    w = QLineEdit()
-                    w.setText(str(info['value']))
-                    if info.has_key('n'):
-                        w.setMaxLength(info['n'])
-                        w.setFixedWidth(info['n']*w.minimumSizeHint().height())
+                    w = SFLineEdit(self.config,cat,setting,info)
                 elif info['type'] == CT_CHECKBOX:
                     w = SFCheckBox(self.config,cat,setting,info)
                 elif info['type'] == CT_SPINBOX:
