@@ -235,7 +235,9 @@ def save_config(config):
         json.dump(config, f, separators=(',',': '), indent=4, sort_keys=True)
         
 def delete_config():
-    os.remove(os.path.join(get_config_home(),'config'))    
+    config_file = os.path.join(get_config_home(),'config')
+    if os.path.isfile(config_file):
+        os.remove(config_file)
 
 def gen_config():
     config = Config()
