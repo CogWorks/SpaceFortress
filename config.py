@@ -231,6 +231,20 @@ def gen_config():
     config = Config()
     save_config(config.config)
     
+class SFSpinBox(QSpinBox):
+    
+    def __init__(self, config, category, setting, default):
+        super(SFSpinBox, self).__init__()
+        self.config = config
+        self.category = category
+        self.setting = setting
+        self.setMaximum(1000000)
+        self.setValue(default)
+        QObject.connect(self, SIGNAL('valueChanged(int)'), self.stateChangeHandler)
+            
+    def stateChangeHandler(self, newVal):
+        self.config.update_setting_value(self.category, self.setting, newVal)
+    
 class SFCheckBox(QCheckBox):
     
     def __init__(self, config, category, setting, default):
@@ -285,9 +299,7 @@ class ConfigEditor(QMainWindow):
                 elif info['type'] == CT_CHECKBOX:
                     w = SFCheckBox(self.config,cat,setting,info['value'])
                 elif info['type'] == CT_SPINBOX:
-                    w = QSpinBox()
-                    w.setMaximum(1000000)
-                    w.setValue(info['value'])
+                    w = SFSpinBox(self.config,cat,setting,info['value'])
                 elif info['type'] == CT_COMBO:
                     w = QComboBox()
                     if info.has_key('options'):
