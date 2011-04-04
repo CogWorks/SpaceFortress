@@ -1,13 +1,14 @@
 #!/usr/bin/env python
 
-import sys, defaults
-
+import sys
 from PySide.QtGui import *
+
+import defaults
 from config.editor import ConfigEditor
     
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     cfg = defaults.get_config()
-    editor = ConfigEditor(cfg, 'Spacefortress Config Editor')
+    cfg.set_user_file(defaults.get_user_file())
+    editor = ConfigEditor(app, cfg, 'Spacefortress Config Editor')
     sys.exit(app.exec_())
-    

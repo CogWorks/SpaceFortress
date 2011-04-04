@@ -1,12 +1,16 @@
 #!/usr/bin/env python
 
 import sys, os, json, copy
-from pythonutils.odict import OrderedDict
+from odict import OrderedDict
 
 class Config():
         
-    def __init__(self):
+    def __init__(self, user_file=None):
         self.config = OrderedDict()
+        self.user_file = user_file
+        
+    def set_user_file(self, user_file):
+        self.user_file = user_file
         
     def add_category(self, category):
         if not self.config.has_key(category):
@@ -53,46 +57,17 @@ class Config():
     def get_categories(self):
         return self.config.keys()
         
-    def update(self, json_config):
-        config = json.loads(json_config)
-        for c in config.keys():
-            for s in config[c].keys():
-                self.update_setting_value(c,s,config[c][s]['value'])
-                
-    def save_config(config_file):
-        with open(config_file, 'w+') as f:
-            json.dump(self.config, f, separators=(',',': '), indent=4, sort_keys=True)
-                            
-"""                            
-os.path.join(get_config_home(),'config')
-        if os.path.isfile(config_file):
-            with open(config_file, 'r') as f:
-                s = f.read()
-                
-def diff_config(config):
-    defC = Config(load=False)
-    if json.dumps(defC.config) == json.dumps(config.config):
-        return False
-    defC = Config()
-    if json.dumps(defC.config) != json.dumps(config.config):
-        defC = Config(load=False)
-        newC = Config(defaults=False, load=False)
-        for c in config.config.keys():
-            for s in config.config[c].keys():
-                if config.config[c][s]['value'] != defC.config[c][s]['value']:
-                    newC.add_setting(c, s, config.config[c][s]['value'], stub=True)    
-        return newC.config
-    else:
-        return None
-                
-
+    def update_from_string(self, json_config):
+        try:
+            config = json.loads(json_config)
+            for c in config.keys():
+                for s in config[c].keys():
+                    self.update_setting_value(c,s,config[c][s]['value'])
+        except ValueError, e:
+            sys.stderr.write('Error reading user file: [%s]' % (e))
         
-def delete_config():
-    config_file = os.path.join(get_config_home(),'config')
-    if os.path.isfile(config_file):
-        os.remove(config_file)
-
-def gen_config():
-    config = Config()
-    save_config(config.config)
-"""
+                
+    def update_from_user_file(self):
+        if self.user_file and os.path.isfile(self.user_file):
+            with open(self.user_file, 'r') as f:
+                return self.update_from_string(f.read())
