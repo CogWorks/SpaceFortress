@@ -214,32 +214,63 @@ class Config():
                                 self.update_setting_value(c,s,config[c][s]['value'])
                             
 def diff_config(config):
-    defC=Config(load=True)
-    newC = Config(defaults=False, load=False)
-    for c in config.keys():
-        for s in config[c].keys():
-            if config[c][s]['value'] != defC.config[c][s]['value']:
-                newC.add_setting(c, s, config[c][s]['value'], stub=True)
-    return newC.config
+    defC = Config(load=False)
+    if json.dumps(defC.config) == json.dumps(config.config):
+        return False
+    defC = Config()
+    if json.dumps(defC.config) != json.dumps(config.config):
+        defC = Config(load=False)
+        newC = Config(defaults=False, load=False)
+        for c in config.config.keys():
+            for s in config.config[c].keys():
+                if config.config[c][s]['value'] != defC.config[c][s]['value']:
+                    newC.add_setting(c, s, config.config[c][s]['value'], stub=True)    
+        return newC.config
+    else:
+        return None
                 
 def save_config(config):
     config_file = os.path.join(get_config_home(),'config')
     with open(config_file, 'w+') as f:
         json.dump(config, f, separators=(',',': '), indent=4, sort_keys=True)
+        
+def delete_config():
+    os.remove(os.path.join(get_config_home(),'config'))    
 
 def gen_config():
     config = Config()
     save_config(config.config)
     
+class SFComboBox(QComboBox):
+    
+    def __init__(self, config, category, setting, info):
+        super(SFComboBox, self).__init__()
+        self.config = config
+        self.category = category
+        self.setting = setting
+        self.info = info
+        if info.has_key('options'):
+            self.addItems(info['options'])
+            for i in range(0,len(info['options'])):
+                if info['options'][i] == info['value']:
+                    self.setCurrentIndex(i)
+        QObject.connect(self, SIGNAL('currentIndexChanged(int)'), self.stateChangeHandler)
+            
+    def stateChangeHandler(self, newVal):
+        for i in range(0,len(self.info['options'])):
+            if self.info['options'][i] == self.info['value']:
+                self.config.update_setting_value(self.category, self.setting, self.info['options'][newVal])
+    
 class SFSpinBox(QSpinBox):
     
-    def __init__(self, config, category, setting, default):
+    def __init__(self, config, category, setting, info):
         super(SFSpinBox, self).__init__()
         self.config = config
         self.category = category
         self.setting = setting
+        self.info = info
         self.setMaximum(1000000)
-        self.setValue(default)
+        self.setValue(info['value'])
         QObject.connect(self, SIGNAL('valueChanged(int)'), self.stateChangeHandler)
             
     def stateChangeHandler(self, newVal):
@@ -247,12 +278,13 @@ class SFSpinBox(QSpinBox):
     
 class SFCheckBox(QCheckBox):
     
-    def __init__(self, config, category, setting, default):
+    def __init__(self, config, category, setting, info):
         super(SFCheckBox, self).__init__()
         self.config = config
         self.category = category
         self.setting = setting
-        if default:
+        self.info = info
+        if info['value']:
             self.setCheckState(Qt.Checked)
         else:
             self.setCheckState(Qt.Unchecked)
@@ -297,16 +329,11 @@ class ConfigEditor(QMainWindow):
                         w.setMaxLength(info['n'])
                         w.setFixedWidth(info['n']*w.minimumSizeHint().height())
                 elif info['type'] == CT_CHECKBOX:
-                    w = SFCheckBox(self.config,cat,setting,info['value'])
+                    w = SFCheckBox(self.config,cat,setting,info)
                 elif info['type'] == CT_SPINBOX:
-                    w = SFSpinBox(self.config,cat,setting,info['value'])
+                    w = SFSpinBox(self.config,cat,setting,info)
                 elif info['type'] == CT_COMBO:
-                    w = QComboBox()
-                    if info.has_key('options'):
-                        w.addItems(info['options'])
-                        for i in range(0,len(info['options'])):
-                            if info['options'][i] == info['value']:
-                                w.setCurrentIndex(i)
+                    w = SFComboBox(self.config,cat,setting,info)
                 sl.addWidget(w)
                 s.setLayout(sl)
                 c = self.config.config[cat].index(setting) % 2
@@ -358,9 +385,10 @@ class ConfigEditor(QMainWindow):
         app.closeAllWindows()
         
     def closeEvent(self, event=None):
-        config = diff_config(self.config.config)
-        if config:
-            print 'settings have changed'
+        config = diff_config(self.config)
+        if config == False:
+            delete_config()
+        elif config != None:
             save_config(config)
         self.quitApp()
     
