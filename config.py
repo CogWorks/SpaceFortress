@@ -39,7 +39,7 @@ class Config():
         if not self.config.has_key(category):
             self.config[category] = OrderedDict()
             
-    def add_setting(self, category, setting, value, about='', type=CT_SPINBOX, **kwargs):
+    def add_setting(self, category, setting, value, about='', type=CT_SPINBOX, stub=False, **kwargs):
         assert category!=None, 'Must specify a category'
         assert setting!=None, 'Must specify a setting'
         assert value!=None, 'Must specify a value'
@@ -47,10 +47,11 @@ class Config():
         if not self.config[category].has_key(setting):
             self.config[category][setting] = OrderedDict()
         self.config[category][setting]['value'] = value
-        self.config[category][setting]['about'] = about
-        self.config[category][setting]['type'] = type
-        for k in kwargs:
-            self.config[category][setting][k] = kwargs[k]
+        if not stub:
+            self.config[category][setting]['about'] = about
+            self.config[category][setting]['type'] = type
+            for k in kwargs:
+                self.config[category][setting][k] = kwargs[k]
         
     def get_setting(self, category, setting, complete=False):
         assert category!=None, 'Must specify a category'
@@ -213,22 +214,41 @@ class Config():
                                 self.update_setting_value(c,s,config[c][s]['value'])
                             
 def diff_config(config):
-    defC=Config(load=False)
+    defC=Config(load=True)
     newC = Config(defaults=False, load=False)
-    config_file = os.path.join(get_config_home(),'config')
     for c in config.keys():
         for s in config[c].keys():
             if config[c][s]['value'] != defC.config[c][s]['value']:
-                newC.add_setting(c, s, config[c][s]['value'])
+                newC.add_setting(c, s, config[c][s]['value'], stub=True)
     return newC.config
                 
 def save_config(config):
+    config_file = os.path.join(get_config_home(),'config')
     with open(config_file, 'w+') as f:
         json.dump(config, f, separators=(',',': '), indent=4, sort_keys=True)
 
 def gen_config():
     config = Config()
     save_config(config.config)
+    
+class SFCheckBox(QCheckBox):
+    
+    def __init__(self, config, category, setting, default):
+        super(SFCheckBox, self).__init__()
+        self.config = config
+        self.category = category
+        self.setting = setting
+        if default:
+            self.setCheckState(Qt.Checked)
+        else:
+            self.setCheckState(Qt.Unchecked)
+        QObject.connect(self, SIGNAL('stateChanged(int)'), self.stateChangeHandler)
+            
+    def stateChangeHandler(self, newVal):
+        if newVal == Qt.Checked:
+            self.config.update_setting_value(self.category, self.setting, True)
+        else:
+            self.config.update_setting_value(self.category, self.setting, False)
     
 class ConfigEditor(QMainWindow):
     
@@ -263,11 +283,7 @@ class ConfigEditor(QMainWindow):
                         w.setMaxLength(info['n'])
                         w.setFixedWidth(info['n']*w.minimumSizeHint().height())
                 elif info['type'] == CT_CHECKBOX:
-                    w = QCheckBox()
-                    if info['value']:
-                        w.setCheckState(Qt.Checked)
-                    else:
-                        w.setCheckState(Qt.Unchecked)
+                    w = SFCheckBox(self.config,cat,setting,info['value'])
                 elif info['type'] == CT_SPINBOX:
                     w = QSpinBox()
                     w.setMaximum(1000000)
