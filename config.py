@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import sys, os, platform, json, copy
-from pythonutils.odict import OrderedDict
+from odict import OrderedDict
 from PySide.QtCore import *
 from PySide.QtGui import *
 
