@@ -146,7 +146,7 @@ class Config():
             self.add_setting('Bonus', 'bonus_pos_x', 355, 'Bonus x position')
             self.add_setting('Bonus', 'bonus_pos_y', 390, 'Bonus y position')
             self.add_setting('Bonus', 'bonus_probability', 0.3, 'Probability that next symbol will be the bonus symbol')
-            self.add_setting('Bonus', 'bonus_symbol', '$', type=CT_LINEEDIT, about='Bonus symbol')
+            self.add_setting('Bonus', 'bonus_symbol', '$', type=CT_LINEEDIT, n=1, about='Bonus symbol')
             self.add_setting('Bonus', 'non_bonus_symbols', '!&*%@', type=CT_LINEEDIT, about="Non-bonus symbols. Defaults are # & * % @. Don't use '-', because that's used in the log file to represent that there's no symbol present")
             self.add_setting('Bonus', 'symbol_down_time', 833, '"Blank time" between symbol appearances in milliseconds**. (Seems like a weird number, but it\'s to sync with the frame-based original)')
             self.add_setting('Bonus', 'symbol_up_time', 2500, 'Time in milliseconds each symbol is visible**')
