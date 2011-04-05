@@ -100,7 +100,7 @@ class ConfigEditor(QMainWindow):
         self.categories = QListWidget()
         self.settings = QStackedWidget()
         
-        self.setFixedSize(640,420)
+        self.setFixedSize(580,380)
         self.categories.setMaximumWidth(120)
         
         QObject.connect(self.categories, SIGNAL('itemSelectionChanged()'), self.category_selected)

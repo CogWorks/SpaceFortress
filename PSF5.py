@@ -5,8 +5,11 @@ import tokens
 from tokens.gameevent import *
 import sys, os
 import pygame
-import argparse
-from config import *
+try:
+    import argparse
+except ImportError:
+    import arparser as argparse
+import defaults
 from pycogworks.cogworld import *
 
 def get_psf_version_string():
@@ -25,8 +28,9 @@ class Game(object):
         else:
             self.app_path = '.'
         self.datapath = os.path.join(self.app_path, "data/")
-        #self.config = load_config(os.path.join(self.app_path,"config.txt"))
-        self.config = Config()
+        self.config = defaults.get_config()
+        self.config.set_user_file(defaults.get_user_file())
+        self.config.update_from_user_file()
         pygame.display.init()
         pygame.font.init()
         self.SCREEN_WIDTH = 1024
