@@ -113,9 +113,13 @@ class ConfigEditor(QMainWindow):
             for setting in self.cfg.get_settings(cat):
                 info = self.cfg.get_setting(cat, setting, True)
                 s = QWidget()
+                s.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Fixed)
                 sl = QVBoxLayout()
-                sl.setAlignment(Qt.AlignLeft)
-                label = QLabel(setting)
+                label = QLabel()
+                if info.has_key('alias'):
+                    label.setText(info['alias'])
+                else:
+                    label.setText(setting)
                 if info.has_key('about'):
                     label.setToolTip(info['about'])
                 sl.addWidget(label)
@@ -126,7 +130,8 @@ class ConfigEditor(QMainWindow):
                 elif info['type'] == CT_SPINBOX:
                     w = SpinBox(self.cfg,cat,setting,info)
                 elif info['type'] == CT_COMBO:
-                    w = ComboBox(self.cfg,cat,setting,info)                    
+                    w = ComboBox(self.cfg,cat,setting,info)
+                w.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Fixed)
                 sl.addWidget(w)
                 s.setLayout(sl)
                 c = self.cfg.config[cat].index(setting) % 2
@@ -136,8 +141,8 @@ class ConfigEditor(QMainWindow):
             settings = QWidget()
             settings.setLayout(settings_layout)
             settings_scroller = QScrollArea()
-            settings_scroller.setAlignment(Qt.AlignHCenter)
             settings_scroller.setWidget(settings)
+            settings_scroller.setWidgetResizable(True)
             self.settings.addWidget(settings_scroller)
         
         self.main = QWidget()
