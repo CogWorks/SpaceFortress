@@ -64,7 +64,7 @@ class Config():
                 for s in config[c].keys():
                     self.update_setting_value(c,s,config[c][s]['value'])
         except ValueError, e:
-            sys.stderr.write('Error reading user file: [%s]' % (e))
+            sys.stderr.write('Empty or malformed config file found!\n')
         
                 
     def update_from_user_file(self):
