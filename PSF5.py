@@ -28,6 +28,7 @@ class Game(object):
         self.config = defaults.get_config()
         self.config.set_user_file(defaults.get_user_file())
         self.config.update_from_user_file()
+        os.environ['SDL_VIDEO_CENTERED'] = '1'
         pygame.display.init()
         pygame.font.init()
         self.SCREEN_WIDTH = 1024
