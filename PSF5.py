@@ -28,6 +28,7 @@ class Game(object):
         self.config = defaults.get_config()
         self.config.set_user_file(defaults.get_user_file())
         self.config.update_from_user_file()
+        os.environ['SDL_VIDEO_CENTERED'] = '1'
         pygame.display.init()
         pygame.font.init()
         self.SCREEN_WIDTH = 1024
@@ -52,10 +53,24 @@ class Game(object):
         self.vector_explosion.set_colorkey((0, 0, 0))
         self.vector_explosion_rect = self.vector_explosion.get_rect()
         self.sounds = tokens.sounds.Sounds(self)
+        self.mainsurf = pygame.Surface((self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
         if self.config.get_setting('General','fullscreen'):
-            self.screen = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT), pygame.FULLSCREEN)
+            self.bestmode = pygame.display.list_modes()[0]
+            grow = self.bestmode[1] / self.SCREEN_HEIGHT
+            self.scaledmode = (int(self.SCREEN_WIDTH * grow), self.bestmode[1])
+            self.scaledsurf = pygame.Surface(self.scaledmode)
+            self.screen = pygame.display.set_mode(self.bestmode, pygame.FULLSCREEN|pygame.HWSURFACE|pygame.DOUBLEBUF)
         else:
-            self.screen = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
+            if pygame.display.list_modes()[1][1] > self.SCREEN_HEIGHT: 
+                self.bestmode = pygame.display.list_modes()[1]
+            else:
+                self.bestmode = (self.SCREEN_WIDTH, self.SCREEN_HEIGHT)
+            grow = self.bestmode[1] / self.SCREEN_HEIGHT
+            self.scaledmode = (int(self.SCREEN_WIDTH * grow), self.bestmode[1])
+            self.scaledsurf = pygame.Surface(self.scaledmode)
+            self.screen = pygame.display.set_mode(self.bestmode)
+        self.scaledrect = self.scaledsurf.get_rect()
+        self.scaledrect.centerx = self.bestmode[0] / 2
         self.clock = pygame.time.Clock()
         self.gametimer = tokens.timer.Timer()
         self.flighttimer = tokens.timer.Timer()
@@ -70,7 +85,7 @@ class Game(object):
             self.scorerect.centerx = self.SCREEN_WIDTH/2
         else:
             self.worldrect.top = 70
-            self.scoresurf = pygame.Surface.copy(self.screen)
+            self.scoresurf = pygame.Surface((self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
             self.scorerect = self.screen.get_rect()
             #self.scorerect.top = 5
         self.bighex = tokens.hexagon.Hex(self, self.config.get_setting('Hexagon','big_hex'))
@@ -465,6 +480,7 @@ class Game(object):
     def draw(self):
         """draws the world"""
         self.screen.fill((0,0,0))
+        self.mainsurf.fill((0,0,0))
         self.frame.draw(self.worldsurf, self.scoresurf)
         self.score.draw(self.scoresurf)
         self.bighex.draw(self.worldsurf)
@@ -488,8 +504,10 @@ class Game(object):
         if self.bonus_exists:
             if self.bonus.visible:
                 self.bonus.draw(self.worldsurf)
-        self.screen.blit(self.scoresurf, self.scorerect)
-        self.screen.blit(self.worldsurf, self.worldrect)
+        self.mainsurf.blit(self.scoresurf, self.scorerect)
+        self.mainsurf.blit(self.worldsurf, self.worldrect)
+        pygame.transform.smoothscale(self.mainsurf, self.scaledmode, self.scaledsurf)
+        self.screen.blit(self.scaledsurf, self.scaledrect)
         pygame.display.flip()
     
     def display_foe_mines(self):
@@ -513,10 +531,12 @@ class Game(object):
         bottom_rect = bottom.get_rect()
         bottom_rect.centerx = self.SCREEN_WIDTH/2
         bottom_rect.centery = 600
-        self.screen.blit(top, top_rect)
-        self.screen.blit(middle, middle_rect)
-        self.screen.blit(midbot, midbot_rect)
-        self.screen.blit(bottom, bottom_rect)
+        self.mainsurf.blit(top, top_rect)
+        self.mainsurf.blit(middle, middle_rect)
+        self.mainsurf.blit(midbot, midbot_rect)
+        self.mainsurf.blit(bottom, bottom_rect)
+        pygame.transform.smoothscale(self.mainsurf, self.scaledmode, self.scaledsurf)
+        self.screen.blit(self.scaledsurf, self.scaledrect)
         pygame.display.flip()
         #self.log.write("# %f %d Foe mines: %s\n"%(time.time(), pygame.time.get_ticks(), " ".join(self.mine.foe_letters)))
         while True:
