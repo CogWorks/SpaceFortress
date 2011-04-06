@@ -21,13 +21,10 @@ class Game(object):
     """Main game application"""
     def __init__(self, cogworld, condition):
         super(Game, self).__init__()
+        self.approot = sys.argv[0][:sys.argv[0].rfind('/')]
+        self.fp = os.path.join(self.approot, "fonts/freesansbold.ttf")
         self.cw = cogworld
         self.cond = condition
-        if sys.platform == "darwin" and release_build:
-            self.app_path = '../../../'
-        else:
-            self.app_path = '.'
-        self.datapath = os.path.join(self.app_path, "data/")
         self.config = defaults.get_config()
         self.config.set_user_file(defaults.get_user_file())
         self.config.update_from_user_file()
@@ -38,12 +35,12 @@ class Game(object):
         self.WORLD_WIDTH = 710
         self.WORLD_HEIGHT = 626
         self.linewidth = self.config.get_setting('General','linewidth')
-        self.frame = tokens.frame.Frame(self.config)
-        self.score = tokens.score.Score(self.config)
-        self.f = pygame.font.Font("fonts/freesansbold.ttf", 14)
-        self.f24 = pygame.font.Font("fonts/freesansbold.ttf", 20)
-        self.f96 = pygame.font.Font("fonts/freesansbold.ttf", 72)
-        self.f36 = pygame.font.Font("fonts/freesansbold.ttf", 36)
+        self.frame = tokens.frame.Frame(self)
+        self.score = tokens.score.Score(self)
+        self.f = pygame.font.Font(self.fp, 14)
+        self.f24 = pygame.font.Font(self.fp, 20)
+        self.f96 = pygame.font.Font(self.fp, 72)
+        self.f36 = pygame.font.Font(self.fp, 36)
         self.thrust_key = eval("pygame.K_%s" % self.config.get_setting('Keybindings','thrust_key'))
         self.left_turn_key = eval("pygame.K_%s" % self.config.get_setting('Keybindings','left_turn_key'))
         self.right_turn_key = eval("pygame.K_%s" % self.config.get_setting('Keybindings','right_turn_key'))
@@ -51,7 +48,7 @@ class Game(object):
         self.IFF_key = eval("pygame.K_%s" % self.config.get_setting('Keybindings','IFF_key'))
         self.shots_key = eval("pygame.K_%s" % self.config.get_setting('Keybindings','shots_key'))
         self.pnts_key = eval("pygame.K_%s" % self.config.get_setting('Keybindings','pnts_key'))
-        self.vector_explosion = pygame.image.load("gfx/exp.png")
+        self.vector_explosion = pygame.image.load(os.path.join(self.approot, "gfx/exp.png"))
         self.vector_explosion.set_colorkey((0, 0, 0))
         self.vector_explosion_rect = self.vector_explosion.get_rect()
         self.sounds = tokens.sounds.Sounds(self)
@@ -545,31 +542,35 @@ def main(cogworld, condition):
 
 if __name__ == '__main__':
     
-    parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('--version', action='version', version=get_psf_version_string())
-    parser.add_argument('--generate-config', action="store_true", dest="genconfig", help='Generate a full default config file.', default=argparse.SUPPRESS)
-    parser.add_argument('--condition', action="store", dest="condition", help='Task Condition', metavar='COND')
-    parser.add_argument('--port', action="store", dest="port", help='CogWorld RPC port')
-    args = parser.parse_args()
-
     cogworld = None
+    args = None
     
-    try:
-        if args.genconfig:
-            if gen_config("config.txt.new"):
-                print 'The new config file "config.txt.new" needs to be renamed before it can be used.'
-            else:
-                print 'Error creating config file.'
-            sys.exit(0)
-        elif args.port:
-            cogworld = CogWorld('localhost', args.port, 'SpaceFortress')
-            ret = cogworld.connect()
-            if (ret!=None):
-                print 'Failed connecting to CogWorld: %s' % (ret)
-                sys.exit()
-    except AttributeError:
-        pass
+    if len(sys.argv) > 1:
+        if sys.argv[1][:5] != '-psn_':
+    
+            parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+            parser.add_argument('--version', action='version', version=get_psf_version_string())
+            parser.add_argument('--generate-config', action="store_true", dest="genconfig", help='Generate a full default config file.', default=argparse.SUPPRESS)
+            parser.add_argument('--condition', action="store", dest="condition", help='Task Condition', metavar='COND')
+            parser.add_argument('--port', action="store", dest="port", help='CogWorld RPC port')
+            args = parser.parse_args()
             
-    main(cogworld, args.condition)
+            try:
+                if args.genconfig:
+                    if gen_config("config.txt.new"):
+                        print 'The new config file "config.txt.new" needs to be renamed before it can be used.'
+                    else:
+                        print 'Error creating config file.'
+                    sys.exit(0)
+                elif args.port:
+                    cogworld = CogWorld('localhost', args.port, 'SpaceFortress')
+                    ret = cogworld.connect()
+                    if (ret!=None):
+                        print 'Failed connecting to CogWorld: %s' % (ret)
+                        sys.exit()
+            except AttributeError:
+                pass
+            
+    main(cogworld, args)
         
 

@@ -5,7 +5,7 @@
 #Fall 2010
 #Class for bonus object, which displays symbols below the fortress
 import pygame
-import random
+import random, os
 from timer import Timer
 
 class Bonus(object):
@@ -21,7 +21,7 @@ class Bonus(object):
             self.x = random.randint(20, app.WORLD_WIDTH - 10)
             self.y = random.randint(20, app.WORLD_HEIGHT - 20)
         self.visible = False
-        self.font = pygame.font.Font("fonts/freesansbold.ttf", 28)
+        self.font = pygame.font.Font(self.app.fp, 28)
         self.bonus_symbol = self.app.config.get_setting('Bonus','bonus_symbol')
         self.current_symbol = None
         self.prior_symbol = None

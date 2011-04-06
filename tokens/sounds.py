@@ -3,7 +3,7 @@
 #Marc Destefano
 #Rensselaer Polytechnic Institute
 #Fall 2010
-import pygame
+import pygame, os
 
 class SFSound(pygame.mixer.Sound):
     def __init__(self, app, file):
@@ -18,10 +18,10 @@ class Sounds(object):
     def __init__(self, app):
         super(Sounds, self).__init__()
         if app.config.get_setting('General','sound'): pygame.mixer.init()
-        self.shell_fired = SFSound(app, "sounds/ShellFired.wav")
-        self.missile_fired = SFSound(app, "sounds/MissileFired.wav")
-        self.explosion = SFSound(app, "sounds/ExpFort.wav")
-        self.collision = SFSound(app, "sounds/Collision.wav")
-        self.vlner_reset = SFSound(app, "sounds/VulnerZeroed.wav")
-        self.bonus_success = SFSound(app, "sounds/bonus_success.wav")
-        self.bonus_fail = SFSound(app, "sounds/bonus_fail.wav")
+        self.shell_fired = SFSound(app, os.path.join(app.approot, "sounds/ShellFired.wav"))
+        self.missile_fired = SFSound(app, os.path.join(app.approot,"sounds/MissileFired.wav"))
+        self.explosion = SFSound(app, os.path.join(app.approot,"sounds/ExpFort.wav"))
+        self.collision = SFSound(app, os.path.join(app.approot,"sounds/Collision.wav"))
+        self.vlner_reset = SFSound(app, os.path.join(app.approot,"sounds/VulnerZeroed.wav"))
+        self.bonus_success = SFSound(app, os.path.join(app.approot,"sounds/bonus_success.wav"))
+        self.bonus_fail = SFSound(app, os.path.join(app.approot,"sounds/bonus_fail.wav"))

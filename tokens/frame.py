@@ -3,32 +3,32 @@
 #Marc Destefano
 #Rensselaer Polytechnic Institute
 #Fall 2010
-import pygame
+import pygame, os
 
 class Frame(object):
     """boundaries of game world"""
-    def __init__(self, config):
+    def __init__(self, app):
+        self.app = app
         super(Frame, self).__init__()
-        self.config = config
-        self.linewidth = self.config.get_setting('General','linewidth')
-        self.f = pygame.font.Font("fonts/freesansbold.ttf", 14)
+        self.linewidth = self.app.config.get_setting('General','linewidth')
+        self.f = pygame.font.Font(self.app.fp, 14)
         #if we're using the new scoring system, PNTS == Flight, CNTRL == Fortress, VLCTY == Mines, SPEED == Bonus
         #indexed array of what score goes in which position. Setting it to 9 to use indicies 1-8
         positions = [0]*9
-        positions[self.config.get_setting('Score','VLNER_pos')] = "VLNER"
-        positions[self.config.get_setting('Score','IFF_pos')] = "IFF"
-        positions[self.config.get_setting('Score','INTRVL_pos')] = "INTRVL"
-        positions[self.config.get_setting('Score','SHOTS_pos')] = "SHOTS"
-        if not self.config.get_setting('Score','new_scoring'):
-            positions[self.config.get_setting('Score','PNTS_pos')] = "PNTS"
-            positions[self.config.get_setting('Score','CNTRL_pos')] = "CNTRL"
-            positions[self.config.get_setting('Score','VLCTY_pos')] = "VLCTY"
-            positions[self.config.get_setting('Score','SPEED_pos')] = "SPEED"
+        positions[self.app.config.get_setting('Score','VLNER_pos')] = "VLNER"
+        positions[self.app.config.get_setting('Score','IFF_pos')] = "IFF"
+        positions[self.app.config.get_setting('Score','INTRVL_pos')] = "INTRVL"
+        positions[self.app.config.get_setting('Score','SHOTS_pos')] = "SHOTS"
+        if not self.app.config.get_setting('Score','new_scoring'):
+            positions[self.app.config.get_setting('Score','PNTS_pos')] = "PNTS"
+            positions[self.app.config.get_setting('Score','CNTRL_pos')] = "CNTRL"
+            positions[self.app.config.get_setting('Score','VLCTY_pos')] = "VLCTY"
+            positions[self.app.config.get_setting('Score','SPEED_pos')] = "SPEED"
         else:
-            positions[self.config.get_setting('Score','PNTS_pos')] = "FLIGHT"
-            positions[self.config.get_setting('Score','CNTRL_pos')] = "FORTRESS"
-            positions[self.config.get_setting('Score','VLCTY_pos')] = "MINES"
-            positions[self.config.get_setting('Score','SPEED_pos')] = "BONUS"
+            positions[self.app.config.get_setting('Score','PNTS_pos')] = "FLIGHT"
+            positions[self.app.config.get_setting('Score','CNTRL_pos')] = "FORTRESS"
+            positions[self.app.config.get_setting('Score','VLCTY_pos')] = "MINES"
+            positions[self.app.config.get_setting('Score','SPEED_pos')] = "BONUS"
         #score labels
         self.p1_surf = self.f.render(positions[1],0, (0,255,0))
         self.p1_rect = self.p1_surf.get_rect()
@@ -62,7 +62,7 @@ class Frame(object):
         self.p8_rect = self.p8_surf.get_rect()
         self.p8_rect.centery = 16
         self.p8_rect.centerx = 668
-        if self.config.get_setting('Score','new_scoring_pos'):
+        if self.app.config.get_setting('Score','new_scoring_pos'):
             self.p1_rect.centery = 15
             self.p1_rect.centerx = 320
             self.p2_rect.centery = 15
@@ -86,7 +86,7 @@ class Frame(object):
         worldsurf.fill((0,0,0))
         scoresurf.fill((0,0,0))
         pygame.draw.rect(worldsurf, (0,255,0), (0,0, 710, 625), self.linewidth) #outer 'world' boundary
-        if not self.config.get_setting('Score','new_scoring_pos'): #draw frame along bottom of gameworld
+        if not self.app.config.get_setting('Score','new_scoring_pos'): #draw frame along bottom of gameworld
             pygame.draw.rect(scoresurf, (0,255,0), (0,0,710, 63), self.linewidth) #bottom box to hold scores
             pygame.draw.line(scoresurf, (0,255,0), (0,32),(709,32), self.linewidth) #divides bottom box horizontally into two rows
             #the following seven lines divides the bottom box vertically into 8 columns

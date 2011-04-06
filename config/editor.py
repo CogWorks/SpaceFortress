@@ -6,12 +6,7 @@ from PySide.QtCore import *
 from PySide.QtGui import *
 
 from __init__ import Config
-
-CT_LINEEDIT = 0
-CT_COMBO = 1
-CT_CHECKBOX = 2
-CT_SPINBOX = 3
-CT_DBLSPINBOX = 4
+import constants
     
 class ComboBox(QComboBox):
     
@@ -123,13 +118,13 @@ class ConfigEditor(QMainWindow):
                 if info.has_key('about'):
                     label.setToolTip(info['about'])
                 sl.addWidget(label)
-                if info['type'] == CT_LINEEDIT:
+                if info['type'] == constants.CT_LINEEDIT:
                     w = LineEdit(self.cfg,cat,setting,info)
-                elif info['type'] == CT_CHECKBOX:
+                elif info['type'] == constants.CT_CHECKBOX:
                     w = CheckBox(self.cfg,cat,setting,info)
-                elif info['type'] == CT_SPINBOX:
+                elif info['type'] == constants.CT_SPINBOX:
                     w = SpinBox(self.cfg,cat,setting,info)
-                elif info['type'] == CT_COMBO:
+                elif info['type'] == constants.CT_COMBO:
                     w = ComboBox(self.cfg,cat,setting,info)
                 w.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Fixed)
                 sl.addWidget(w)
