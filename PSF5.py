@@ -31,6 +31,7 @@ class Game(object):
         os.environ['SDL_VIDEO_CENTERED'] = '1'
         pygame.display.init()
         pygame.font.init()
+        self.modes = pygame.display.list_modes()
         self.SCREEN_WIDTH = 1024
         self.SCREEN_HEIGHT = 768
         self.WORLD_WIDTH = 710
@@ -54,9 +55,9 @@ class Game(object):
         self.vector_explosion_rect = self.vector_explosion.get_rect()
         self.sounds = tokens.sounds.Sounds(self)
         if self.config.get_setting('General','fullscreen'):
-            self.screen = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT), pygame.FULLSCREEN)
+            self.screen = pygame.display.set_mode(self.modes[0], pygame.FULLSCREEN)
         else:
-            self.screen = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
+            self.screen = pygame.display.set_mode(self.modes[0])
         self.clock = pygame.time.Clock()
         self.gametimer = tokens.timer.Timer()
         self.flighttimer = tokens.timer.Timer()
@@ -71,9 +72,12 @@ class Game(object):
             self.scorerect.centerx = self.SCREEN_WIDTH/2
         else:
             self.worldrect.top = 70
-            self.scoresurf = pygame.Surface.copy(self.screen)
+            self.scoresurf = pygame.Surface((self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
             self.scorerect = self.screen.get_rect()
             #self.scorerect.top = 5
+        self.mainsurf = pygame.Surface((self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
+        self.mainrect = self.mainsurf.get_rect()
+        self.mainrect.center = (self.modes[0][0]/2,self.modes[0][1]/2)
         self.bighex = tokens.hexagon.Hex(self, self.config.get_setting('Hexagon','big_hex'))
         self.smallhex = tokens.hexagon.Hex(self, self.config.get_setting('Hexagon','small_hex')) 
         if self.config.get_setting('Mine','mine_exists'):
@@ -489,8 +493,9 @@ class Game(object):
         if self.bonus_exists:
             if self.bonus.visible:
                 self.bonus.draw(self.worldsurf)
-        self.screen.blit(self.scoresurf, self.scorerect)
-        self.screen.blit(self.worldsurf, self.worldrect)
+        self.mainsurf.blit(self.scoresurf, self.scorerect)
+        self.mainsurf.blit(self.worldsurf, self.worldrect)
+        self.screen.blit(self.mainsurf, self.mainrect)
         pygame.display.flip()
     
     def display_foe_mines(self):
@@ -514,10 +519,11 @@ class Game(object):
         bottom_rect = bottom.get_rect()
         bottom_rect.centerx = self.SCREEN_WIDTH/2
         bottom_rect.centery = 600
-        self.screen.blit(top, top_rect)
-        self.screen.blit(middle, middle_rect)
-        self.screen.blit(midbot, midbot_rect)
-        self.screen.blit(bottom, bottom_rect)
+        self.mainsurf.blit(top, top_rect)
+        self.mainsurf.blit(middle, middle_rect)
+        self.mainsurf.blit(midbot, midbot_rect)
+        self.mainsurf.blit(bottom, bottom_rect)
+        self.screen.blit(self.mainsurf, self.mainrect)
         pygame.display.flip()
         #self.log.write("# %f %d Foe mines: %s\n"%(time.time(), pygame.time.get_ticks(), " ".join(self.mine.foe_letters)))
         while True:
