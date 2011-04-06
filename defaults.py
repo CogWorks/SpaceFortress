@@ -40,10 +40,10 @@ def get_config():
     cfg.add_setting('General', 'print_events', False, alias='Print Events', type=config.constants.CT_CHECKBOX, about='Print events to stdout')
     cfg.add_setting('General', 'sound', True, alias='Sound', type=config.constants.CT_CHECKBOX, about='Enable/disable sound')
     
-    cfg.add_setting('Keybindings', 'thrust_key', 'w', alias='Turn Right', type=config.constants.CT_COMBO, options=PYGAME_KEYS)
-    cfg.add_setting('Keybindings', 'left_turn_key', 'a', alias='Turn Left', type=config.constants.CT_COMBO, options=PYGAME_KEYS)
-    cfg.add_setting('Keybindings', 'right_turn_key', 'd', alias='Thrust', type=config.constants.CT_COMBO, options=PYGAME_KEYS)
     cfg.add_setting('Keybindings', 'fire_key', 'SPACE', alias='Fire', type=config.constants.CT_COMBO, options=PYGAME_KEYS)
+    cfg.add_setting('Keybindings', 'thrust_key', 'w', alias='Thrust', type=config.constants.CT_COMBO, options=PYGAME_KEYS)
+    cfg.add_setting('Keybindings', 'left_turn_key', 'a', alias='Turn Left', type=config.constants.CT_COMBO, options=PYGAME_KEYS)
+    cfg.add_setting('Keybindings', 'right_turn_key', 'd', alias='Turn Right', type=config.constants.CT_COMBO, options=PYGAME_KEYS)
     cfg.add_setting('Keybindings', 'shots_key', 'k', alias='Shots Bonus', type=config.constants.CT_COMBO, options=PYGAME_KEYS)
     cfg.add_setting('Keybindings', 'pnts_key', 'l', alias='Points Bonus', type=config.constants.CT_COMBO, options=PYGAME_KEYS)
     cfg.add_setting('Keybindings', 'IFF_key', 'j', alias='Identify Friend or Foe', type=config.constants.CT_COMBO, options=PYGAME_KEYS)
