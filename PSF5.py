@@ -186,7 +186,7 @@ class Game(object):
                 self.gameevents.add("score+", "cntrl", self.config.get_setting('Score','CNTRL_increment')/2)
                 self.gameevents.add("score+", "flight", self.config.get_setting('Score','CNTRL_increment')/2)
         if self.bonus_exists:
-            if self.config.get_setting('Bonus','bonus_system') == "AX-CPT":
+            if self.config.get_setting('General','bonus_system') == "AX-CPT":
                 self.bonus.axcpt_update()
             else:
                 if self.bonus.visible == False and self.bonus.timer.elapsed() > self.config.get_setting('Bonus','symbol_down_time'):
@@ -237,7 +237,7 @@ class Game(object):
                         else:
                             self.gameevents.add("second_tag", "out_of_bounds")
                 elif obj == "shots":
-                    if self.config.get_setting('Bonus','bonus_system') == "standard":
+                    if self.config.get_setting('General','bonus_system') == "standard":
                         #if current symbol is bonus but previous wasn't, set flag to deny bonus if next symbol happens to be the bonus symbol
                         if (self.bonus.current_symbol == self.bonus.bonus_symbol) and (self.bonus.prior_symbol != self.bonus.bonus_symbol):
                             self.bonus.flag = True
@@ -257,7 +257,7 @@ class Game(object):
                             self.bonus.axcpt_flag = False
                             self.sounds.bonus_fail.play()
                 elif obj == "pnts":
-                    if self.config.get_setting('Bonus','bonus_system') == "standard":
+                    if self.config.get_setting('General','bonus_system') == "standard":
                     #if current symbol is bonus but previous wasn't, set flag to deny bonus if next symbol happens to be the bonus symbol
                         if (self.bonus.current_symbol == self.bonus.bonus_symbol) and (self.bonus.prior_symbol != self.bonus.bonus_symbol):
                             self.bonus.flag = True

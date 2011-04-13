@@ -28,6 +28,21 @@ class ComboBox(QComboBox):
             if self.info['options'][i] == self.info['value']:
                 self.cfg.update_setting_value(self.category, self.setting, self.info['options'][newVal])
 
+class DoubleSpinBox(QDoubleSpinBox):
+    
+    def __init__(self, config, category, setting, info):
+        super(DoubleSpinBox, self).__init__()
+        self.cfg = config
+        self.category = category
+        self.setting = setting
+        self.info = info
+        self.setMaximum(1000000)
+        self.setValue(info['value'])
+        QObject.connect(self, SIGNAL('valueChanged(double)'), self.stateChangeHandler)
+            
+    def stateChangeHandler(self, newVal):
+        self.cfg.update_setting_value(self.category, self.setting, newVal)
+        
 class SpinBox(QSpinBox):
     
     def __init__(self, config, category, setting, info):
@@ -124,6 +139,8 @@ class ConfigEditor(QMainWindow):
                     w = CheckBox(self.cfg,cat,setting,info)
                 elif info['type'] == constants.CT_SPINBOX:
                     w = SpinBox(self.cfg,cat,setting,info)
+                elif info['type'] == constants.CT_DBLSPINBOX:
+                    w = DoubleSpinBox(self.cfg,cat,setting,info)
                 elif info['type'] == constants.CT_COMBO:
                     w = ComboBox(self.cfg,cat,setting,info)
                 w.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Fixed)
