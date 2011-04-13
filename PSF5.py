@@ -5,12 +5,18 @@ import tokens
 from tokens.gameevent import *
 import sys, os
 import pygame
+
 try:
     import argparse
 except ImportError:
     import argparser as argparse
+
+try:
+    from pycogworks.cogworld import *
+except ImportError:
+    pass
+
 import defaults
-from pycogworks.cogworld import *
 
 def get_psf_version_string():
     return "SpaceFortress 5.0"
