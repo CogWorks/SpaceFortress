@@ -8,7 +8,7 @@ import pygame
 try:
     import argparse
 except ImportError:
-    import arparser as argparse
+    import argparser as argparse
 import defaults
 from pycogworks.cogworld import *
 
