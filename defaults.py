@@ -105,8 +105,8 @@ def get_config():
     cfg.add_setting('AX-CPT', 'bx_prob', .2, type=config.constants.CT_DBLSPINBOX)
     cfg.add_setting('AX-CPT', 'by_prob', .2, type=config.constants.CT_DBLSPINBOX)
     cfg.add_setting('AX-CPT', 'a_symbols', "A", type=config.constants.CT_LINEEDIT, about="symbols to draw for correct cues")
-    cfg.add_setting('AX-CPT', 'b_symbols', "X", type=config.constants.CT_LINEEDIT)
-    cfg.add_setting('AX-CPT', 'x_symbols', "B", type=config.constants.CT_LINEEDIT)
+    cfg.add_setting('AX-CPT', 'b_symbols', "B", type=config.constants.CT_LINEEDIT)
+    cfg.add_setting('AX-CPT', 'x_symbols', "X", type=config.constants.CT_LINEEDIT)
     cfg.add_setting('AX-CPT', 'y_symbols', "Y", type=config.constants.CT_LINEEDIT)
     cfg.add_setting('AX-CPT', 'state', 'iti', type=config.constants.CT_COMBO, options=['iti','isi','cue','target'], alias="State")
 
