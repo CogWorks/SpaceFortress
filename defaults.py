@@ -86,7 +86,7 @@ def get_config():
     cfg.add_setting('Shell', 'shell_radius', 3, 'Shell collision radius')
     
     cfg.add_setting('Bonus', 'bonus_exists', True, type=config.constants.CT_CHECKBOX, about='Do bonuses exist?')
-    cfg.add_setting('Bonus', 'bonus_system', "AX-CPT", type=config.constants.CT_LINEEDIT, about='Bonus system standard or AX-CPT?')
+    cfg.add_setting('Bonus', 'bonus_system', "AX-CPT", type=config.constants.CT_COMBO, options=['standard','AX-CPT'], about='Bonus system standard or AX-CPT?')
     cfg.add_setting('Bonus', 'randomize_bonus_pos', False, type=config.constants.CT_CHECKBOX, about='Randomize bonus position?')
     cfg.add_setting('Bonus', 'bonus_pos_x', 355, 'Bonus x position')
     cfg.add_setting('Bonus', 'bonus_pos_y', 390, 'Bonus y position')
