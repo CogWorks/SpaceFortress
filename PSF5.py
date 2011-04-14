@@ -31,7 +31,9 @@ class Game(object):
         os.environ['SDL_VIDEO_CENTERED'] = '1'
         pygame.display.init()
         pygame.font.init()
-        self.SCREEN_WIDTH = 1024
+        display_info = pygame.display.Info()
+        aspect_ratio = float(display_info.current_w) / display_info.current_h
+        self.SCREEN_WIDTH = 768 * aspect_ratio
         self.SCREEN_HEIGHT = 768
         self.WORLD_WIDTH = 710
         self.WORLD_HEIGHT = 626

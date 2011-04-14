@@ -63,22 +63,23 @@ class Frame(object):
         self.p8_rect.centery = 16
         self.p8_rect.centerx = 668
         if self.app.config.get_setting('Score','new_scoring_pos'):
+            half_width = self.app.SCREEN_WIDTH / 2
             self.p1_rect.centery = 15
-            self.p1_rect.centerx = 320
+            self.p1_rect.centerx = half_width - 192 #320
             self.p2_rect.centery = 15
-            self.p2_rect.centerx = 660
+            self.p2_rect.centerx = half_width + 148 #660
             self.p3_rect.centery = 188
-            self.p3_rect.centerx = 940
+            self.p3_rect.centerx = half_width + 428 #940
             self.p4_rect.centery = 520
-            self.p4_rect.centerx = 940
+            self.p4_rect.centerx = half_width + 428 #940
             self.p5_rect.centery = 720
-            self.p5_rect.centerx = 660
+            self.p5_rect.centerx = half_width + 148 #660
             self.p6_rect.centery = 720
-            self.p6_rect.centerx = 320
+            self.p6_rect.centerx = half_width - 192 #320
             self.p7_rect.centery = 520
-            self.p7_rect.centerx = 80
+            self.p7_rect.centerx = half_width - 432 #80
             self.p8_rect.centery = 188
-            self.p8_rect.centerx = 80
+            self.p8_rect.centerx = half_width - 432 #80
             
         
     def draw(self, worldsurf, scoresurf):
@@ -98,10 +99,15 @@ class Frame(object):
             pygame.draw.line(scoresurf, (0,255,0), (534, 0), (534, 64), self.linewidth)
             pygame.draw.line(scoresurf, (0,255,0), (623, 0), (623, 64), self.linewidth)
         else: #draw frame in "eye-tracker-friendly" format
-            pygame.draw.rect(scoresurf, (0,255,0), (157, 5, 710, 57), self.linewidth)
-            pygame.draw.rect(scoresurf, (0,255,0), (878, 70, 130, 626), self.linewidth)
-            pygame.draw.rect(scoresurf, (0,255,0), (157, 705, 710, 57), self.linewidth)
-            pygame.draw.rect(scoresurf, (0,255,0), (17, 70, 130, 626), self.linewidth)
+            half_width = self.app.SCREEN_WIDTH / 2
+            pygame.draw.rect(scoresurf, (0,255,0), (half_width - 355, 5, 710, 57), self.linewidth)
+            pygame.draw.rect(scoresurf, (0,255,0), (half_width + 366, 70, 130, 626), self.linewidth)
+            pygame.draw.rect(scoresurf, (0,255,0), (half_width - 355, 705, 710, 57), self.linewidth)
+            pygame.draw.rect(scoresurf, (0,255,0), (half_width - 495, 70, 130, 626), self.linewidth)
+            # pygame.draw.rect(scoresurf, (0,255,0), (157, 5, 710, 57), self.linewidth)
+            # pygame.draw.rect(scoresurf, (0,255,0), (878, 70, 130, 626), self.linewidth)
+            # pygame.draw.rect(scoresurf, (0,255,0), (157, 705, 710, 57), self.linewidth)
+            # pygame.draw.rect(scoresurf, (0,255,0), (17, 70, 130, 626), self.linewidth)
         #score labels
         scoresurf.blit(self.p1_surf, self.p1_rect)
         scoresurf.blit(self.p2_surf, self.p2_rect)
