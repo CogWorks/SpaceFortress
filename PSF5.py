@@ -5,6 +5,7 @@ import tokens
 from tokens.gameevent import *
 import sys, os
 import pygame
+import time
 try:
     import argparse
 except ImportError:
@@ -33,7 +34,7 @@ class Game(object):
         pygame.font.init()
         display_info = pygame.display.Info()
         aspect_ratio = float(display_info.current_w) / display_info.current_h
-        self.SCREEN_WIDTH = 768 * aspect_ratio
+        self.SCREEN_WIDTH = int(768 * aspect_ratio)
         self.SCREEN_HEIGHT = 768
         self.WORLD_WIDTH = 710
         self.WORLD_HEIGHT = 626
@@ -83,6 +84,9 @@ class Game(object):
         else:
             self.mine_exists = False
         self.mine_list = tokens.mine.MineList(self)
+        self.log = open("test.txt", "w")
+        self.log.write("%s\n"%str(self.config.config.items()))
+        self.gameevents = GameEventList()
     
     def setup_world(self):
         """initializes gameplay"""
@@ -193,10 +197,12 @@ class Game(object):
             command = currentevent.command
             obj = currentevent.obj
             target = currentevent.target
+            self.log.write("# %f %d %s %s %s\n"%(time.time(), pygame.time.get_ticks(), command, obj, target))
             if self.config.get_setting('General','print_events'):
                 print "time %d, command %s, object %s, target %s"%(pygame.time.get_ticks(), command, obj, target)
             if command == "press":    
                 if obj == "quit":
+                    self.log.close()
                     sys.exit(0)
                 elif obj == "left":
                     self.ship.turn_flag = "left"
@@ -245,9 +251,11 @@ class Game(object):
                     else: #AX-CPT
                         if self.bonus.axcpt_flag == True and (self.bonus.state == "iti" or self.bonus.state == "target") and self.bonus.current_pair == "ax":
                             self.sounds.bonus_success.play()
+                            self.gameevents.add("shots_bonus_capture")
                         elif self.bonus.axcpt_flag:
                             self.bonus.axcpt_flag = False
                             self.sounds.bonus_fail.play()
+                            self.gameevents.add("shots_bonus_failure")
                 elif obj == "pnts":
                     if self.config.get_setting('Bonus','bonus_system') == "standard":
                     #if current symbol is bonus but previous wasn't, set flag to deny bonus if next symbol happens to be the bonus symbol
@@ -266,9 +274,11 @@ class Game(object):
                     else: #AX-CPT
                         if self.bonus.axcpt_flag == True and (self.bonus.state == "iti" or self.bonus.state == "target") and self.bonus.current_pair == "ax":
                             self.sounds.bonus_success.play()
+                            self.gameevents.add("pnts_bonus_capture")
                         elif self.bonus.axcpt_flag:
                             self.bonus.axcpt_flag = False
                             self.sounds.bonus_fail.play()
+                            self.gameevents.add("pnts_bonus_failure")
             elif command == "first_tag":
                 if obj == "foe":
                     self.mine_list.iff_flag = True
@@ -494,6 +504,12 @@ class Game(object):
         self.screen.blit(self.scoresurf, self.scorerect)
         self.screen.blit(self.worldsurf, self.worldrect)
         pygame.display.flip()
+        
+    def record_log(self):
+        """logs current state of world to logfile"""
+        #Please use tabs between columns, and wrap cells with spaces in them in quotes, like the column with the
+        #list of shells
+        self.log.write("%f %d\n"%(time.time(), pygame.time.get_ticks()))
     
     def display_foe_mines(self):
         """before game begins, present the list of IFF letters to target"""
@@ -521,10 +537,11 @@ class Game(object):
         self.screen.blit(midbot, midbot_rect)
         self.screen.blit(bottom, bottom_rect)
         pygame.display.flip()
-        #self.log.write("# %f %d Foe mines: %s\n"%(time.time(), pygame.time.get_ticks(), " ".join(self.mine.foe_letters)))
+        self.log.write("# %f %d Foe mines: %s\n"%(time.time(), pygame.time.get_ticks(), " ".join(self.mine_list.foe_letters)))
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
+                    self.gameevents.add("Start", "game")
                     return
     
 
@@ -540,6 +557,7 @@ def main(cogworld, condition):
         g.process_game_logic()
         g.process_events()              
         g.draw()
+        g.record_log()
         if g.ship.alive == False:
             g.reset_position()
 

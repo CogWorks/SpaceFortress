@@ -87,10 +87,15 @@ class Bonus(object):
             self.axcpt_flag = True
             self.current_symbol = self.current_symbols[0]
             self.visible = True
+            if self.current_symbol in self.a_symbols:
+                self.app.gameevents.add("bonus", "cue_appears", "correct")
+            else:
+                self.app.gameevents.add("bonus", "cue_appears", "incorrect")
         elif self.state == "cue" and self.timer.elapsed() > self.cue_time: #make cue disappear
             self.timer.reset()
             self.state = "isi"
             self.visible = False
+            self.app.gameevents.add("bonus", "cue_disappears")
         elif self.state == "isi" and self.timer.elapsed() > self.isi_time: #make target appear
             self.timer.reset()
             if self.isi_time == 800:
@@ -100,9 +105,16 @@ class Bonus(object):
             self.state = "target"
             self.current_symbol = self.current_symbols[1]
             self.visible = True
+            if self.current_symbol in self.x_symbols:
+                self.app.gameevents.add("bonus", "target_appears", "correct")
+            else:
+                self.app.gameevents.add("bonus", "target_appears", "incorrect")
+            if self.current_pair == "ax":
+                self.app.gameevents.add("bonus_available")
         elif self.state == "target" and self.timer.elapsed() > self.target_time: #make target disappear
             self.timer.reset()
             self.state = "iti"
             self.visible = False
+            self.app.gameevents.add("bonus", "target_disappears")
             
         
