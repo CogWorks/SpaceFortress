@@ -5,11 +5,7 @@ import tokens
 from tokens.gameevent import *
 import sys, os
 import pygame
-<<<<<<< HEAD
-
-=======
 import time
->>>>>>> 6be67046ab50bf87e8d4f9e188a43e56410a332e
 try:
     import argparse
 except ImportError:
@@ -42,11 +38,8 @@ class Game(object):
         pygame.font.init()
         display_info = pygame.display.Info()
         aspect_ratio = float(display_info.current_w) / display_info.current_h
-<<<<<<< HEAD
         self.SCREEN_WIDTH = 768 * aspect_ratio
-=======
         self.SCREEN_WIDTH = int(768 * aspect_ratio)
->>>>>>> 6be67046ab50bf87e8d4f9e188a43e56410a332e
         self.SCREEN_HEIGHT = 768
         self.WORLD_WIDTH = 710
         self.WORLD_HEIGHT = 626
