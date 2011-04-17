@@ -38,7 +38,6 @@ class Game(object):
         pygame.font.init()
         display_info = pygame.display.Info()
         aspect_ratio = float(display_info.current_w) / display_info.current_h
-        self.SCREEN_WIDTH = 768 * aspect_ratio
         self.SCREEN_WIDTH = int(768 * aspect_ratio)
         self.SCREEN_HEIGHT = 768
         self.WORLD_WIDTH = 710
