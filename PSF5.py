@@ -6,6 +6,7 @@ from tokens.gameevent import *
 import sys, os
 import pygame
 import time
+import datetime
 try:
     import argparse
 except ImportError:
@@ -88,7 +89,9 @@ class Game(object):
         else:
             self.mine_exists = False
         self.mine_list = tokens.mine.MineList(self)
-        self.log = open("test.txt", "w")
+        d = datetime.datetime.now().timetuple()
+        log_filename = "%d %d-%d-%d %d-%d-%d.dat"%(self.config.get_setting('General','id'), d[0], d[1], d[2], d[3], d[4], d[5])
+        self.log = open(log_filename, "w")
         self.log.write("%s\n"%str(self.config.config.items()))
         self.gameevents = GameEventList()
     

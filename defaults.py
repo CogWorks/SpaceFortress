@@ -35,6 +35,7 @@ def get_config():
     cfg.add_setting('General', 'fullscreen', False, alias='Fullscreen Mode', type=config.constants.CT_CHECKBOX, about='Run at full screen? Set to f to run in a window')
     cfg.add_setting('General', 'linewidth', 1, alias='Linewidth', about='Width of lines drawn on screen. Increase for a more "projector-friendly" game')
     cfg.add_setting('General', 'psf', False, alias='Classic Mode', type=config.constants.CT_CHECKBOX, about='Original PSF (SF4) settings? If t, *ALL* further values are ignored')
+    cfg.add_setting('General', 'id', 1234, alias='Subject ID#', about='Subject identifier used in log filename"')
     cfg.add_setting('General', 'bonus_system', "AX-CPT", alias="Bonus System", type=config.constants.CT_COMBO, options=['standard','AX-CPT'], about='Bonus system standard or AX-CPT?')
     cfg.add_setting('General', 'game_time', 30000, alias='Game Duration (ms)', about='Time in milliseconds for a game. NOTE! If you escape in the middle of a game, the log will have "short" prepended to the name')
     cfg.add_setting('General', 'games_per_session', 8, alias='Max # of Games', about='Number of games per "session"')
