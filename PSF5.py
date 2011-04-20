@@ -254,11 +254,14 @@ class Game(object):
                             else:
                                 self.gameevents.add("shots_bonus_capture")
                                 self.gameevents.add("score++", "shots", self.config.get_setting('Score','bonus_missiles'))
+                                self.gameevents.add("score++", "bonus", self.config.get_setting('Score','bonus_points')/2)
                                 self.bonus.flag = True
                     else: #AX-CPT
                         if self.bonus.axcpt_flag == True and (self.bonus.state == "iti" or self.bonus.state == "target") and self.bonus.current_pair == "ax":
                             self.sounds.bonus_success.play()
                             self.gameevents.add("shots_bonus_capture")
+                            self.gameevents.add("score++", "shots", self.config.get_setting('Score','bonus_missiles'))
+                            self.gameevents.add("score++", "bonus", self.config.get_setting('Score','bonus_points')/2)
                         elif self.bonus.axcpt_flag:
                             self.bonus.axcpt_flag = False
                             self.sounds.bonus_fail.play()
@@ -274,14 +277,16 @@ class Game(object):
                             if self.bonus.flag:
                                 self.gameevents.add("attempt_to_capture_flagged_bonus")
                             else:
-                                self.gameevents.add("shots_pnts_capture")
-                                self.gameevents.add("score++", "bonus", int(self.config["bonus_missiles"]))
-                                self.gameevents.add("score++", "pnts", int(self.config["bonus_missiles"]))
+                                self.gameevents.add("pnts_pnts_capture")
+                                self.gameevents.add("score++", "bonus", self.config.get_setting('Score','bonus_points'))
+                                self.gameevents.add("score++", "pnts", self.config.get_setting('Score','bonus_points'))
                                 self.bonus.flag = True
                     else: #AX-CPT
                         if self.bonus.axcpt_flag == True and (self.bonus.state == "iti" or self.bonus.state == "target") and self.bonus.current_pair == "ax":
                             self.sounds.bonus_success.play()
                             self.gameevents.add("pnts_bonus_capture")
+                            self.gameevents.add("score++", "bonus", self.config.get_setting('Score','bonus_points'))
+                            self.gameevents.add("score++", "pnts", self.config.get_setting('Score','bonus_points'))
                         elif self.bonus.axcpt_flag:
                             self.bonus.axcpt_flag = False
                             self.sounds.bonus_fail.play()
@@ -512,11 +517,92 @@ class Game(object):
         self.screen.blit(self.worldsurf, self.worldrect)
         pygame.display.flip()
         
-    def record_log(self):
+    def log_world(self):
         """logs current state of world to logfile"""
         #Please use tabs between columns, and wrap cells with spaces in them in quotes, like the column with the
         #list of shells
-        self.log.write("%f %d\n"%(time.time(), pygame.time.get_ticks()))
+        #self.log.write("%f %d\n"%(time.time(), pygame.time.get_ticks()))
+        #KEEP TRACK OF BOTH SCORES!
+        """log current frame's data to text file. Note that first line contains foe mine designations
+        format:
+        system_clock game_time ship_alive? ship_x ship_y ship_vel_x ship_vel_y ship_orientation mine_alive? mine_x mine_y 
+        fortress_alive? fortress_orientation [missile_x missile_y ...] [shell_x shell_y ...] bonus_symbol
+        pnts cntrl vlcty vlner iff intervl speed shots thrust_key left_key right_key fire_key iff_key shots_key pnts_key"""
+        system_clock = time.time()
+        game_time = pygame.time.get_ticks()
+        if self.ship.alive:
+            ship_alive = "y"
+            ship_x = "%.3f"%(self.ship.position.x)
+            ship_y = "%.3f"%(self.ship.position.y)
+            ship_vel_x = "%.3f"%(self.ship.velocity.x)
+            ship_vel_y = "%.3f"%(self.ship.velocity.y)
+            ship_orientation = "%.3f"%(self.ship.orientation)
+        else:
+            ship_alive = "n"
+            ship_x = "-"
+            ship_y = "-"
+            ship_vel_x = "-"
+            ship_vel_y = "-"
+            ship_orientation = "-"
+        if self.mine.alive:
+            mine_alive = "y"
+            mine_x = "%.3f"%(self.mine.position.x)
+            mine_y = "%.3f"%(self.mine.position.y)
+        else:
+            mine_alive = "n"
+            mine_x = "-"
+            mine_y = "-"
+        if self.fortress.alive:
+            fortress_alive = "y"
+            fortress_orientation = str(self.fortress.orientation)
+        else:
+            fortress_alive = "n"
+            fortress_orientation = "-"
+        missile = '['
+        for m in self.missile_list:
+            missile += "%.3f %.3f "%(m.position.x, m.position.y)
+        missile += ']'
+        shell = '['
+        for s in self.shell_list:
+            shell += "%.3f %.3f "%(s.position.x, s.position.y)
+        shell += ']'
+        if self.bonus.current_symbol == '':
+            bonus = "-"
+        else:
+            bonus = self.bonus.current_symbol
+        keys = pygame.key.get_pressed()
+        if keys[self.thrust_key]:
+            thrust_key = "y"
+        else:
+            thrust_key = "n"
+        if keys[self.left_turn_key]:
+            left_key = "y"
+        else:
+            left_key = "n"
+        if keys[self.right_turn_key]:
+            right_key = "y"
+        else:
+            right_key = "n"
+        if keys[self.fire_key]:
+            fire_key = "y"
+        else:
+            fire_key = "n"
+        if keys[self.IFF_key]:
+            iff_key = "y"
+        else:
+            iff_key = "n"
+        if keys[self.shots_key]:
+            shots_key = "y"
+        else:
+            shots_key = "n"
+        if keys[self.pnts_key]:
+            pnts_key = "y"
+        else:
+            pnts_key = "n"
+        self.log.write("%f\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%d\t%d\t%d\t%d\t%s\t%d\t%d\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n"%\
+        (system_clock, game_time, ship_alive, ship_x, ship_y, ship_vel_x, ship_vel_y, ship_orientation, mine_alive, mine_x, mine_y, fortress_alive, fortress_orientation,\
+        missile, shell, bonus, self.score.pnts, self.score.cntrl, self.score.vlcty, self.score.vlner, self.score.iff, self.score.intrvl,\
+        self.score.speed, self.score.shots, thrust_key, left_key, right_key, fire_key, iff_key, shots_key, pnts_key))
     
     def display_foe_mines(self):
         """before game begins, present the list of IFF letters to target"""
@@ -564,7 +650,7 @@ def main(cogworld, condition):
         g.process_game_logic()
         g.process_events()              
         g.draw()
-        g.record_log()
+        g.log_world()
         if g.ship.alive == False:
             g.reset_position()
 
