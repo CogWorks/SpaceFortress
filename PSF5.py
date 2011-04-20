@@ -253,15 +253,15 @@ class Game(object):
                                 self.gameevents.add("attempt_to_capture_flagged_bonus")
                             else:
                                 self.gameevents.add("shots_bonus_capture")
-                                self.gameevents.add("score++", "shots", self.config.get_setting('Score','bonus_missiles'))
-                                self.gameevents.add("score++", "bonus", self.config.get_setting('Score','bonus_points')/2)
+                                self.gameevents.add("score+", "shots", self.config.get_setting('Score','bonus_missiles'))
+                                self.gameevents.add("score+", "bonus", self.config.get_setting('Score','bonus_points')/2)
                                 self.bonus.flag = True
                     else: #AX-CPT
                         if self.bonus.axcpt_flag == True and (self.bonus.state == "iti" or self.bonus.state == "target") and self.bonus.current_pair == "ax":
                             self.sounds.bonus_success.play()
                             self.gameevents.add("shots_bonus_capture")
-                            self.gameevents.add("score++", "shots", self.config.get_setting('Score','bonus_missiles'))
-                            self.gameevents.add("score++", "bonus", self.config.get_setting('Score','bonus_points')/2)
+                            self.gameevents.add("score+", "shots", self.config.get_setting('Score','bonus_missiles'))
+                            self.gameevents.add("score+", "bonus", self.config.get_setting('Score','bonus_points')/2)
                         elif self.bonus.axcpt_flag:
                             self.bonus.axcpt_flag = False
                             self.sounds.bonus_fail.play()
@@ -278,15 +278,15 @@ class Game(object):
                                 self.gameevents.add("attempt_to_capture_flagged_bonus")
                             else:
                                 self.gameevents.add("pnts_pnts_capture")
-                                self.gameevents.add("score++", "bonus", self.config.get_setting('Score','bonus_points'))
-                                self.gameevents.add("score++", "pnts", self.config.get_setting('Score','bonus_points'))
+                                self.gameevents.add("score+", "bonus", self.config.get_setting('Score','bonus_points'))
+                                self.gameevents.add("score+", "pnts", self.config.get_setting('Score','bonus_points'))
                                 self.bonus.flag = True
                     else: #AX-CPT
                         if self.bonus.axcpt_flag == True and (self.bonus.state == "iti" or self.bonus.state == "target") and self.bonus.current_pair == "ax":
                             self.sounds.bonus_success.play()
                             self.gameevents.add("pnts_bonus_capture")
-                            self.gameevents.add("score++", "bonus", self.config.get_setting('Score','bonus_points'))
-                            self.gameevents.add("score++", "pnts", self.config.get_setting('Score','bonus_points'))
+                            self.gameevents.add("score+", "bonus", self.config.get_setting('Score','bonus_points'))
+                            self.gameevents.add("score+", "pnts", self.config.get_setting('Score','bonus_points'))
                         elif self.bonus.axcpt_flag:
                             self.bonus.axcpt_flag = False
                             self.sounds.bonus_fail.play()
@@ -636,6 +636,182 @@ class Game(object):
                 if event.type == pygame.KEYDOWN:
                     self.gameevents.add("Start", "game")
                     return
+                    
+    def fade(self):
+        """fade screen to show score"""
+        fadesurf = pygame.Surface((self.SCREEN_WIDTH, self.SCREEN_HEIGHT)).convert_alpha()
+        fadesurf.fill((0,0,0,6))
+        for i in range(100):
+            self.screen.blit(fadesurf, pygame.Rect(0,0, self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
+            pygame.display.flip()
+
+    def show_old_score(self):
+        """shows score for last game and waits to continue"""
+        pygame.event.get() #clear event list? Otherwise it skips
+        self.screen.fill((0, 0, 0))
+        #sessionsurf = self.f24.render("Session %d, Game %d/%s"%(self.session_number, self.game_number, self.config["games_per_session"]), True, (255,255,255))
+        # sessionrect = sessionsurf.get_rect()
+        # sessionrect.centerx = self.SCREEN_WIDTH / 2
+        # sessionrect.y = 100
+        # self.screen.blit(sessionsurf, sessionrect)
+        pntssurf = self.f24.render("PNTS score:", True, (255, 255,0))
+        pntsrect = pntssurf.get_rect()
+        pntsrect.move_ip((250, 200))
+        self.screen.blit(pntssurf, pntsrect)
+        cntrlsurf = self.f24.render("CNTRL score:", True, (255, 255,0))
+        cntrlrect = cntrlsurf.get_rect()
+        cntrlrect.move_ip((250, 300))
+        self.screen.blit(cntrlsurf, cntrlrect)
+        vlctysurf = self.f24.render("VLCTY score:", True, (255, 255,0))
+        vlctyrect = vlctysurf.get_rect()
+        vlctyrect.move_ip((250, 400))
+        self.screen.blit(vlctysurf, vlctyrect)
+        speedsurf = self.f24.render("SPEED score:", True, (255, 255,0))
+        speedrect = speedsurf.get_rect()
+        speedrect.move_ip((250, 500))
+        self.screen.blit(speedsurf, speedrect)
+        pntsnsurf = self.f24.render("%d"%self.score.pnts, True, (255, 255,255))
+        pntsnrect = pntsnsurf.get_rect()
+        pntsnrect.right = 700
+        pntsnrect.y = 200
+        self.screen.blit(pntsnsurf, pntsnrect)
+        cntrlnsurf = self.f24.render("%d"%self.score.cntrl, True, (255, 255,255))
+        cntrlnrect = cntrlnsurf.get_rect()
+        cntrlnrect.right = 700
+        cntrlnrect.y = 300
+        self.screen.blit(cntrlnsurf, cntrlnrect)
+        vlctynsurf = self.f24.render("%d"%self.score.vlcty, True, (255, 255,255))
+        vlctynrect = vlctynsurf.get_rect()
+        vlctynrect.right = 700
+        vlctynrect.y = 400
+        self.screen.blit(vlctynsurf, vlctynrect)
+        speednsurf = self.f24.render("%d"%self.score.speed, True, (255, 255,255))
+        speednrect = speednsurf.get_rect()
+        speednrect.right = 700
+        speednrect.y = 500
+        self.screen.blit(speednsurf, speednrect)
+        #draw line
+        pygame.draw.line(self.screen, (255, 255, 255), (200, 580), (800, 580))
+        totalsurf = self.f24.render("Total score for this game:", True, (255, 255,0))
+        totalrect = totalsurf.get_rect()
+        totalrect.move_ip((200, 620))
+        self.screen.blit(totalsurf, totalrect)
+        totalnsurf = self.f24.render("%d"%(self.score.pnts + self.score.cntrl + self.score.vlcty + self.score.speed), True, (255, 255,255))
+        totalnrect = totalnsurf.get_rect()
+        totalnrect.right = 700
+        totalnrect.y = 620
+        self.screen.blit(totalnsurf, totalnrect)
+        # if self.game_number == int(self.config["games_per_session"]):
+        finalsurf = self.f24.render("You're done! Press any key to exit", True, (0,255,0))
+        # else:
+        #            finalsurf = self.f24.render("Press any key to continue to next game or ESC to exit", True, (255,255,255))
+        finalrect = finalsurf.get_rect()
+        finalrect.centerx = self.SCREEN_WIDTH /2
+        finalrect.y = 700
+        self.screen.blit(finalsurf, finalrect)
+        pygame.display.flip()
+        self.log.write("# pnts score %d\n"%self.score.pnts)
+        self.log.write("# cntrl score %d\n"%self.score.cntrl)
+        self.log.write("# vlcty score %d\n"%self.score.vlcty)
+        self.log.write("# speed score %d\n"%self.score.speed)
+        self.log.write("# flight score %d\n"%self.score.flight)
+        self.log.write("# fortress score %d\n"%self.score.fortress)
+        self.log.write("# mine score %d\n"%self.score.mines)
+        self.log.write("# bonus score %d\n"%self.score.bonus)
+        self.log.write("# total standard score %d\n"%(self.score.pnts + self.score.cntrl + self.score.vlcty + self.score.speed))
+        self.log.write("# total new score %d"%(self.score.flight + self.score.fortress + self.score.mines + self.score.bonus))
+        self.log.close()
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        sys.exit()
+                    else:
+                        return
+                        
+    def show_new_score(self):
+        """shows score for last game and waits to continue"""
+        pygame.event.get() #clear event list? Otherwise it skips
+        self.screen.fill((0, 0, 0))
+        #sessionsurf = self.f24.render("Session %d, Game %d/%s"%(self.session_number, self.game_number, self.config["games_per_session"]), True, (255,255,255))
+        # sessionrect = sessionsurf.get_rect()
+        # sessionrect.centerx = self.SCREEN_WIDTH / 2
+        # sessionrect.y = 100
+        # self.screen.blit(sessionsurf, sessionrect)
+        pntssurf = self.f24.render("Flight score:", True, (255, 255,0))
+        pntsrect = pntssurf.get_rect()
+        pntsrect.move_ip((250, 200))
+        self.screen.blit(pntssurf, pntsrect)
+        cntrlsurf = self.f24.render("Fortress score:", True, (255, 255,0))
+        cntrlrect = cntrlsurf.get_rect()
+        cntrlrect.move_ip((250, 300))
+        self.screen.blit(cntrlsurf, cntrlrect)
+        vlctysurf = self.f24.render("Mine score:", True, (255, 255,0))
+        vlctyrect = vlctysurf.get_rect()
+        vlctyrect.move_ip((250, 400))
+        self.screen.blit(vlctysurf, vlctyrect)
+        speedsurf = self.f24.render("Bonus score:", True, (255, 255,0))
+        speedrect = speedsurf.get_rect()
+        speedrect.move_ip((250, 500))
+        self.screen.blit(speedsurf, speedrect)
+        pntsnsurf = self.f24.render("%d"%self.score.flight, True, (255, 255,255))
+        pntsnrect = pntsnsurf.get_rect()
+        pntsnrect.right = 700
+        pntsnrect.y = 200
+        self.screen.blit(pntsnsurf, pntsnrect)
+        cntrlnsurf = self.f24.render("%d"%self.score.fortress, True, (255, 255,255))
+        cntrlnrect = cntrlnsurf.get_rect()
+        cntrlnrect.right = 700
+        cntrlnrect.y = 300
+        self.screen.blit(cntrlnsurf, cntrlnrect)
+        vlctynsurf = self.f24.render("%d"%self.score.mines, True, (255, 255,255))
+        vlctynrect = vlctynsurf.get_rect()
+        vlctynrect.right = 700
+        vlctynrect.y = 400
+        self.screen.blit(vlctynsurf, vlctynrect)
+        speednsurf = self.f24.render("%d"%self.score.bonus, True, (255, 255,255))
+        speednrect = speednsurf.get_rect()
+        speednrect.right = 700
+        speednrect.y = 500
+        self.screen.blit(speednsurf, speednrect)
+        #draw line
+        pygame.draw.line(self.screen, (255, 255, 255), (200, 580), (800, 580))
+        totalsurf = self.f24.render("Total score for this game:", True, (255, 255,0))
+        totalrect = totalsurf.get_rect()
+        totalrect.move_ip((200, 620))
+        self.screen.blit(totalsurf, totalrect)
+        totalnsurf = self.f24.render("%d"%(self.score.flight + self.score.fortress + self.score.mines + self.score.bonus), True, (255, 255,255))
+        totalnrect = totalnsurf.get_rect()
+        totalnrect.right = 700
+        totalnrect.y = 620
+        self.screen.blit(totalnsurf, totalnrect)
+        # if self.game_number == int(self.config["games_per_session"]):
+        finalsurf = self.f24.render("You're done! Press any key to exit", True, (0,255,0))
+        # else:
+        #            finalsurf = self.f24.render("Press any key to continue to next game or ESC to exit", True, (255,255,255))
+        finalrect = finalsurf.get_rect()
+        finalrect.centerx = self.SCREEN_WIDTH /2
+        finalrect.y = 700
+        self.screen.blit(finalsurf, finalrect)
+        pygame.display.flip()
+        self.log.write("# pnts score %d\n"%self.score.pnts)
+        self.log.write("# cntrl score %d\n"%self.score.cntrl)
+        self.log.write("# vlcty score %d\n"%self.score.vlcty)
+        self.log.write("# speed score %d\n"%self.score.speed)
+        self.log.write("# flight score %d\n"%self.score.flight)
+        self.log.write("# fortress score %d\n"%self.score.fortress)
+        self.log.write("# mine score %d\n"%self.score.mines)
+        self.log.write("# bonus score %d\n"%self.score.bonus)
+        self.log.write("# total standard score %d\n"%(self.score.pnts + self.score.cntrl + self.score.vlcty + self.score.speed))
+        self.log.write("# total new score %d"%(self.score.flight + self.score.fortress + self.score.mines + self.score.bonus))
+        self.log.close()
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        sys.exit()
+                    else:
+                        return
     
 
 def main(cogworld, condition):
@@ -644,15 +820,23 @@ def main(cogworld, condition):
     if g.mine_exists:
         g.display_foe_mines()
     g.setup_world()
+    gameTimer = tokens.timer.Timer()
     while True:
         g.clock.tick(30)
         g.process_input()
         g.process_game_logic()
         g.process_events()              
         g.draw()
-        g.log_world()
+        #g.log_world()
         if g.ship.alive == False:
             g.reset_position()
+        if gameTimer.elapsed() > g.config.get_setting('General','game_time'):
+            g.fade()
+            if g.config.get_setting('General','bonus_system') == "standard":
+                g.show_old_score()
+            else:
+                g.show_new_score()
+            sys.exit()
 
 if __name__ == '__main__':
     
