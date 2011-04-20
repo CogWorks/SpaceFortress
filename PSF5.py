@@ -544,10 +544,10 @@ class Game(object):
             ship_vel_x = "-"
             ship_vel_y = "-"
             ship_orientation = "-"
-        if self.mine.alive:
+        if len(self.mine_list) > 0:
             mine_alive = "y"
-            mine_x = "%.3f"%(self.mine.position.x)
-            mine_y = "%.3f"%(self.mine.position.y)
+            mine_x = "%.3f"%(self.mine_list[0].position.x)
+            mine_y = "%.3f"%(self.mine_list[0].position.y)
         else:
             mine_alive = "n"
             mine_x = "-"
@@ -558,14 +558,16 @@ class Game(object):
         else:
             fortress_alive = "n"
             fortress_orientation = "-"
-        missile = '['
+        missile = '"'
         for m in self.missile_list:
             missile += "%.3f %.3f "%(m.position.x, m.position.y)
-        missile += ']'
-        shell = '['
+        missile.rstrip()
+        missile += '"'
+        shell = '"'
         for s in self.shell_list:
             shell += "%.3f %.3f "%(s.position.x, s.position.y)
-        shell += ']'
+        shell.rstrip()
+        shell += '"'
         if self.bonus.current_symbol == '':
             bonus = "-"
         else:
@@ -827,7 +829,7 @@ def main(cogworld, condition):
         g.process_game_logic()
         g.process_events()              
         g.draw()
-        #g.log_world()
+        g.log_world()
         if g.ship.alive == False:
             g.reset_position()
         if gameTimer.elapsed() > g.config.get_setting('General','game_time'):
