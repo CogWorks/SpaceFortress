@@ -5,6 +5,7 @@ import tokens
 from tokens.gameevent import *
 import sys, os
 import pygame
+import pygame.macosx
 import time
 import datetime
 try:
@@ -28,7 +29,11 @@ class Game(object):
     """Main game application"""
     def __init__(self, cogworld, condition):
         super(Game, self).__init__()
-        self.approot = sys.argv[0][:sys.argv[0].rfind('/')]
+        i = sys.argv[0].rfind('/')
+        if i != -1:
+            self.approot = sys.argv[0][:sys.argv[0].rfind('/')]
+        else:
+            self.approot = './'
         self.fp = os.path.join(self.approot, "fonts/freesansbold.ttf")
         self.cw = cogworld
         self.cond = condition
