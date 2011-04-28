@@ -41,10 +41,18 @@ class Game(object):
         self.config.update_from_user_file()
         pygame.display.init()
         pygame.font.init()
+        pygame.mouse.set_visible(False)
         display_info = pygame.display.Info()
-        aspect_ratio = float(display_info.current_w) / display_info.current_h
+        mode_list = pygame.display.list_modes()
+        best_mode = None
+        for mode in mode_list:
+            if mode[1] == display_info.current_h:
+                best_mode = mode
+                break
+        aspect_ratio = float(best_mode[0]) / best_mode[1]
         self.SCREEN_WIDTH = int(768 * aspect_ratio)
         self.SCREEN_HEIGHT = 768
+        os.environ['SDL_VIDEO_WINDOW_POS'] = str(int(best_mode[0]/2-self.SCREEN_WIDTH/2)) + "," + str(int(best_mode[1]/2-self.SCREEN_HEIGHT/2))
         self.WORLD_WIDTH = 710
         self.WORLD_HEIGHT = 626
         self.linewidth = self.config.get_setting('General','linewidth')
@@ -65,8 +73,10 @@ class Game(object):
         self.vector_explosion.set_colorkey((0, 0, 0))
         self.vector_explosion_rect = self.vector_explosion.get_rect()
         self.sounds = tokens.sounds.Sounds(self)
-        if self.config.get_setting('General','fullscreen'):
+        if self.config.get_setting('General','display_mode') == 'Fullscreen':
             self.screen = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT), pygame.FULLSCREEN)
+        elif self.config.get_setting('General','display_mode') == 'Fake Fullscreen':
+            self.screen = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT), pygame.NOFRAME)
         else:
             self.screen = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
         self.clock = pygame.time.Clock()

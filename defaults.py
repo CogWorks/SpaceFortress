@@ -32,7 +32,7 @@ def get_config():
     cfg = Config()
     
     cfg.add_setting('General', 'player', True, alias='Player', options=['Human','Model'], type=config.constants.CT_COMBO, about='Will this game be played by a human or a cognitive model? Set to f to disable human control, enabling ACT-R')
-    cfg.add_setting('General', 'fullscreen', False, alias='Fullscreen Mode', type=config.constants.CT_CHECKBOX, about='Run at full screen? Set to f to run in a window')
+    cfg.add_setting('General', 'display_mode', 'Fullscreen', alias='Display Mode', options=['Fullscreen','Windowed','Fake Fullscreen'], type=config.constants.CT_COMBO, about='Run at full screen? Set to f to run in a window')
     cfg.add_setting('General', 'linewidth', 1, alias='Linewidth', about='Width of lines drawn on screen. Increase for a more "projector-friendly" game')
     cfg.add_setting('General', 'psf', False, alias='Classic Mode', type=config.constants.CT_CHECKBOX, about='Original PSF (SF4) settings? If t, *ALL* further values are ignored')
     cfg.add_setting('General', 'id', 1234, alias='Subject ID#', about='Subject identifier used in log filename"')
