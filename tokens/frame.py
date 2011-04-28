@@ -32,61 +32,61 @@ class Frame(object):
         #score labels
         self.p1_surf = self.f.render(positions[1],0, (0,255,0))
         self.p1_rect = self.p1_surf.get_rect()
-        self.p1_rect.centery = 16
-        self.p1_rect.centerx = 45
+        self.p1_rect.centery = 16*self.app.aspect_ratio
+        self.p1_rect.centerx = 45*self.app.aspect_ratio
         self.p2_surf = self.f.render(positions[2],0, (0,255,0))
         self.p2_rect = self.p2_surf.get_rect()
-        self.p2_rect.centery = 16
-        self.p2_rect.centerx = 134
+        self.p2_rect.centery = 16*self.app.aspect_ratio
+        self.p2_rect.centerx = 134*self.app.aspect_ratio
         self.p3_surf = self.f.render(positions[3],0, (0,255,0))
         self.p3_rect = self.p3_surf.get_rect()
-        self.p3_rect.centery = 16
-        self.p3_rect.centerx = 223
+        self.p3_rect.centery = 16*self.app.aspect_ratio
+        self.p3_rect.centerx = 223*self.app.aspect_ratio
         self.p4_surf = self.f.render(positions[4],0, (0,255,0))
         self.p4_rect = self.p4_surf.get_rect()
-        self.p4_rect.centery = 16
-        self.p4_rect.centerx = 312
+        self.p4_rect.centery = 16*self.app.aspect_ratio
+        self.p4_rect.centerx = 312*self.app.aspect_ratio
         self.p5_surf = self.f.render(positions[5],0, (0,255,0))
         self.p5_rect = self.p5_surf.get_rect()
-        self.p5_rect.centery = 16
-        self.p5_rect.centerx = 401
+        self.p5_rect.centery = 16*self.app.aspect_ratio
+        self.p5_rect.centerx = 401*self.app.aspect_ratio
         self.p6_surf = self.f.render(positions[6],0, (0,255,0))
         self.p6_rect = self.p6_surf.get_rect()
-        self.p6_rect.centery = 16
-        self.p6_rect.centerx = 490
+        self.p6_rect.centery = 16*self.app.aspect_ratio
+        self.p6_rect.centerx = 490*self.app.aspect_ratio
         self.p7_surf = self.f.render(positions[7],0, (0,255,0))
         self.p7_rect = self.p7_surf.get_rect()
-        self.p7_rect.centery = 16
-        self.p7_rect.centerx = 579
+        self.p7_rect.centery = 16*self.app.aspect_ratio
+        self.p7_rect.centerx = 579*self.app.aspect_ratio
         self.p8_surf = self.f.render(positions[8],0, (0,255,0))
         self.p8_rect = self.p8_surf.get_rect()
-        self.p8_rect.centery = 16
-        self.p8_rect.centerx = 668
+        self.p8_rect.centery = 16*self.app.aspect_ratio
+        self.p8_rect.centerx = 668*self.app.aspect_ratio
         if self.app.config.get_setting('Score','new_scoring_pos'):
             half_width = self.app.SCREEN_WIDTH / 2
-            self.p1_rect.centery = 15
-            self.p1_rect.centerx = half_width - 192 #320
-            self.p2_rect.centery = 15
-            self.p2_rect.centerx = half_width + 148 #660
-            self.p3_rect.centery = 188
-            self.p3_rect.centerx = half_width + 428 #940
-            self.p4_rect.centery = 520
-            self.p4_rect.centerx = half_width + 428 #940
-            self.p5_rect.centery = 720
-            self.p5_rect.centerx = half_width + 148 #660
-            self.p6_rect.centery = 720
-            self.p6_rect.centerx = half_width - 192 #320
-            self.p7_rect.centery = 520
-            self.p7_rect.centerx = half_width - 432 #80
-            self.p8_rect.centery = 188
-            self.p8_rect.centerx = half_width - 432 #80
+            self.p1_rect.centery = 15*self.app.aspect_ratio
+            self.p1_rect.centerx = half_width - 192*self.app.aspect_ratio #320
+            self.p2_rect.centery = 15*self.app.aspect_ratio
+            self.p2_rect.centerx = half_width + 148*self.app.aspect_ratio #660
+            self.p3_rect.centery = 188*self.app.aspect_ratio
+            self.p3_rect.centerx = half_width + 428*self.app.aspect_ratio #940
+            self.p4_rect.centery = 520*self.app.aspect_ratio
+            self.p4_rect.centerx = half_width + 428*self.app.aspect_ratio #940
+            self.p5_rect.centery = 720*self.app.aspect_ratio
+            self.p5_rect.centerx = half_width + 148*self.app.aspect_ratio #660
+            self.p6_rect.centery = 720*self.app.aspect_ratio
+            self.p6_rect.centerx = half_width - 192*self.app.aspect_ratio #320
+            self.p7_rect.centery = 520*self.app.aspect_ratio
+            self.p7_rect.centerx = half_width - 432*self.app.aspect_ratio #80
+            self.p8_rect.centery = 188*self.app.aspect_ratio
+            self.p8_rect.centerx = half_width - 432*self.app.aspect_ratio #80
             
         
     def draw(self, worldsurf, scoresurf):
         """Draws the game boundaries and 'table' to hold the scores"""
         worldsurf.fill((0,0,0))
         scoresurf.fill((0,0,0))
-        pygame.draw.rect(worldsurf, (0,255,0), (0,0, 710, 625), self.linewidth) #outer 'world' boundary
+        pygame.draw.rect(worldsurf, (0,255,0), (0,0, self.app.WORLD_WIDTH, self.app.WORLD_HEIGHT), self.linewidth) #outer 'world' boundary
         if not self.app.config.get_setting('Score','new_scoring_pos'): #draw frame along bottom of gameworld
             pygame.draw.rect(scoresurf, (0,255,0), (0,0,710, 63), self.linewidth) #bottom box to hold scores
             pygame.draw.line(scoresurf, (0,255,0), (0,32),(709,32), self.linewidth) #divides bottom box horizontally into two rows
@@ -100,10 +100,10 @@ class Frame(object):
             pygame.draw.line(scoresurf, (0,255,0), (623, 0), (623, 64), self.linewidth)
         else: #draw frame in "eye-tracker-friendly" format
             half_width = self.app.SCREEN_WIDTH / 2
-            pygame.draw.rect(scoresurf, (0,255,0), (half_width - 355, 5, 710, 57), self.linewidth)
-            pygame.draw.rect(scoresurf, (0,255,0), (half_width + 366, 70, 130, 626), self.linewidth)
-            pygame.draw.rect(scoresurf, (0,255,0), (half_width - 355, 705, 710, 57), self.linewidth)
-            pygame.draw.rect(scoresurf, (0,255,0), (half_width - 495, 70, 130, 626), self.linewidth)
+            pygame.draw.rect(scoresurf, (0,255,0), (half_width - 355*self.app.aspect_ratio, 5*self.app.aspect_ratio, 710*self.app.aspect_ratio, 57*self.app.aspect_ratio), self.linewidth)
+            pygame.draw.rect(scoresurf, (0,255,0), (half_width + 366*self.app.aspect_ratio, 70*self.app.aspect_ratio, 130*self.app.aspect_ratio, 626*self.app.aspect_ratio), self.linewidth)
+            pygame.draw.rect(scoresurf, (0,255,0), (half_width - 355*self.app.aspect_ratio, 705*self.app.aspect_ratio, 710*self.app.aspect_ratio, 57*self.app.aspect_ratio), self.linewidth)
+            pygame.draw.rect(scoresurf, (0,255,0), (half_width - 495*self.app.aspect_ratio, 70*self.app.aspect_ratio, 130*self.app.aspect_ratio, 626*self.app.aspect_ratio), self.linewidth)
             # pygame.draw.rect(scoresurf, (0,255,0), (157, 5, 710, 57), self.linewidth)
             # pygame.draw.rect(scoresurf, (0,255,0), (878, 70, 130, 626), self.linewidth)
             # pygame.draw.rect(scoresurf, (0,255,0), (157, 705, 710, 57), self.linewidth)

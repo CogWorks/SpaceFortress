@@ -19,9 +19,9 @@ class Fortress(token.Token):
     def __init__(self, app):
         super(Fortress, self).__init__()
         self.app = app
-        self.position.x = self.app.config.get_setting('Fortress','fortress_pos_x')
-        self.position.y = self.app.config.get_setting('Fortress','fortress_pos_y')
-        self.collision_radius = self.app.config.get_setting('Fortress','fortress_radius') 
+        self.position.x = int(self.app.config.get_setting('Fortress','fortress_pos_x')*self.app.aspect_ratio)
+        self.position.y = int(self.app.config.get_setting('Fortress','fortress_pos_y')*self.app.aspect_ratio)
+        self.collision_radius = self.app.config.get_setting('Fortress','fortress_radius')*self.app.aspect_ratio
         self.last_orientation = self.orientation 
         if self.app.config.get_setting('General','player') == 'Model':
             self.timer = frame_timer(self.app)
@@ -54,29 +54,29 @@ class Fortress(token.Token):
     def draw(self, worldsurf):
         """draws fortress to worldsurf"""
         #draws a small black circle under the fortress so we don't see the shell in the center
-        pygame.draw.circle(worldsurf, (0,0,0), (self.position.x, self.position.y), 30)
+        pygame.draw.circle(worldsurf, (0,0,0), (self.position.x, self.position.y), int(30*self.app.aspect_ratio))
         #photoshop measurement shows 36 pixels long, and two wings 18 from center and 18 long
         #these formulae rotate about the origin. Need to translate to origin, rotate, and translate back
         self.sinphi = math.sin(math.radians((self.orientation) % 360))
         self.cosphi = math.cos(math.radians((self.orientation) % 360))
         #x1 = self.position.x
         #y1 = self.position.y
-        x1 = 18 * self.cosphi + self.position.x
-        y1 = -(18 * self.sinphi) + self.position.y
-        x2 = 36 * self.cosphi + self.position.x
-        y2 = -(36 * self.sinphi) + self.position.y
+        x1 = 18 * self.cosphi*self.app.aspect_ratio + self.position.x
+        y1 = -(18 * self.sinphi)*self.app.aspect_ratio + self.position.y
+        x2 = 36 * self.cosphi*self.app.aspect_ratio + self.position.x
+        y2 = -(36 * self.sinphi)*self.app.aspect_ratio + self.position.y
         #x3, y3 = 18, -18
-        x3 = 18 * self.cosphi - -18 * self.sinphi + self.position.x
-        y3 = -(-18 * self.cosphi + 18 * self.sinphi) + self.position.y
+        x3 = (18 * self.cosphi - -18 * self.sinphi)*self.app.aspect_ratio + self.position.x
+        y3 = (-(-18 * self.cosphi + 18 * self.sinphi))*self.app.aspect_ratio + self.position.y
         #x4, y4 = 0, -18
-        x4 = -(-18 * self.sinphi) + self.position.x
-        y4 = -(-18 * self.cosphi) + self.position.y
+        x4 = -(-18 * self.sinphi)*self.app.aspect_ratio + self.position.x
+        y4 = -(-18 * self.cosphi)*self.app.aspect_ratio + self.position.y
         #x5, y5 = 18, 18
-        x5 = 18 * self.cosphi - 18 * self.sinphi + self.position.x
-        y5 = -(18 * self.cosphi + 18 * self.sinphi) + self.position.y
+        x5 = (18 * self.cosphi - 18 * self.sinphi)*self.app.aspect_ratio + self.position.x
+        y5 = (-(18 * self.cosphi + 18 * self.sinphi))*self.app.aspect_ratio + self.position.y
         #x6, y6 = 0, 18
-        x6 = - (18 * self.sinphi) + self.position.x
-        y6 = -(18 * self.cosphi) + self.position.y
+        x6 = - (18 * self.sinphi)*self.app.aspect_ratio + self.position.x
+        y6 = -(18 * self.cosphi)*self.app.aspect_ratio + self.position.y
         
         pygame.draw.line(worldsurf, (255,255,0), (x1,y1), (x2, y2), self.app.linewidth)
         pygame.draw.line(worldsurf, (255,255,0), (x3,y3), (x5, y5), self.app.linewidth)

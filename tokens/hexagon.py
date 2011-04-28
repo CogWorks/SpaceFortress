@@ -16,22 +16,22 @@ class Hex(token.Token):
         super(Hex, self).__init__()
         self.app = app
         self.original_radius = radius
-        self.radius = radius
-        self.x = self.app.config.get_setting('Hexagon','hex_pos_x')
-        self.y = self.app.config.get_setting('Hexagon','hex_pos_y')
+        self.radius = radius*self.app.aspect_ratio
+        self.x = self.app.config.get_setting('Hexagon','hex_pos_x')*self.app.aspect_ratio
+        self.y = self.app.config.get_setting('Hexagon','hex_pos_y')*self.app.aspect_ratio
         self.shrink_radius = self.app.config.get_setting('Hexagon','hex_shrink_radius')
-        self.set_points(radius)
+        self.set_points(self.radius)
         self.small_hex_flag = False #simple flag to prevent ship getting "stuck" in small hex
         
     def set_points(self, radius):
         """sets points of hex based on radius"""
-        self.PointX1 = (int) (self.x - radius)
-        self.PointX2 = (int) (self.x - radius * 0.5)
-        self.PointX3 = (int) (self.x + radius * 0.5) 
-        self.PointX4 = (int) (self.x + radius) 
+        self.PointX1 = (int) (self.x - self.radius)
+        self.PointX2 = (int) (self.x - self.radius * 0.5)
+        self.PointX3 = (int) (self.x + self.radius * 0.5) 
+        self.PointX4 = (int) (self.x + self.radius) 
         self.PointY1 = self.y
-        self.PointY2 = (int) (self.y - radius * 1.125)
-        self.PointY3 = (int) (self.y + radius * 1.125) 
+        self.PointY2 = (int) (self.y - self.radius * 1.125)
+        self.PointY3 = (int) (self.y + self.radius * 1.125) 
         self.points_x = [0] * 6
         self.points_y = [0] * 6
 

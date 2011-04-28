@@ -44,24 +44,23 @@ class Game(object):
         pygame.mouse.set_visible(False)
         display_info = pygame.display.Info()
         mode_list = pygame.display.list_modes()
-        best_mode = None
-        for mode in mode_list:
-            if mode[1] == display_info.current_h:
-                best_mode = mode
-                break
-        aspect_ratio = float(best_mode[0]) / best_mode[1]
-        self.SCREEN_WIDTH = int(768 * aspect_ratio)
-        self.SCREEN_HEIGHT = 768
-        os.environ['SDL_VIDEO_WINDOW_POS'] = str(int(best_mode[0]/2-self.SCREEN_WIDTH/2)) + "," + str(int(best_mode[1]/2-self.SCREEN_HEIGHT/2))
-        self.WORLD_WIDTH = 710
-        self.WORLD_HEIGHT = 626
+        if self.config.get_setting('General','display_mode') == 'Windowed':
+            best_mode = mode_list[1]
+        else:
+            best_mode = mode_list[0]
+        self.aspect_ratio = best_mode[1]/768
+        self.SCREEN_WIDTH = best_mode[0]#int(768 * aspect_ratio)
+        self.SCREEN_HEIGHT = best_mode[1]#768
+        os.environ['SDL_VIDEO_WINDOW_POS'] = str(int(mode_list[0][0]/2-self.SCREEN_WIDTH/2)) + "," + str(int(mode_list[0][1]/2-self.SCREEN_HEIGHT/2))
+        self.WORLD_WIDTH = int(710 * self.aspect_ratio)
+        self.WORLD_HEIGHT = int(626 * self.aspect_ratio)
         self.linewidth = self.config.get_setting('General','linewidth')
         self.frame = tokens.frame.Frame(self)
         self.score = tokens.score.Score(self)
-        self.f = pygame.font.Font(self.fp, 14)
-        self.f24 = pygame.font.Font(self.fp, 20)
-        self.f96 = pygame.font.Font(self.fp, 72)
-        self.f36 = pygame.font.Font(self.fp, 36)
+        self.f = pygame.font.Font(self.fp, int(14*self.aspect_ratio))
+        self.f24 = pygame.font.Font(self.fp, int(20*self.aspect_ratio))
+        self.f96 = pygame.font.Font(self.fp, int(72*self.aspect_ratio))
+        self.f36 = pygame.font.Font(self.fp, int(36*self.aspect_ratio))
         self.thrust_key = eval("pygame.K_%s" % self.config.get_setting('Keybindings','thrust_key'))
         self.left_turn_key = eval("pygame.K_%s" % self.config.get_setting('Keybindings','left_turn_key'))
         self.right_turn_key = eval("pygame.K_%s" % self.config.get_setting('Keybindings','right_turn_key'))
@@ -85,14 +84,15 @@ class Game(object):
         self.worldsurf = pygame.Surface((self.WORLD_WIDTH, self.WORLD_HEIGHT))
         self.worldrect = self.worldsurf.get_rect()
         self.worldrect.centerx = self.SCREEN_WIDTH/2
+        self.worldrect.centery = self.SCREEN_HEIGHT/2
         if not self.config.get_setting('Score','new_scoring_pos'):
-            self.worldrect.top = 5
-            self.scoresurf = pygame.Surface((self.WORLD_WIDTH, 64))
+            self.worldrect.top = 5 * self.aspect_ratio
+            self.scoresurf = pygame.Surface((self.WORLD_WIDTH, 64*self.aspect_ratio))
             self.scorerect = self.scoresurf.get_rect()
-            self.scorerect.top = 634
+            self.scorerect.top = 634 * self.aspect_ratio
             self.scorerect.centerx = self.SCREEN_WIDTH/2
         else:
-            self.worldrect.top = 70
+            self.worldrect.top = 70 * self.aspect_ratio
             self.scoresurf = pygame.Surface.copy(self.screen)
             self.scorerect = self.screen.get_rect()
             #self.scorerect.top = 5
@@ -628,7 +628,7 @@ class Game(object):
         top = self.f24.render("The Type-2 mines for this session are:", True, (255,255,0))
         top_rect = top.get_rect()
         top_rect.centerx = self.SCREEN_WIDTH/2
-        top_rect.centery = 270
+        top_rect.centery = 270*self.aspect_ratio
         middle = self.f96.render(", ".join(self.mine_list.foe_letters), True, (255,255,255))
         middle_rect = middle.get_rect()
         middle_rect.centerx = self.SCREEN_WIDTH/2
@@ -636,11 +636,11 @@ class Game(object):
         midbot = self.f24.render("Try to memorize them before proceeding", True, (255,255,0))
         midbot_rect = midbot.get_rect()
         midbot_rect.centerx = self.SCREEN_WIDTH/2
-        midbot_rect.centery = 500
+        midbot_rect.centery = 500*self.aspect_ratio
         bottom = self.f24.render("Press any key to begin", True, (255,255,0))
         bottom_rect = bottom.get_rect()
         bottom_rect.centerx = self.SCREEN_WIDTH/2
-        bottom_rect.centery = 600
+        bottom_rect.centery = 600*self.aspect_ratio
         self.screen.blit(top, top_rect)
         self.screen.blit(middle, middle_rect)
         self.screen.blit(midbot, midbot_rect)

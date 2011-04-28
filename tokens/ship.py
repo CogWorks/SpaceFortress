@@ -16,9 +16,9 @@ class Ship(token.Token):
     def __init__(self, app):
         super(Ship, self).__init__()
         self.app = app
-        self.collision_radius = self.app.config.get_setting('Ship','ship_radius')
-        self.position.x = self.app.config.get_setting('Ship','ship_pos_x')
-        self.position.y = self.app.config.get_setting('Ship','ship_pos_y')
+        self.collision_radius = self.app.config.get_setting('Ship','ship_radius')*self.app.aspect_ratio
+        self.position.x = self.app.config.get_setting('Ship','ship_pos_x')*self.app.aspect_ratio
+        self.position.y = self.app.config.get_setting('Ship','ship_pos_y')*self.app.aspect_ratio
         self.velocity.x = self.app.config.get_setting('Ship','ship_vel_x')
         self.velocity.y = self.app.config.get_setting('Ship','ship_vel_y')
         self.orientation = self.app.config.get_setting('Ship','ship_orientation')
@@ -95,20 +95,20 @@ class Ship(token.Token):
         self.sinphi = math.sin(math.radians((self.orientation) % 360))
         self.cosphi = math.cos(math.radians((self.orientation) % 360))
         #old x1 = -18
-        x1 = -18 * self.cosphi + self.position.x
-        y1 = -(-18 * self.sinphi) + self.position.y
+        x1 = -18 * self.cosphi * self.app.aspect_ratio + self.position.x
+        y1 = -(-18 * self.sinphi) * self.app.aspect_ratio + self.position.y
         #old x2 = + 18
-        x2 = 18 * self.cosphi + self.position.x
-        y2 = -(18 * self.sinphi) + self.position.y
+        x2 = 18 * self.cosphi * self.app.aspect_ratio + self.position.x
+        y2 = -(18 * self.sinphi) * self.app.aspect_ratio + self.position.y
         #x3 will be center point
         x3 = self.position.x
         y3 = self.position.y
         #x4, y4 = -18, 18
-        x4 = -18 * self.cosphi - 18 * self.sinphi + self.position.x
-        y4 = -((18 * self.cosphi) + (-18 * self.sinphi)) + self.position.y
+        x4 = (-18 * self.cosphi - 18 * self.sinphi)*self.app.aspect_ratio + self.position.x
+        y4 = (-((18 * self.cosphi) + (-18 * self.sinphi)))*self.app.aspect_ratio + self.position.y
         #x5, y5 = -18, -18
-        x5 = -18 * self.cosphi - -18 * self.sinphi + self.position.x
-        y5 = -((-18 * self.cosphi) + (-18 * self.sinphi)) + self.position.y
+        x5 = (-18 * self.cosphi - -18 * self.sinphi)*self.app.aspect_ratio + self.position.x
+        y5 = (-((-18 * self.cosphi) + (-18 * self.sinphi)))*self.app.aspect_ratio + self.position.y
         
         pygame.draw.line(worldsurf, (255,255,0), (x1,y1), (x2,y2), self.app.linewidth)
         pygame.draw.line(worldsurf, (255,255,0), (x3,y3), (x4,y4), self.app.linewidth)

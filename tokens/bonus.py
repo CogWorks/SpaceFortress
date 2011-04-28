@@ -21,7 +21,7 @@ class Bonus(object):
             self.x = random.randint(20, app.WORLD_WIDTH - 10)
             self.y = random.randint(20, app.WORLD_HEIGHT - 20)
         self.visible = False
-        self.font = pygame.font.Font(self.app.fp, 28)
+        self.font = pygame.font.Font(self.app.fp, int(28*self.app.aspect_ratio))
         self.bonus_symbol = self.app.config.get_setting('Bonus','bonus_symbol')
         self.current_symbol = None
         self.prior_symbol = None
@@ -48,7 +48,7 @@ class Bonus(object):
         
     def draw(self, worldsurf):
         """draws bonus symbol to screen"""
-        worldsurf.blit(self.font.render("%s"%self.current_symbol, 1, (255, 255, 0)), pygame.Rect(self.x, self.y, 150, 30))
+        worldsurf.blit(self.font.render("%s"%self.current_symbol, 1, (255, 255, 0)), pygame.Rect(self.x*self.app.aspect_ratio, self.y*self.app.aspect_ratio, 150*self.app.aspect_ratio, 30*self.app.aspect_ratio))
     
     def get_new_symbol(self):
         """assigns new bonus symbol"""

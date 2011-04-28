@@ -19,7 +19,7 @@ class Missile(token.Token):
         self.orientation = self.app.ship.orientation
         self.position.x = self.app.ship.position.x
         self.position.y = self.app.ship.position.y
-        self.collision_radius = self.app.config.get_setting('Missle','missile_radius')
+        self.collision_radius = self.app.config.get_setting('Missle','missile_radius')*self.app.aspect_ratio
         self.speed = self.app.config.get_setting('Missle','missile_speed')
         self.velocity.x = math.cos(math.radians((self.orientation) % 360)) * self.speed
         self.velocity.y = -math.sin(math.radians((self.orientation) % 360)) * self.speed
@@ -39,14 +39,14 @@ class Missile(token.Token):
         self.x1 = self.position.x
         self.y1 = self.position.y
         #x2 is -25
-        self.x2 = -25 * self.cosphi + self.position.x
-        self.y2 = -(-25 * self.sinphi) + self.position.y
+        self.x2 = -25 * self.cosphi*self.app.aspect_ratio + self.position.x
+        self.y2 = -(-25 * self.sinphi)*self.app.aspect_ratio + self.position.y
         #x3, y3 is -5, +5
-        self.x3 = (-5 * self.cosphi) - (5 * self.sinphi) + self.position.x
-        self.y3 = -((5 * self.cosphi) + (-5 * self.sinphi)) + self.position.y
+        self.x3 = ((-5 * self.cosphi) - (5 * self.sinphi))*self.app.aspect_ratio + self.position.x
+        self.y3 = (-((5 * self.cosphi) + (-5 * self.sinphi)))*self.app.aspect_ratio + self.position.y
         #x4, y4 is -5, -5
-        self.x4 = (-5 * self.cosphi) - (-5 * self.sinphi) + self.position.x
-        self.y4 = -((-5 * self.cosphi) + (-5 * self.sinphi)) + self.position.y
+        self.x4 = ((-5 * self.cosphi) - (-5 * self.sinphi))*self.app.aspect_ratio + self.position.x
+        self.y4 = (-((-5 * self.cosphi) + (-5 * self.sinphi)))*self.app.aspect_ratio + self.position.y
         
         pygame.draw.line(worldsurf, (255,0,0), (self.x1, self.y1), (self.x2, self.y2), self.app.linewidth)
         pygame.draw.line(worldsurf, (255,0,0), (self.x1, self.y1), (self.x3, self.y3), self.app.linewidth)

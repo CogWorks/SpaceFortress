@@ -20,7 +20,7 @@ class Shell(token.Token):
         self.position.x = self.app.fortress.position.x
         self.position.y = self.app.fortress.position.y
         self.speed = self.app.config.get_setting('Shell','shell_speed')
-        self.collision_radius = 3
+        self.collision_radius = 3*self.app.aspect_ratio
         self.velocity.x = math.cos(math.radians((self.orientation) % 360)) * self.speed
         self.velocity.y = -math.sin(math.radians((self.orientation) % 360)) * self.speed
         
@@ -38,14 +38,14 @@ class Shell(token.Token):
         self.sinphi = math.sin(math.radians((self.orientation) % 360))
         self.cosphi = math.cos(math.radians((self.orientation) % 360))
         
-        x1 = -8 * self.cosphi + self.position.x
-        y1 = -(-8 * self.sinphi) + self.position.y
-        x2 = -(-6 * self.sinphi) + self.position.x
-        y2 = -(-6 * self.cosphi) + self.position.y
-        x3 = 16 * self.cosphi + self.position.x
-        y3 = -(16 * self.sinphi) + self.position.y
-        x4 = -(6 * self.sinphi) + self.position.x
-        y4 = -(6 * self.cosphi) + self.position.y
+        x1 = -8 * self.cosphi*self.app.aspect_ratio + self.position.x
+        y1 = -(-8 * self.sinphi)*self.app.aspect_ratio + self.position.y
+        x2 = -(-6 * self.sinphi)*self.app.aspect_ratio + self.position.x
+        y2 = -(-6 * self.cosphi)*self.app.aspect_ratio + self.position.y
+        x3 = 16 * self.cosphi*self.app.aspect_ratio + self.position.x
+        y3 = -(16 * self.sinphi)*self.app.aspect_ratio + self.position.y
+        x4 = -(6 * self.sinphi)*self.app.aspect_ratio + self.position.x
+        y4 = -(6 * self.cosphi)*self.app.aspect_ratio + self.position.y
         
         pygame.draw.line(worldsurf, (255,0,0), (x1, y1), (x2, y2), self.app.linewidth)
         pygame.draw.line(worldsurf, (255,0,0), (x2, y2), (x3, y3), self.app.linewidth)
