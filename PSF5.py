@@ -5,7 +5,6 @@ import tokens
 from tokens.gameevent import *
 import sys, os
 import pygame
-import pygame.macosx
 import time
 import datetime
 try:
