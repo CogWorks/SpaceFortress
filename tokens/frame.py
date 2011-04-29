@@ -88,16 +88,16 @@ class Frame(object):
         scoresurf.fill((0,0,0))
         pygame.draw.rect(worldsurf, (0,255,0), (0,0, self.app.WORLD_WIDTH, self.app.WORLD_HEIGHT), self.linewidth) #outer 'world' boundary
         if not self.app.config.get_setting('Score','new_scoring_pos'): #draw frame along bottom of gameworld
-            pygame.draw.rect(scoresurf, (0,255,0), (0,0,710, 63), self.linewidth) #bottom box to hold scores
-            pygame.draw.line(scoresurf, (0,255,0), (0,32),(709,32), self.linewidth) #divides bottom box horizontally into two rows
+            pygame.draw.rect(scoresurf, (0,255,0), (0,0,710*self.app.aspect_ratio, 63*self.app.aspect_ratio), self.linewidth) #bottom box to hold scores
+            pygame.draw.line(scoresurf, (0,255,0), (0,32*self.app.aspect_ratio),(709*self.app.aspect_ratio,32*self.app.aspect_ratio), self.linewidth) #divides bottom box horizontally into two rows
             #the following seven lines divides the bottom box vertically into 8 columns
-            pygame.draw.line(scoresurf, (0,255,0), (89, 0), (89, 64), self.linewidth)
-            pygame.draw.line(scoresurf, (0,255,0), (178, 0), (178, 64), self.linewidth)
-            pygame.draw.line(scoresurf, (0,255,0), (267, 0), (267, 64), self.linewidth)
-            pygame.draw.line(scoresurf, (0,255,0), (356, 0), (356, 64), self.linewidth)
-            pygame.draw.line(scoresurf, (0,255,0), (445, 0), (445, 64), self.linewidth)
-            pygame.draw.line(scoresurf, (0,255,0), (534, 0), (534, 64), self.linewidth)
-            pygame.draw.line(scoresurf, (0,255,0), (623, 0), (623, 64), self.linewidth)
+            pygame.draw.line(scoresurf, (0,255,0), (89*self.app.aspect_ratio, 0), (89*self.app.aspect_ratio, 62*self.app.aspect_ratio), self.linewidth)
+            pygame.draw.line(scoresurf, (0,255,0), (178*self.app.aspect_ratio, 0), (178*self.app.aspect_ratio, 62*self.app.aspect_ratio), self.linewidth)
+            pygame.draw.line(scoresurf, (0,255,0), (267*self.app.aspect_ratio, 0), (267*self.app.aspect_ratio, 62*self.app.aspect_ratio), self.linewidth)
+            pygame.draw.line(scoresurf, (0,255,0), (356*self.app.aspect_ratio, 0), (356*self.app.aspect_ratio, 62*self.app.aspect_ratio), self.linewidth)
+            pygame.draw.line(scoresurf, (0,255,0), (445*self.app.aspect_ratio, 0), (445*self.app.aspect_ratio, 62*self.app.aspect_ratio), self.linewidth)
+            pygame.draw.line(scoresurf, (0,255,0), (534*self.app.aspect_ratio, 0), (534*self.app.aspect_ratio, 62*self.app.aspect_ratio), self.linewidth)
+            pygame.draw.line(scoresurf, (0,255,0), (623*self.app.aspect_ratio, 0), (623*self.app.aspect_ratio, 62*self.app.aspect_ratio), self.linewidth)
         else: #draw frame in "eye-tracker-friendly" format
             half_width = self.app.SCREEN_WIDTH / 2
             pygame.draw.rect(scoresurf, (0,255,0), (half_width - 355*self.app.aspect_ratio, 5*self.app.aspect_ratio, 710*self.app.aspect_ratio, 57*self.app.aspect_ratio), self.linewidth)
