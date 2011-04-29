@@ -7,6 +7,11 @@ all: clean macosx
 
 clean:
 	@rm -rf build dist
+	
+build-info:
+	@git describe --dirty --always > build-info
+	
+deps: build-info
 
 macosx: ce-macosx sf-macosx
 	mkdir dist/macosx/SpaceFortress\ 5.0

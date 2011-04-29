@@ -1,10 +1,38 @@
 #!/usr/bin/env python
 
 from __future__ import division
+import subprocess, os, sys, platform
+
+githash = None
+env = os.environ
+env['PATH'] = '/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/local/git/bin:/opt/local/bin:/opt/local/sbin'
+if platform.system() == 'Windows':
+    try:
+        subprocess.call(['make','deps'],env=env)
+    except OSError:
+        pass
+    except WindowsError:
+        pass
+else:
+    try:
+        subprocess.call(['make','deps'],env=env)
+    except OSError:
+        pass
+try:
+    f = open(os.path.join(os.path.realpath(os.path.dirname(sys.argv[0])), 'build-info'), 'r')
+    githash = f.read()
+    githash = githash[:-1]
+    f.close()
+except IOError:
+    pass
+if not githash:
+    sys.exit("Must run 'make deps' before running.")
+    
 import tokens
 from tokens.gameevent import *
 import sys, os
 import pygame
+import picture
 import time
 import datetime
 try:
@@ -20,7 +48,7 @@ except ImportError:
 import defaults
 
 def get_psf_version_string():
-    return "SpaceFortress 5.0"
+    return "SpaceFortress 5"
 
 release_build = False
 
@@ -619,6 +647,35 @@ class Game(object):
         (system_clock, game_time, ship_alive, ship_x, ship_y, ship_vel_x, ship_vel_y, ship_orientation, mine_alive, mine_x, mine_y, fortress_alive, fortress_orientation,\
         missile, shell, bonus, self.score.pnts, self.score.cntrl, self.score.vlcty, self.score.vlner, self.score.iff, self.score.intrvl,\
         self.score.speed, self.score.shots, thrust_key, left_key, right_key, fire_key, iff_key, shots_key, pnts_key))
+
+    def display_intro(self):
+        """display intro scene"""
+        font1 = pygame.font.Font(self.fp, int(self.SCREEN_HEIGHT/10))
+        title = font1.render(get_psf_version_string(), True, (255,200,100))
+        title_rect = title.get_rect()
+        title_rect.center = (self.SCREEN_WIDTH/2,self.SCREEN_HEIGHT/5)
+        fh = int(self.SCREEN_HEIGHT/72)
+        font2 = pygame.font.Font(self.fp, fh)
+        vers = font2.render('Version: %s' % (githash), True, (255,200,100))
+        vers_rect = vers.get_rect()
+        vers_rect.center = (self.SCREEN_WIDTH/2,4*self.SCREEN_HEIGHT/5 - fh/2 - 2)
+        copy = font2.render('Copyright \xa92011 CogWorks Laboratory, Rensselaer Polytechnic Institute', True, (255,200,100))
+        copy_rect = copy.get_rect()
+        copy_rect.center = (self.SCREEN_WIDTH/2,4*self.SCREEN_HEIGHT/5 + fh/2 + 2)
+        scale = .4 * self.SCREEN_HEIGHT / 128
+        logo = picture.Picture(os.path.join(self.approot, 'psf5.png'), scale)
+        logo.rect.center = (self.SCREEN_WIDTH/2,self.SCREEN_HEIGHT/2)
+        self.screen.fill((0,0,0))
+        self.screen.blit(title, title_rect)
+        self.screen.blit(vers, vers_rect)
+        self.screen.blit(copy, copy_rect)
+        self.screen.blit(logo.image, logo.rect)
+        pygame.display.flip()
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
+                    return
+        
     
     def display_foe_mines(self):
         """before game begins, present the list of IFF letters to target"""
@@ -833,6 +890,7 @@ class Game(object):
 def main(cogworld, condition):
     
     g = Game(cogworld, condition)
+    g.display_intro()
     if g.mine_exists:
         g.display_foe_mines()
     g.setup_world()
@@ -863,7 +921,7 @@ if __name__ == '__main__':
         if sys.argv[1][:5] != '-psn_':
     
             parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-            parser.add_argument('--version', action='version', version=get_psf_version_string())
+            parser.add_argument('--version', action='version', version="%s %s" % (get_psf_version_string(), githash))
             parser.add_argument('--generate-config', action="store_true", dest="genconfig", help='Generate a full default config file.', default=argparse.SUPPRESS)
             parser.add_argument('--condition', action="store", dest="condition", help='Task Condition', metavar='COND')
             parser.add_argument('--port', action="store", dest="port", help='CogWorld RPC port')
