@@ -14,12 +14,7 @@ class Bonus(object):
         super(Bonus, self).__init__()
         self.app = app
         self.symbols = self.app.config.get_setting('Bonus','non_bonus_symbols')
-        if self.app.config.get_setting('General','bonus_location') == 'Random':
-            self.x = random.randint(20, app.WORLD_WIDTH - 10)
-            self.y = random.randint(20, app.WORLD_HEIGHT - 20)
-        else:
-            self.x = self.app.config.get_setting('Bonus','bonus_pos_x')
-            self.y = self.app.config.get_setting('Bonus','bonus_pos_y')
+        self.set_bonus_location()
         self.visible = False
         self.font = pygame.font.Font(self.app.fp, int(28*self.app.aspect_ratio))
         self.bonus_symbol = self.app.config.get_setting('Bonus','bonus_symbol')
@@ -44,11 +39,41 @@ class Bonus(object):
         self.y_symbols = self.app.config.get_setting('AX-CPT','y_symbols')
         self.current_pair = "nothing" #either "ax", "ay", "bx", or "by"
         self.current_symbols = self.pick_next_pair()
-        self.axcpt_flag = False #bonus is capturable        
+        self.axcpt_flag = False #bonus is capturable
+        
+    def set_bonus_location(self):
+        if self.app.config.get_setting('General','bonus_location') == 'Random':
+            self.x = random.randint(30, self.app.WORLD_WIDTH - 30)
+            self.y = random.randint(30, self.app.WORLD_HEIGHT - 30)
+        elif self.app.config.get_setting('General','bonus_location') == 'Probabilistic':
+            w = self.app.WORLD_WIDTH / 5
+            h = self.app.WORLD_HEIGHT / 5
+            if random.random() <= self.app.config.get_setting('Probabilistic Bonus','nw_prob'):
+                print 'nw'
+                self.x = w
+                self.y = h
+            elif random.random() <= self.app.config.get_setting('Probabilistic Bonus','ne_prob'):
+                print 'ne'
+                self.x = w*4
+                self.y = h
+            elif random.random() <= self.app.config.get_setting('Probabilistic Bonus','sw_prob'):
+                print 'sw'
+                self.x = w
+                self.y = h*4
+            else:
+                print 'se'
+                self.x = w*4
+                self.y = h*4
+        else:
+            self.x = self.app.config.get_setting('Bonus','bonus_pos_x')*self.app.aspect_ratio
+            self.y = self.app.config.get_setting('Bonus','bonus_pos_y')*self.app.aspect_ratio
         
     def draw(self, worldsurf):
         """draws bonus symbol to screen"""
-        worldsurf.blit(self.font.render("%s"%self.current_symbol, 1, (255, 255, 0)), pygame.Rect(self.x*self.app.aspect_ratio, self.y*self.app.aspect_ratio, 150*self.app.aspect_ratio, 30*self.app.aspect_ratio))
+        bonus = self.font.render("%s"%self.current_symbol, 1, (255, 255, 0))
+        bonus_rect = bonus.get_rect()
+        bonus_rect.center = (self.x, self.y)
+        worldsurf.blit(bonus,bonus_rect)
     
     def get_new_symbol(self):
         """assigns new bonus symbol"""
@@ -58,9 +83,7 @@ class Bonus(object):
         else:
             self.current_symbol = random.sample(self.symbols, 1)[0]
             self.flag = True
-        if self.app.config.get_setting('Bonus','randomize_bonus_pos'):
-            self.x = random.randint(30, self.app.WORLD_WIDTH - 30)
-            self.y = random.randint(30, self.app.WORLD_HEIGHT - 30)
+        self.set_bonus_location()
             
     def pick_next_pair(self):
         """picks next cue and target for ax-cpt task"""
