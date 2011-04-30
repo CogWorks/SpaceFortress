@@ -50,6 +50,18 @@ import defaults
 def get_psf_version_string():
     return "SpaceFortress 5"
 
+def get_default_logdir():
+    _home = os.environ.get('HOME', '/')
+    if platform.system() == 'Windows':
+        logdir = os.path.join(os.environ['USERPROFILE'], 'My Documents', 'Spacefortress')
+    elif platform.system() == 'Linux' or platform.system() == 'Darwin':
+        logdir = os.path.join(_home, 'Documents', 'Spacefortress')
+    else:
+        logdir = os.path.join(_home, 'Spacefortress')
+    if not os.path.exists(logdir):
+        os.makedirs(logdir)
+    return logdir
+
 release_build = False
 
 class Game(object):
@@ -134,6 +146,10 @@ class Game(object):
         d = datetime.datetime.now().timetuple()
         if self.config.get_setting('General','logging'):
             log_filename = "%d %d-%d-%d %d-%d-%d.dat"%(self.config.get_setting('General','id'), d[0], d[1], d[2], d[3], d[4], d[5])
+            logdir = self.config.get_setting('General','logdir')
+            if len(logdir.strip()) == 0:
+                logdir = get_default_logdir()
+            log_filename = os.path.join(logdir, log_filename)
             self.log = open(log_filename, "w")
             self.log.write("%s\n"%str(self.config.config.items()))
         self.gameevents = GameEventList()

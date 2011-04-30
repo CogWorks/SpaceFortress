@@ -56,9 +56,10 @@ def get_config():
     cfg.add_setting('General', 'bonus_system', "AX-CPT", alias="Bonus System", type=config.constants.CT_COMBO, options=['standard','AX-CPT'], about='Bonus system standard or AX-CPT?')
     cfg.add_setting('General', 'bonus_location', 'Fixed', alias='Bonus Location', type=config.constants.CT_COMBO, options=['Fixed','Random','Probabilistic'], about='Randomize bonus position?')
     cfg.add_setting('General', 'game_time', 300000, alias='Game Duration (ms)', about='Time in milliseconds for a game. NOTE! If you escape in the middle of a game, the log will have "short" prepended to the name')
-    cfg.add_setting('General', 'print_events', False, alias='Print Events', type=config.constants.CT_CHECKBOX, about='Print events to stdout')
     cfg.add_setting('General', 'sound', True, alias='Sound', type=config.constants.CT_CHECKBOX, about='Enable/disable sound')
     cfg.add_setting('General', 'logging', True, alias='Logging', type=config.constants.CT_CHECKBOX, about='Enable/disable logging')
+    cfg.add_setting('General', 'logdir', '', alias='Log Directory', type=config.constants.CT_LINEEDIT, about='Directory for log files, leave blank for default.')
+    cfg.add_setting('General', 'print_events', False, alias='Print Events', type=config.constants.CT_CHECKBOX, about='Print events to stdout')
     
     cfg.add_setting('Keybindings', 'fire_key', 'SPACE', alias='Fire', type=config.constants.CT_COMBO, options=PYGAME_KEYS)
     cfg.add_setting('Keybindings', 'thrust_key', 'w', alias='Thrust', type=config.constants.CT_COMBO, options=PYGAME_KEYS)
