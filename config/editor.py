@@ -108,14 +108,16 @@ class ConfigEditor(QMainWindow):
         self.base_cfg = copy.deepcopy(self.cfg)
         
         self.categories = QListWidget()
+        #self.categories.setSizePolicy(QSizePolicy.Fixed,QSizePolicy.Expanding)
         self.settings = QStackedWidget()
-        
-        self.setFixedSize(580,380)
-        self.categories.setMaximumWidth(120)
+        #self.categories.setSizePolicy(QSizePolicy.MinimumExpanding,QSizePolicy.Expanding)
         
         QObject.connect(self.categories, SIGNAL('itemSelectionChanged()'), self.category_selected)
         
+        longest_cat = 0
         for cat in self.cfg.get_categories():
+            if len(cat) > longest_cat:
+                longest_cat = len(cat)
             self.categories.addItem(cat)
             settings_layout = QGridLayout()
             r = 0
@@ -156,11 +158,16 @@ class ConfigEditor(QMainWindow):
             settings_scroller.setWidget(settings)
             settings_scroller.setWidgetResizable(True)
             self.settings.addWidget(settings_scroller)
+            
+        font = self.categories.font()
+        fm = QFontMetrics(font)
+        self.categories.setMaximumWidth(fm.widthChar('X')*(longest_cat+4))
         
         self.main = QWidget()
         self.main_layout = QHBoxLayout()
         self.main_layout.addWidget(self.categories)
         self.main_layout.addWidget(self.settings)
+        
         self.main.setLayout(self.main_layout)
         
         self.setCentralWidget(self.main)
@@ -184,8 +191,10 @@ class ConfigEditor(QMainWindow):
         self.activateWindow()
         self.raise_()
         
+        self.setMinimumWidth(self.geometry().width()*1.2)
+        
         screen = QDesktopWidget().screenGeometry()
-        size =  self.geometry()
+        size = self.geometry()
         self.move((screen.width()-size.width())/2, (screen.height()-size.height())/2)
         
     def category_selected(self):
