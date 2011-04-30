@@ -48,20 +48,18 @@ class Bonus(object):
         elif self.app.config.get_setting('General','bonus_location') == 'Probabilistic':
             w = self.app.WORLD_WIDTH / 5
             h = self.app.WORLD_HEIGHT / 5
-            if random.random() <= self.app.config.get_setting('Probabilistic Bonus','nw_prob'):
-                print 'nw'
+            probs = map(float,self.app.config.get_setting('Bonus','quadrant_probs').split(','))
+            print probs
+            if random.random() <= probs[0]:
                 self.x = w
                 self.y = h
-            elif random.random() <= self.app.config.get_setting('Probabilistic Bonus','ne_prob'):
-                print 'ne'
+            elif random.random() <= probs[1]:
                 self.x = w*4
                 self.y = h
-            elif random.random() <= self.app.config.get_setting('Probabilistic Bonus','sw_prob'):
-                print 'sw'
+            elif random.random() <= probs[2]:
                 self.x = w
                 self.y = h*4
             else:
-                print 'se'
                 self.x = w*4
                 self.y = h*4
         else:
@@ -107,6 +105,8 @@ class Bonus(object):
             self.timer.reset()
             self.state = "cue"
             self.current_symbols = self.pick_next_pair()
+            # idk if this is the best place for this ~rmh
+            self.set_bonus_location()
             self.axcpt_flag = True
             self.current_symbol = self.current_symbols[0]
             self.visible = True
