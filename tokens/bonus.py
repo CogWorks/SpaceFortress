@@ -14,12 +14,12 @@ class Bonus(object):
         super(Bonus, self).__init__()
         self.app = app
         self.symbols = self.app.config.get_setting('Bonus','non_bonus_symbols')
-        if not self.app.config.get_setting('Bonus','randomize_bonus_pos'):
-            self.x = self.app.config.get_setting('Bonus','bonus_pos_x')
-            self.y = self.app.config.get_setting('Bonus','bonus_pos_y')
-        else:
+        if self.app.config.get_setting('General','bonus_location') == 'Random':
             self.x = random.randint(20, app.WORLD_WIDTH - 10)
             self.y = random.randint(20, app.WORLD_HEIGHT - 20)
+        else:
+            self.x = self.app.config.get_setting('Bonus','bonus_pos_x')
+            self.y = self.app.config.get_setting('Bonus','bonus_pos_y')
         self.visible = False
         self.font = pygame.font.Font(self.app.fp, int(28*self.app.aspect_ratio))
         self.bonus_symbol = self.app.config.get_setting('Bonus','bonus_symbol')

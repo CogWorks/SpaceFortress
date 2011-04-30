@@ -36,9 +36,10 @@ def get_config():
     cfg.add_setting('General', 'linewidth', 1, alias='Linewidth', about='Width of lines drawn on screen. Increase for a more "projector-friendly" game')
     cfg.add_setting('General', 'psf', False, alias='Classic Mode', type=config.constants.CT_CHECKBOX, about='Original PSF (SF4) settings? If t, *ALL* further values are ignored')
     cfg.add_setting('General', 'id', 1234, alias='Subject ID#', about='Subject identifier used in log filename"')
-    cfg.add_setting('General', 'bonus_system', "AX-CPT", alias="Bonus System", type=config.constants.CT_COMBO, options=['standard','AX-CPT'], about='Bonus system standard or AX-CPT?')
-    cfg.add_setting('General', 'game_time', 300000, alias='Game Duration (ms)', about='Time in milliseconds for a game. NOTE! If you escape in the middle of a game, the log will have "short" prepended to the name')
     cfg.add_setting('General', 'games_per_session', 8, alias='Max # of Games', about='Number of games per "session"')
+    cfg.add_setting('General', 'bonus_system', "AX-CPT", alias="Bonus System", type=config.constants.CT_COMBO, options=['standard','AX-CPT'], about='Bonus system standard or AX-CPT?')
+    cfg.add_setting('General', 'bonus_location', 'Fixed', alias='Bonus Location', type=config.constants.CT_COMBO, options=['Fixed','Random','Probabilistic'], about='Randomize bonus position?')
+    cfg.add_setting('General', 'game_time', 300000, alias='Game Duration (ms)', about='Time in milliseconds for a game. NOTE! If you escape in the middle of a game, the log will have "short" prepended to the name')
     cfg.add_setting('General', 'print_events', False, alias='Print Events', type=config.constants.CT_CHECKBOX, about='Print events to stdout')
     cfg.add_setting('General', 'sound', True, alias='Sound', type=config.constants.CT_CHECKBOX, about='Enable/disable sound')
     
@@ -88,7 +89,6 @@ def get_config():
     cfg.add_setting('Shell', 'shell_radius', 3, 'Shell collision radius')
     
     cfg.add_setting('Bonus', 'bonus_exists', True, type=config.constants.CT_CHECKBOX, about='Do bonuses exist?')
-    cfg.add_setting('Bonus', 'randomize_bonus_pos', False, type=config.constants.CT_CHECKBOX, about='Randomize bonus position?')
     cfg.add_setting('Bonus', 'bonus_pos_x', 355, 'Bonus x position')
     cfg.add_setting('Bonus', 'bonus_pos_y', 390, 'Bonus y position')
     cfg.add_setting('Bonus', 'bonus_probability', 0.3, 'Probability that next symbol will be the bonus symbol')
@@ -96,6 +96,11 @@ def get_config():
     cfg.add_setting('Bonus', 'non_bonus_symbols', '!&*%@', type=config.constants.CT_LINEEDIT, about="Non-bonus symbols. Defaults are # & * % @. Don't use '-', because that's used in the log file to represent that there's no symbol present")
     cfg.add_setting('Bonus', 'symbol_down_time', 833, '"Blank time" between symbol appearances in milliseconds**. (Seems like a weird number, but it\'s to sync with the frame-based original)')
     cfg.add_setting('Bonus', 'symbol_up_time', 2500, 'Time in milliseconds each symbol is visible**')
+    
+    cfg.add_setting('Probabilistic Bonus', 'nw_prob', .2, alias="North-West Quadrant Prob", type=config.constants.CT_DBLSPINBOX)
+    cfg.add_setting('Probabilistic Bonus', 'ne_prob', .4, alias="North-East Quadrant Prob", type=config.constants.CT_DBLSPINBOX)
+    cfg.add_setting('Probabilistic Bonus', 'sw_prob', .2, alias="South-West Quadrant Prob", type=config.constants.CT_DBLSPINBOX)
+    cfg.add_setting('Probabilistic Bonus', 'se_prob', .2, alias="South-East Quadrant Prob", type=config.constants.CT_DBLSPINBOX)
     
     cfg.add_setting('AX-CPT', 'cue_visibility', 250, 'The time cue is visible in ms')
     cfg.add_setting('AX-CPT', 'target_visibility', 250, 'The time cue is visible in ms')
