@@ -19,6 +19,7 @@ class Ship(token.Token):
         self.collision_radius = self.app.config.get_setting('Ship','ship_radius')*self.app.aspect_ratio
         self.position.x = self.app.config.get_setting('Ship','ship_pos_x')*self.app.aspect_ratio
         self.position.y = self.app.config.get_setting('Ship','ship_pos_y')*self.app.aspect_ratio
+        self.nose = (self.position.x, self.position.y)
         self.velocity.x = self.app.config.get_setting('Ship','ship_vel_x')
         self.velocity.y = self.app.config.get_setting('Ship','ship_vel_y')
         self.orientation = self.app.config.get_setting('Ship','ship_orientation')
@@ -100,6 +101,8 @@ class Ship(token.Token):
         #old x2 = + 18
         x2 = 18 * self.cosphi * self.app.aspect_ratio + self.position.x
         y2 = -(18 * self.sinphi) * self.app.aspect_ratio + self.position.y
+        # nose
+        self.nose = (x2,y2)        
         #x3 will be center point
         x3 = self.position.x
         y3 = self.position.y
