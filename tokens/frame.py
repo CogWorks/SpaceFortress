@@ -11,7 +11,7 @@ class Frame(object):
         self.app = app
         super(Frame, self).__init__()
         self.linewidth = self.app.config.get_setting('General','linewidth')
-        self.f = pygame.font.Font(self.app.fp, 14)
+        self.f = pygame.font.Font(self.app.fp, int(14*self.app.aspect_ratio))
         #if we're using the new scoring system, PNTS == Flight, CNTRL == Fortress, VLCTY == Mines, SPEED == Bonus
         #indexed array of what score goes in which position. Setting it to 9 to use indicies 1-8
         positions = [0]*9
