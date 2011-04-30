@@ -2,7 +2,7 @@ import sys
 from cx_Freeze import setup, Executable
 
 includes = []
-excludes = ['email','distutils','PySide','Tkinter','nose','ssl','xml','numpy','multiprocessing']
+excludes = ['pkg_resources','email','distutils','PySide','Tkinter','nose','ssl','xml','numpy','multiprocessing']
 packages = []
 path = []
 icon = None
