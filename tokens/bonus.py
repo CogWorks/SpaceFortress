@@ -49,7 +49,6 @@ class Bonus(object):
             w = self.app.WORLD_WIDTH / 5
             h = self.app.WORLD_HEIGHT / 5
             probs = map(float,self.app.config.get_setting('Bonus','quadrant_probs').split(','))
-            print probs
             if random.random() <= probs[0]:
                 self.x = w
                 self.y = h
