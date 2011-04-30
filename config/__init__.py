@@ -2,6 +2,11 @@
 
 import sys, os, json, copy
 from odict import OrderedDict
+from json import JSONEncoder
+
+class MyEncoder(JSONEncoder):
+    def default(self, o):
+        return o.__dict__
 
 class Config():
         

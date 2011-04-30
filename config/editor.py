@@ -5,7 +5,7 @@ import sys, os, copy, platform, json
 from PySide.QtCore import *
 from PySide.QtGui import *
 
-from __init__ import Config
+from __init__ import Config, MyEncoder
 import constants
     
 class ComboBox(QComboBox):
@@ -204,9 +204,10 @@ class ConfigEditor(QMainWindow):
         self.app.closeAllWindows()
         
     def get_changes(self):
-        if json.dumps(self.def_cfg.config) == json.dumps(self.cfg.config):
+        enc = MyEncoder()
+        if enc.encode(self.def_cfg.config) == enc.encode(self.cfg.config):
             return False
-        if json.dumps(self.base_cfg.config) != json.dumps(self.cfg.config):
+        if enc.encode(self.base_cfg.config) != enc.encode(self.cfg.config):
             newC = Config()
             for c in self.cfg.config.keys():
                 for s in self.cfg.config[c].keys():
@@ -216,13 +217,35 @@ class ConfigEditor(QMainWindow):
         else:
             return None
         
+    def validate_settings(self):
+        ret = []
+        for cat in self.cfg.get_categories():
+            for setting in self.cfg.get_settings(cat):
+                info = self.cfg.get_setting(cat, setting, True)
+                if info.has_key('validate'):
+                    if not info['validate'](info):
+                        ret.append((cat,setting))
+        return ret
+            
     def closeEvent(self, event=None):
-        config = self.get_changes()
-        if config == False:
-            if os.path.isfile(self.cfg.user_file):
-                os.remove(self.cfg.user_file)
-        elif config != None:
-            with open(self.cfg.user_file, 'w+') as f:
-                f.write(config)
-        self.quitApp()
+        bad_settings = self.validate_settings()
+        if bad_settings == []:
+            config = self.get_changes()
+            if config == False:
+                if os.path.isfile(self.cfg.user_file):
+                    os.remove(self.cfg.user_file)
+            elif config != None:
+                with open(self.cfg.user_file, 'w+') as f:
+                    f.write(config)
+            self.quitApp()
+        else:
+            event.ignore()
+            msgBox = QMessageBox()
+            msgBox.setText("Must fix the following invalid settings before quitting:")
+            info = ''
+            for setting in bad_settings:
+                new = '%s,%s<br>' % setting
+                info = '%s%s' % (info, new)
+            msgBox.setInformativeText(info)
+            msgBox.exec_()
     

@@ -132,9 +132,10 @@ class Game(object):
             self.mine_exists = False
         self.mine_list = tokens.mine.MineList(self)
         d = datetime.datetime.now().timetuple()
-        log_filename = "%d %d-%d-%d %d-%d-%d.dat"%(self.config.get_setting('General','id'), d[0], d[1], d[2], d[3], d[4], d[5])
-        self.log = open(log_filename, "w")
-        self.log.write("%s\n"%str(self.config.config.items()))
+        if self.config.get_setting('General','logging'):
+            log_filename = "%d %d-%d-%d %d-%d-%d.dat"%(self.config.get_setting('General','id'), d[0], d[1], d[2], d[3], d[4], d[5])
+            self.log = open(log_filename, "w")
+            self.log.write("%s\n"%str(self.config.config.items()))
         self.gameevents = GameEventList()
     
     def setup_world(self):
@@ -246,12 +247,14 @@ class Game(object):
             command = currentevent.command
             obj = currentevent.obj
             target = currentevent.target
-            self.log.write("# %f %d %s %s %s\n"%(time.time(), pygame.time.get_ticks(), command, obj, target))
+            if self.config.get_setting('General','logging'):
+                self.log.write("# %f %d %s %s %s\n"%(time.time(), pygame.time.get_ticks(), command, obj, target))
             if self.config.get_setting('General','print_events'):
                 print "time %d, command %s, object %s, target %s"%(pygame.time.get_ticks(), command, obj, target)
             if command == "press":    
                 if obj == "quit":
-                    self.log.close()
+                    if self.config.get_setting('General','logging'):
+                        self.log.close()
                     sys.exit(0)
                 elif obj == "left":
                     self.ship.turn_flag = "left"
@@ -703,7 +706,8 @@ class Game(object):
         self.screen.blit(midbot, midbot_rect)
         self.screen.blit(bottom, bottom_rect)
         pygame.display.flip()
-        self.log.write("# %f %d Foe mines: %s\n"%(time.time(), pygame.time.get_ticks(), " ".join(self.mine_list.foe_letters)))
+        if self.config.get_setting('General','logging'):
+            self.log.write("# %f %d Foe mines: %s\n"%(time.time(), pygame.time.get_ticks(), " ".join(self.mine_list.foe_letters)))
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
@@ -783,17 +787,18 @@ class Game(object):
         finalrect.y = 700
         self.screen.blit(finalsurf, finalrect)
         pygame.display.flip()
-        self.log.write("# pnts score %d\n"%self.score.pnts)
-        self.log.write("# cntrl score %d\n"%self.score.cntrl)
-        self.log.write("# vlcty score %d\n"%self.score.vlcty)
-        self.log.write("# speed score %d\n"%self.score.speed)
-        self.log.write("# flight score %d\n"%self.score.flight)
-        self.log.write("# fortress score %d\n"%self.score.fortress)
-        self.log.write("# mine score %d\n"%self.score.mines)
-        self.log.write("# bonus score %d\n"%self.score.bonus)
-        self.log.write("# total standard score %d\n"%(self.score.pnts + self.score.cntrl + self.score.vlcty + self.score.speed))
-        self.log.write("# total new score %d"%(self.score.flight + self.score.fortress + self.score.mines + self.score.bonus))
-        self.log.close()
+        if self.config.get_setting('General','logging'):
+            self.log.write("# pnts score %d\n"%self.score.pnts)
+            self.log.write("# cntrl score %d\n"%self.score.cntrl)
+            self.log.write("# vlcty score %d\n"%self.score.vlcty)
+            self.log.write("# speed score %d\n"%self.score.speed)
+            self.log.write("# flight score %d\n"%self.score.flight)
+            self.log.write("# fortress score %d\n"%self.score.fortress)
+            self.log.write("# mine score %d\n"%self.score.mines)
+            self.log.write("# bonus score %d\n"%self.score.bonus)
+            self.log.write("# total standard score %d\n"%(self.score.pnts + self.score.cntrl + self.score.vlcty + self.score.speed))
+            self.log.write("# total new score %d"%(self.score.flight + self.score.fortress + self.score.mines + self.score.bonus))
+            self.log.close()
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
@@ -867,17 +872,18 @@ class Game(object):
         finalrect.y = 700
         self.screen.blit(finalsurf, finalrect)
         pygame.display.flip()
-        self.log.write("# pnts score %d\n"%self.score.pnts)
-        self.log.write("# cntrl score %d\n"%self.score.cntrl)
-        self.log.write("# vlcty score %d\n"%self.score.vlcty)
-        self.log.write("# speed score %d\n"%self.score.speed)
-        self.log.write("# flight score %d\n"%self.score.flight)
-        self.log.write("# fortress score %d\n"%self.score.fortress)
-        self.log.write("# mine score %d\n"%self.score.mines)
-        self.log.write("# bonus score %d\n"%self.score.bonus)
-        self.log.write("# total standard score %d\n"%(self.score.pnts + self.score.cntrl + self.score.vlcty + self.score.speed))
-        self.log.write("# total new score %d"%(self.score.flight + self.score.fortress + self.score.mines + self.score.bonus))
-        self.log.close()
+        if self.config.get_setting('General','logging'):
+            self.log.write("# pnts score %d\n"%self.score.pnts)
+            self.log.write("# cntrl score %d\n"%self.score.cntrl)
+            self.log.write("# vlcty score %d\n"%self.score.vlcty)
+            self.log.write("# speed score %d\n"%self.score.speed)
+            self.log.write("# flight score %d\n"%self.score.flight)
+            self.log.write("# fortress score %d\n"%self.score.fortress)
+            self.log.write("# mine score %d\n"%self.score.mines)
+            self.log.write("# bonus score %d\n"%self.score.bonus)
+            self.log.write("# total standard score %d\n"%(self.score.pnts + self.score.cntrl + self.score.vlcty + self.score.speed))
+            self.log.write("# total new score %d"%(self.score.flight + self.score.fortress + self.score.mines + self.score.bonus))
+            self.log.close()
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
@@ -901,7 +907,8 @@ def main(cogworld, condition):
         g.process_game_logic()
         g.process_events()              
         g.draw()
-        g.log_world()
+        if g.config.get_setting('General','logging'):
+            g.log_world()
         if g.ship.alive == False:
             g.reset_position()
         if gameTimer.elapsed() > g.config.get_setting('General','game_time'):

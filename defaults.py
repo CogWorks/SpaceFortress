@@ -27,6 +27,22 @@ def get_config_home():
 def get_user_file():
     return os.path.join(get_config_home(),'config')
 
+def validate_string_len(info):
+    if len(info['value']) == info['n']:
+        return True
+    else:
+        return False
+
+def validate_quadrant_probs(info):
+    try:
+        list = info['value'].split(',')
+        if len(list) == 4 and sum(map(float,list)) == 1.0:
+            return True
+        else:
+            return False
+    except ValueError:
+        return False
+
 def get_config():
     
     cfg = Config()
@@ -42,6 +58,7 @@ def get_config():
     cfg.add_setting('General', 'game_time', 300000, alias='Game Duration (ms)', about='Time in milliseconds for a game. NOTE! If you escape in the middle of a game, the log will have "short" prepended to the name')
     cfg.add_setting('General', 'print_events', False, alias='Print Events', type=config.constants.CT_CHECKBOX, about='Print events to stdout')
     cfg.add_setting('General', 'sound', True, alias='Sound', type=config.constants.CT_CHECKBOX, about='Enable/disable sound')
+    cfg.add_setting('General', 'logging', True, alias='Logging', type=config.constants.CT_CHECKBOX, about='Enable/disable logging')
     
     cfg.add_setting('Keybindings', 'fire_key', 'SPACE', alias='Fire', type=config.constants.CT_COMBO, options=PYGAME_KEYS)
     cfg.add_setting('Keybindings', 'thrust_key', 'w', alias='Thrust', type=config.constants.CT_COMBO, options=PYGAME_KEYS)
@@ -92,15 +109,11 @@ def get_config():
     cfg.add_setting('Bonus', 'bonus_pos_x', 355, 'Bonus x position')
     cfg.add_setting('Bonus', 'bonus_pos_y', 390, 'Bonus y position')
     cfg.add_setting('Bonus', 'bonus_probability', 0.3, 'Probability that next symbol will be the bonus symbol')
-    cfg.add_setting('Bonus', 'bonus_symbol', '$', type=config.constants.CT_LINEEDIT, n=1, about='Bonus symbol')
+    cfg.add_setting('Bonus', 'bonus_symbol', '$', type=config.constants.CT_LINEEDIT, n=1, validate=validate_string_len, about='Bonus symbol')
     cfg.add_setting('Bonus', 'non_bonus_symbols', '!&*%@', type=config.constants.CT_LINEEDIT, about="Non-bonus symbols. Defaults are # & * % @. Don't use '-', because that's used in the log file to represent that there's no symbol present")
     cfg.add_setting('Bonus', 'symbol_down_time', 833, '"Blank time" between symbol appearances in milliseconds**. (Seems like a weird number, but it\'s to sync with the frame-based original)')
     cfg.add_setting('Bonus', 'symbol_up_time', 2500, 'Time in milliseconds each symbol is visible**')
-    
-    cfg.add_setting('Probabilistic Bonus', 'nw_prob', .2, alias="North-West Quadrant Prob", type=config.constants.CT_DBLSPINBOX)
-    cfg.add_setting('Probabilistic Bonus', 'ne_prob', .4, alias="North-East Quadrant Prob", type=config.constants.CT_DBLSPINBOX)
-    cfg.add_setting('Probabilistic Bonus', 'sw_prob', .2, alias="South-West Quadrant Prob", type=config.constants.CT_DBLSPINBOX)
-    cfg.add_setting('Probabilistic Bonus', 'se_prob', .2, alias="South-East Quadrant Prob", type=config.constants.CT_DBLSPINBOX)
+    cfg.add_setting('Bonus', 'quadrant_probs', '.2,.2,.2,.4', type=config.constants.CT_LINEEDIT, validate=validate_quadrant_probs)
     
     cfg.add_setting('AX-CPT', 'cue_visibility', 250, 'The time cue is visible in ms')
     cfg.add_setting('AX-CPT', 'target_visibility', 250, 'The time cue is visible in ms')
