@@ -152,7 +152,7 @@ class Game(object):
             self.fortress = tokens.fortress.Fortress(self)
             self.fortress_exists = True
         else:
-            self.fortress.exists = False
+            self.fortress_exists = False
         self.gametimer.reset()
         self.flighttimer.reset()
         self.mine_list.timer.reset()
@@ -490,7 +490,7 @@ class Game(object):
         #need to treat this carefully - the mine can overlap the fortress, so we don't want to remove the same missile twice
         for i, missile in enumerate(self.missile_list):
             del_missile = False
-            if missile.collide(self.fortress):
+            if self.fortress_exists and missile.collide(self.fortress):
                 self.gameevents.add("collide", "missile_"+str(i), "fortress")
                 del_missile = True
             for j, mine in enumerate(self.mine_list):
@@ -594,7 +594,7 @@ class Game(object):
             mine_alive = "n"
             mine_x = "-"
             mine_y = "-"
-        if self.fortress.alive:
+        if self.fortress_exists and self.fortress.alive:
             fortress_alive = "y"
             fortress_orientation = str(self.fortress.orientation)
         else:
