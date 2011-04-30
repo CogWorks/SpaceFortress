@@ -749,50 +749,55 @@ class Game(object):
         # self.screen.blit(sessionsurf, sessionrect)
         pntssurf = self.f24.render("PNTS score:", True, (255, 255,0))
         pntsrect = pntssurf.get_rect()
-        pntsrect.move_ip((250, 200))
+        pntsrect.left = self.SCREEN_WIDTH / 3
+        pntsrect.centery = self.SCREEN_HEIGHT / 16 * 4
         self.screen.blit(pntssurf, pntsrect)
         cntrlsurf = self.f24.render("CNTRL score:", True, (255, 255,0))
         cntrlrect = cntrlsurf.get_rect()
-        cntrlrect.move_ip((250, 300))
+        cntrlrect.left = self.SCREEN_WIDTH / 3 
+        cntrlrect.centery = self.SCREEN_HEIGHT / 16 * 6
         self.screen.blit(cntrlsurf, cntrlrect)
         vlctysurf = self.f24.render("VLCTY score:", True, (255, 255,0))
         vlctyrect = vlctysurf.get_rect()
-        vlctyrect.move_ip((250, 400))
+        vlctyrect.left = self.SCREEN_WIDTH / 3
+        vlctyrect.centery = self.SCREEN_HEIGHT / 16 * 8
         self.screen.blit(vlctysurf, vlctyrect)
         speedsurf = self.f24.render("SPEED score:", True, (255, 255,0))
         speedrect = speedsurf.get_rect()
-        speedrect.move_ip((250, 500))
+        speedrect.left = self.SCREEN_WIDTH / 3
+        speedrect.centery = self.SCREEN_HEIGHT / 16 * 10 
         self.screen.blit(speedsurf, speedrect)
         pntsnsurf = self.f24.render("%d"%self.score.pnts, True, (255, 255,255))
         pntsnrect = pntsnsurf.get_rect()
-        pntsnrect.right = 700
-        pntsnrect.y = 200
+        pntsnrect.right = self.SCREEN_WIDTH / 3 * 2
+        pntsnrect.centery = self.SCREEN_HEIGHT / 16 * 4
         self.screen.blit(pntsnsurf, pntsnrect)
         cntrlnsurf = self.f24.render("%d"%self.score.cntrl, True, (255, 255,255))
         cntrlnrect = cntrlnsurf.get_rect()
-        cntrlnrect.right = 700
-        cntrlnrect.y = 300
+        cntrlnrect.right = self.SCREEN_WIDTH / 3 * 2
+        cntrlnrect.centery = self.SCREEN_HEIGHT / 16 * 6
         self.screen.blit(cntrlnsurf, cntrlnrect)
         vlctynsurf = self.f24.render("%d"%self.score.vlcty, True, (255, 255,255))
         vlctynrect = vlctynsurf.get_rect()
-        vlctynrect.right = 700
-        vlctynrect.y = 400
+        vlctynrect.right = self.SCREEN_WIDTH / 3 * 2
+        vlctynrect.centery = self.SCREEN_HEIGHT / 16 * 8
         self.screen.blit(vlctynsurf, vlctynrect)
         speednsurf = self.f24.render("%d"%self.score.speed, True, (255, 255,255))
         speednrect = speednsurf.get_rect()
-        speednrect.right = 700
-        speednrect.y = 500
+        speednrect.right = self.SCREEN_WIDTH / 3 * 2
+        speednrect.centery = self.SCREEN_HEIGHT / 16 * 10
         self.screen.blit(speednsurf, speednrect)
         #draw line
-        pygame.draw.line(self.screen, (255, 255, 255), (200, 580), (800, 580))
-        totalsurf = self.f24.render("Total score for this game:", True, (255, 255,0))
+        pygame.draw.line(self.screen, (255, 255, 255), (self.SCREEN_WIDTH / 4 , self.SCREEN_HEIGHT / 16 * 11), (self.SCREEN_WIDTH / 4 * 3, self.SCREEN_HEIGHT / 16 * 11))
+        totalsurf = self.f24.render("Total game score:", True, (255, 255,0))
         totalrect = totalsurf.get_rect()
-        totalrect.move_ip((200, 620))
+        totalrect.left = self.SCREEN_WIDTH / 3
+        totalrect.centery = self.SCREEN_HEIGHT / 16 * 12
         self.screen.blit(totalsurf, totalrect)
         totalnsurf = self.f24.render("%d"%(self.score.pnts + self.score.cntrl + self.score.vlcty + self.score.speed), True, (255, 255,255))
         totalnrect = totalnsurf.get_rect()
-        totalnrect.right = 700
-        totalnrect.y = 620
+        totalnrect.right = self.SCREEN_WIDTH / 3 * 2
+        totalnrect.centery = self.SCREEN_HEIGHT / 16 * 12
         self.screen.blit(totalnsurf, totalnrect)
         # if self.game_number == int(self.config["games_per_session"]):
         finalsurf = self.f24.render("You're done! Press any key to exit", True, (0,255,0))
@@ -800,7 +805,7 @@ class Game(object):
         #            finalsurf = self.f24.render("Press any key to continue to next game or ESC to exit", True, (255,255,255))
         finalrect = finalsurf.get_rect()
         finalrect.centerx = self.SCREEN_WIDTH /2
-        finalrect.y = 700
+        finalrect.centery = self.SCREEN_HEIGHT / 16 * 14
         self.screen.blit(finalsurf, finalrect)
         pygame.display.flip()
         if self.config.get_setting('General','logging'):
@@ -834,50 +839,55 @@ class Game(object):
         # self.screen.blit(sessionsurf, sessionrect)
         pntssurf = self.f24.render("Flight score:", True, (255, 255,0))
         pntsrect = pntssurf.get_rect()
-        pntsrect.move_ip((250, 200))
+        pntsrect.left = self.SCREEN_WIDTH / 3
+        pntsrect.centery = self.SCREEN_HEIGHT / 16 * 4
         self.screen.blit(pntssurf, pntsrect)
         cntrlsurf = self.f24.render("Fortress score:", True, (255, 255,0))
         cntrlrect = cntrlsurf.get_rect()
-        cntrlrect.move_ip((250, 300))
+        cntrlrect.left = self.SCREEN_WIDTH / 3 
+        cntrlrect.centery = self.SCREEN_HEIGHT / 16 * 6
         self.screen.blit(cntrlsurf, cntrlrect)
         vlctysurf = self.f24.render("Mine score:", True, (255, 255,0))
         vlctyrect = vlctysurf.get_rect()
-        vlctyrect.move_ip((250, 400))
+        vlctyrect.left = self.SCREEN_WIDTH / 3
+        vlctyrect.centery = self.SCREEN_HEIGHT / 16 * 8
         self.screen.blit(vlctysurf, vlctyrect)
         speedsurf = self.f24.render("Bonus score:", True, (255, 255,0))
         speedrect = speedsurf.get_rect()
-        speedrect.move_ip((250, 500))
+        speedrect.left = self.SCREEN_WIDTH / 3
+        speedrect.centery = self.SCREEN_HEIGHT / 16 * 10
         self.screen.blit(speedsurf, speedrect)
         pntsnsurf = self.f24.render("%d"%self.score.flight, True, (255, 255,255))
         pntsnrect = pntsnsurf.get_rect()
-        pntsnrect.right = 700
-        pntsnrect.y = 200
+        pntsnrect.right = self.SCREEN_WIDTH / 3 * 2
+        pntsnrect.centery = self.SCREEN_HEIGHT / 16 * 4
         self.screen.blit(pntsnsurf, pntsnrect)
         cntrlnsurf = self.f24.render("%d"%self.score.fortress, True, (255, 255,255))
         cntrlnrect = cntrlnsurf.get_rect()
-        cntrlnrect.right = 700
-        cntrlnrect.y = 300
+        cntrlnrect.right = self.SCREEN_WIDTH / 3 * 2
+        cntrlnrect.centery = self.SCREEN_HEIGHT / 16 * 6
         self.screen.blit(cntrlnsurf, cntrlnrect)
         vlctynsurf = self.f24.render("%d"%self.score.mines, True, (255, 255,255))
         vlctynrect = vlctynsurf.get_rect()
-        vlctynrect.right = 700
-        vlctynrect.y = 400
+        vlctynrect.right = self.SCREEN_WIDTH / 3 * 2
+        vlctynrect.centery = self.SCREEN_HEIGHT / 16 * 8
         self.screen.blit(vlctynsurf, vlctynrect)
         speednsurf = self.f24.render("%d"%self.score.bonus, True, (255, 255,255))
         speednrect = speednsurf.get_rect()
-        speednrect.right = 700
-        speednrect.y = 500
+        speednrect.right = self.SCREEN_WIDTH / 3 * 2
+        speednrect.centery = self.SCREEN_HEIGHT / 16 * 10
         self.screen.blit(speednsurf, speednrect)
         #draw line
-        pygame.draw.line(self.screen, (255, 255, 255), (200, 580), (800, 580))
-        totalsurf = self.f24.render("Total score for this game:", True, (255, 255,0))
+        pygame.draw.line(self.screen, (255, 255, 255), (self.SCREEN_WIDTH / 4 , self.SCREEN_HEIGHT / 16 * 11), (self.SCREEN_WIDTH / 4 * 3, self.SCREEN_HEIGHT / 16 * 11))
+        totalsurf = self.f24.render("Total game score:", True, (255, 255,0))
         totalrect = totalsurf.get_rect()
-        totalrect.move_ip((200, 620))
+        totalrect.left = self.SCREEN_WIDTH / 3
+        totalrect.centery = self.SCREEN_HEIGHT / 16 * 12
         self.screen.blit(totalsurf, totalrect)
         totalnsurf = self.f24.render("%d"%(self.score.flight + self.score.fortress + self.score.mines + self.score.bonus), True, (255, 255,255))
         totalnrect = totalnsurf.get_rect()
-        totalnrect.right = 700
-        totalnrect.y = 620
+        totalnrect.right = self.SCREEN_WIDTH / 3 * 2
+        totalnrect.centery = self.SCREEN_HEIGHT / 16 * 12
         self.screen.blit(totalnsurf, totalnrect)
         # if self.game_number == int(self.config["games_per_session"]):
         finalsurf = self.f24.render("You're done! Press any key to exit", True, (0,255,0))
@@ -885,7 +895,7 @@ class Game(object):
         #            finalsurf = self.f24.render("Press any key to continue to next game or ESC to exit", True, (255,255,255))
         finalrect = finalsurf.get_rect()
         finalrect.centerx = self.SCREEN_WIDTH /2
-        finalrect.y = 700
+        finalrect.centery = self.SCREEN_HEIGHT / 16 * 14
         self.screen.blit(finalsurf, finalrect)
         pygame.display.flip()
         if self.config.get_setting('General','logging'):
@@ -929,7 +939,7 @@ def main(cogworld, condition):
             g.reset_position()
         if gameTimer.elapsed() > g.config.get_setting('General','game_time'):
             g.fade()
-            if g.config.get_setting('General','bonus_system') == "standard":
+            if g.config.get_setting('Score','new_scoring'):
                 g.show_old_score()
             else:
                 g.show_new_score()
