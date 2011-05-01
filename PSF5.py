@@ -321,9 +321,7 @@ class Game(object):
                 if obj == "pause":
                     self.pause_game()
                 elif obj == "quit":
-                    if self.config.get_setting('Logging','logging'):
-                        self.log.close()
-                    sys.exit(0)
+                    self.quit(1)
                 elif obj == "left":
                     self.ship.turn_flag = "left"
                 elif obj == "right":
@@ -880,12 +878,11 @@ class Game(object):
             self.log.write("# bonus score %d\n"%self.score.bonus)
             self.log.write("# total standard score %d\n"%(self.score.pnts + self.score.cntrl + self.score.vlcty + self.score.speed))
             self.log.write("# total new score %d"%(self.score.flight + self.score.fortress + self.score.mines + self.score.bonus))
-            self.log.close()
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
-                        sys.exit()
+                        self.quit(1)
                     else:
                         return
                         
@@ -970,14 +967,19 @@ class Game(object):
             self.log.write("# bonus score %d\n"%self.score.bonus)
             self.log.write("# total standard score %d\n"%(self.score.pnts + self.score.cntrl + self.score.vlcty + self.score.speed))
             self.log.write("# total new score %d"%(self.score.flight + self.score.fortress + self.score.mines + self.score.bonus))
-            self.log.close()
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
-                        sys.exit()
+                        self.quit(1)
                     else:
-                        return   
+                        return
+    
+    def quit(self, ret=0):
+        if self.config.get_setting('Logging','logging'):
+            self.log.close()
+        pygame.quit()
+        sys.exit(ret)
 
 def main(cogworld, condition):
     
@@ -1026,8 +1028,7 @@ def main(cogworld, condition):
                     else:
                         g.log.write("# %f %d Scores Hide\n"%(time.time(), pygame.time.get_ticks()))
                 break
-    if g.config.get_setting('Logging','logging'):
-        g.log.close()
+    g.quit()
 
 if __name__ == '__main__':
     
