@@ -19,8 +19,10 @@ macosx: ce-macosx sf-macosx
 	mv dist/macosx/*.app dist/macosx/SpaceFortress\ 5.0/
 	python mac-tools/AssignIcon.py psf5.png dist/macosx/SpaceFortress\ 5.0
 	mv dist/macosx/SpaceFortress\ 5.0 dist/macosx/bundle
-	sh mac-tools/create-dmg --window-pos 400 400 --window-size 384 224 --volname SpaceFortress dist/macosx/SpaceFortress.dmg dist/macosx/bundle
-	rm -rf dist/macosx/bundle
+	ver=`cat build-info`;\
+	cd dist/macosx; \
+	/Developer/usr/bin/packagemaker -r bundle -v -i edu.rpi.cogsci.cogworks.spacefortress \
+		-o SpaceFortress-$$ver.pkg --no-relocate -l /Applications -t SpaceFortress --target 10.5 --version $$ver
 
 sf-macosx: deps
 	rm -rf dist/macosx/SpaceFortress*
@@ -83,6 +85,7 @@ ce-macosx:
 	mkdir dist/macosx/configEditor.app/Contents/MacOS
 	mkdir dist/macosx/configEditor.app/Contents/Resources
 	cp prefs.icns dist/macosx/configEditor.app/Contents/Resources
+	cp -r /opt/local/lib/Resources/qt_menu.nib dist/macosx/configEditor.app/Contents/Resources
 	cp Info.plist.ce dist/macosx/configEditor.app/Contents/Info.plist
 	echo "APPL????" > dist/macosx/configEditor.app/Contents/PkgInfo
 	mv build/exe.macosx-10.6-*-2.7/configEditor dist/macosx/configEditor.app/Contents/MacOS/
@@ -90,21 +93,11 @@ ce-macosx:
 	mv build/exe.macosx-10.6-*-2.7/PySide* dist/macosx/configEditor.app/Contents/MacOS/
 	mv build/exe.macosx-10.6-*-2.7/*.zip dist/macosx/configEditor.app/Contents/MacOS/
 	morelibs=`ls build/exe.macosx-10.6-*-2.7`
-	/opt/local/bin/macdeployqt dist/macosx/configEditor.app
-	cd dist/macosx/configEditor.app/Contents/Frameworks; \
-	rm -rf QtDeclarative.framework; \
-	rm -rf QtNetwork.framework; \
-	rm -rf QtScript.framework; \
-	rm -rf QtSql.framework; \
-	rm -rf QtSvg.framework; \
-	rm -rf QtXmlPatterns.framework
 	cd dist/macosx/configEditor.app/Contents/MacOS; \
-	rm libQtCore.4.dylib; \
-	rm libQtGui.4.dylib; \
-	install_name_tool -change /opt/local/lib/libQtCore.4.dylib @executable_path/../Frameworks/QtCore.framework/Versions/4/QtCore PySide.QtCore.so; \
-	install_name_tool -change /opt/local/lib/libQtGui.4.dylib @executable_path/../Frameworks/QtGui.framework/Versions/4/QtGui PySide.QtGui.so; \
-	install_name_tool -change /opt/local/lib/libQtCore.4.dylib @executable_path/../Frameworks/QtCore.framework/Versions/4/QtCore PySide.QtGui.so; \
-	install_name_tool -change /opt/local/lib/libQtCore.4.dylib @executable_path/../Frameworks/QtCore.framework/Versions/4/QtCore libpyside-python2.7.1.0.dylib; \
+	install_name_tool -change /opt/local/lib/libQtCore.4.dylib @executable_path/libQtCore.4.dylib PySide.QtCore.so; \
+	install_name_tool -change /opt/local/lib/libQtGui.4.dylib @executable_path/libQtGui.4.dylib PySide.QtGui.so; \
+	install_name_tool -change /opt/local/lib/libQtCore.4.dylib @executable_path/libQtCore.4.dylib PySide.QtGui.so; \
+	install_name_tool -change /opt/local/lib/libQtCore.4.dylib @executable_path/libQtCore.4.dylib libpyside-python2.7.1.0.dylib; \
 	for f in `ls *.so`; do \
 		libs=`otool -XL $$f | grep "/opt/local/lib" | cut -f 2 | cut -f 1 -d " "`; \
  		if [[ -n $$libs ]]; then \
