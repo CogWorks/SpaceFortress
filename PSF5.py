@@ -84,7 +84,7 @@ class Game(object):
         pygame.mouse.set_visible(False)
         display_info = pygame.display.Info()
         mode_list = pygame.display.list_modes()
-        if self.config.get_setting('General','display_mode') == 'Windowed':
+        if self.config.get_setting('Display','display_mode') == 'Windowed':
             best_mode = mode_list[1]
         else:
             best_mode = mode_list[0]
@@ -94,7 +94,7 @@ class Game(object):
         os.environ['SDL_VIDEO_WINDOW_POS'] = str(int(mode_list[0][0]/2-self.SCREEN_WIDTH/2)) + "," + str(int(mode_list[0][1]/2-self.SCREEN_HEIGHT/2))
         self.WORLD_WIDTH = int(710 * self.aspect_ratio)
         self.WORLD_HEIGHT = int(626 * self.aspect_ratio)
-        self.linewidth = self.config.get_setting('General','linewidth')
+        self.linewidth = self.config.get_setting('Display','linewidth')
         self.frame = tokens.frame.Frame(self)
         self.score = tokens.score.Score(self)
         self.f = pygame.font.Font(self.fp, int(14*self.aspect_ratio))
@@ -108,13 +108,14 @@ class Game(object):
         self.IFF_key = eval("pygame.K_%s" % self.config.get_setting('Keybindings','IFF_key'))
         self.shots_key = eval("pygame.K_%s" % self.config.get_setting('Keybindings','shots_key'))
         self.pnts_key = eval("pygame.K_%s" % self.config.get_setting('Keybindings','pnts_key'))
+        self.pause_key = eval("pygame.K_%s" % self.config.get_setting('Keybindings','pause_key'))
         self.vector_explosion = pygame.image.load(os.path.join(self.approot, "gfx/exp.png"))
         self.vector_explosion.set_colorkey((0, 0, 0))
         self.vector_explosion_rect = self.vector_explosion.get_rect()
         self.sounds = tokens.sounds.Sounds(self)
-        if self.config.get_setting('General','display_mode') == 'Fullscreen':
+        if self.config.get_setting('Display','display_mode') == 'Fullscreen':
             self.screen = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT), pygame.FULLSCREEN)
-        elif self.config.get_setting('General','display_mode') == 'Fake Fullscreen':
+        elif self.config.get_setting('Display','display_mode') == 'Fake Fullscreen':
             self.screen = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT), pygame.NOFRAME)
         else:
             self.screen = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
@@ -182,12 +183,32 @@ class Game(object):
         self.mine_list.MOT_timer.reset()
         self.mine_list.MOT_switch_timer.reset()
         
+    def pause_game(self):
+        """pause game till player is ready to resume"""
+        if self.config.get_setting('Display','pause_overlay'):
+            backup = self.screen.copy()
+            self.screen.fill((0,0,0))
+            pause = self.f96.render("Paused!", True, (255,255,255))
+            pause_rect = pause.get_rect()
+            pause_rect.centerx = self.SCREEN_WIDTH/2
+            pause_rect.centery =self.SCREEN_HEIGHT/2
+            self.screen.blit(pause, pause_rect)
+            pygame.display.flip()
+        while True:
+            event = pygame.event.wait()
+            if event.type == pygame.KEYDOWN and event.key == self.pause_key:
+                self.gameevents.add("press", "unpause")
+                if self.config.get_setting('Display','pause_overlay'):
+                    self.screen.blit(backup,(0,0))
+                return
     
     def process_input(self):
         """creates game events based on pygame events"""
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
+                if event.key == pygame.K_F12 and self.config.get_setting('General','allow_pause'):
+                    self.gameevents.add("press", "pause")
+                elif event.key == pygame.K_ESCAPE:
                     self.gameevents.add("press", "quit")
                 elif event.key == self.thrust_key:
                     self.gameevents.add("press", "thrust")
@@ -273,8 +294,10 @@ class Game(object):
                 self.log.write("# %f %d %s %s %s\n"%(time.time(), pygame.time.get_ticks(), command, obj, target))
             if self.config.get_setting('Logging','print_events'):
                 print "time %d, command %s, object %s, target %s"%(pygame.time.get_ticks(), command, obj, target)
-            if command == "press":    
-                if obj == "quit":
+            if command == "press":
+                if obj == "pause":
+                    self.pause_game()
+                elif obj == "quit":
                     if self.config.get_setting('Logging','logging'):
                         self.log.close()
                     sys.exit(0)
@@ -922,8 +945,7 @@ class Game(object):
                     if event.key == pygame.K_ESCAPE:
                         sys.exit()
                     else:
-                        return
-    
+                        return   
 
 def main(cogworld, condition):
     

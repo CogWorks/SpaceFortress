@@ -8,7 +8,8 @@ PYGAME_KEYS = ['1','2','3','4','5','6','7','8','9','0',
                'z','x','c','v','b','n','m','SPACE',
                'BACKSPACE','TAB','RETURN','COMMA','MINUS','PERIOD',
                'SLASH','SEMICOLON','QUOTE','LEFTBRACKET','RIGHTBRACKET',
-               'BACKSLASH','EQUALS','BACKQUOTE','UP','DOWN','RIGHT','LEFT']
+               'BACKSLASH','EQUALS','BACKQUOTE','UP','DOWN','RIGHT','LEFT',
+               'F1','F2','F3','F4','F5','F6','F7','F8','F9','F10','F11','F12']
 
 def get_config_home():
     _home = os.environ.get('HOME', '/')
@@ -48,8 +49,6 @@ def get_config():
     cfg = Config()
     
     cfg.add_setting('General', 'player', True, alias='Player', options=['Human','Model'], type=config.constants.CT_COMBO, about='Will this game be played by a human or a cognitive model? Set to f to disable human control, enabling ACT-R')
-    cfg.add_setting('General', 'display_mode', 'Windowed', alias='Display Mode', options=['Fullscreen','Windowed','Fake Fullscreen'], type=config.constants.CT_COMBO, about='Run at full screen? Set to f to run in a window')
-    cfg.add_setting('General', 'linewidth', 1, alias='Linewidth', about='Width of lines drawn on screen. Increase for a more "projector-friendly" game')
     cfg.add_setting('General', 'psf', False, alias='Classic Mode', type=config.constants.CT_CHECKBOX, about='Original PSF (SF4) settings? If t, *ALL* further values are ignored')
     cfg.add_setting('General', 'id', 1234, alias='Subject ID#', about='Subject identifier used in log filename"')
     cfg.add_setting('General', 'games_per_session', 8, alias='Max # of Games', about='Number of games per "session"')
@@ -57,6 +56,11 @@ def get_config():
     cfg.add_setting('General', 'bonus_location', 'Probabilistic', alias='Bonus Location', type=config.constants.CT_COMBO, options=['Fixed','Random','Probabilistic'], about='Randomize bonus position?')
     cfg.add_setting('General', 'game_time', 300000, alias='Game Duration (ms)', about='Time in milliseconds for a game. NOTE! If you escape in the middle of a game, the log will have "short" prepended to the name')
     cfg.add_setting('General', 'sound', True, alias='Sound', type=config.constants.CT_CHECKBOX, about='Enable/disable sound')
+    cfg.add_setting('General', 'allow_pause', True, alias='Allow Pausing', type=config.constants.CT_CHECKBOX, about='Enable/disable whether or not pausing is allowed.')
+    
+    cfg.add_setting('Display', 'display_mode', 'Windowed', alias='Display Mode', options=['Fullscreen','Windowed','Fake Fullscreen'], type=config.constants.CT_COMBO, about='Run at full screen? Set to f to run in a window')
+    cfg.add_setting('Display', 'linewidth', 1, alias='Linewidth', about='Width of lines drawn on screen. Increase for a more "projector-friendly" game')
+    cfg.add_setting('Display', 'pause_overlay', True, alias='Pause Overlay', type=config.constants.CT_CHECKBOX, about='Blank screen and show "Paused!" when game is paused.')
     
     cfg.add_setting('Logging', 'logging', True, alias='Logging', type=config.constants.CT_CHECKBOX, about='Enable/disable logging')
     cfg.add_setting('Logging', 'print_events', False, alias='Print Events', type=config.constants.CT_CHECKBOX, about='Print events to stdout')
@@ -69,6 +73,7 @@ def get_config():
     cfg.add_setting('Keybindings', 'shots_key', 'k', alias='Shots Bonus', type=config.constants.CT_COMBO, options=PYGAME_KEYS)
     cfg.add_setting('Keybindings', 'pnts_key', 'l', alias='Points Bonus', type=config.constants.CT_COMBO, options=PYGAME_KEYS)
     cfg.add_setting('Keybindings', 'IFF_key', 'j', alias='Identify Friend or Foe', type=config.constants.CT_COMBO, options=PYGAME_KEYS)
+    cfg.add_setting('Keybindings', 'pause_key', 'F12', alias='Pause', type=config.constants.CT_COMBO, options=PYGAME_KEYS)
     
     cfg.add_setting('Ship', 'ship_acceleration', 0.3, 'Ship acceleration factor', type=config.constants.CT_DBLSPINBOX)
     cfg.add_setting('Ship', 'ship_hit_points', 4, 'Number of hits ship takes before it is destroyed')

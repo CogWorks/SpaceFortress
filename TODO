@@ -1,6 +1,8 @@
 
-* Explosion transparency does not seem to work on Mac, works fine on Linux
-
 * Velocities seems different on different resolutions
 
 * Center world on non wide-screen displays that are windowed
+
+* Seems to miss some keypress events, noticable if hold down thrust/turn keys
+
+* Fortress does not always make explosion sound when destroyed

@@ -10,7 +10,6 @@ class Frame(object):
     def __init__(self, app):
         self.app = app
         super(Frame, self).__init__()
-        self.linewidth = self.app.config.get_setting('General','linewidth')
         self.f = pygame.font.Font(self.app.fp, int(14*self.app.aspect_ratio))
         #if we're using the new scoring system, PNTS == Flight, CNTRL == Fortress, VLCTY == Mines, SPEED == Bonus
         #indexed array of what score goes in which position. Setting it to 9 to use indicies 1-8
@@ -86,28 +85,28 @@ class Frame(object):
         """Draws the game boundaries and 'table' to hold the scores"""
         worldsurf.fill((0,0,0))
         scoresurf.fill((0,0,0))
-        pygame.draw.rect(worldsurf, (0,255,0), (0,0, self.app.WORLD_WIDTH, self.app.WORLD_HEIGHT), self.linewidth) #outer 'world' boundary
+        pygame.draw.rect(worldsurf, (0,255,0), (0,0, self.app.WORLD_WIDTH, self.app.WORLD_HEIGHT), self.app.linewidth) #outer 'world' boundary
         if not self.app.config.get_setting('Score','new_scoring_pos'): #draw frame along bottom of gameworld
-            pygame.draw.rect(scoresurf, (0,255,0), (0,0,710*self.app.aspect_ratio, 63*self.app.aspect_ratio), self.linewidth) #bottom box to hold scores
-            pygame.draw.line(scoresurf, (0,255,0), (0,32*self.app.aspect_ratio),(709*self.app.aspect_ratio,32*self.app.aspect_ratio), self.linewidth) #divides bottom box horizontally into two rows
+            pygame.draw.rect(scoresurf, (0,255,0), (0,0,710*self.app.aspect_ratio, 63*self.app.aspect_ratio), self.app.linewidth) #bottom box to hold scores
+            pygame.draw.line(scoresurf, (0,255,0), (0,32*self.app.aspect_ratio),(709*self.app.aspect_ratio,32*self.app.aspect_ratio), self.app.linewidth) #divides bottom box horizontally into two rows
             #the following seven lines divides the bottom box vertically into 8 columns
-            pygame.draw.line(scoresurf, (0,255,0), (89*self.app.aspect_ratio, 0), (89*self.app.aspect_ratio, 62*self.app.aspect_ratio), self.linewidth)
-            pygame.draw.line(scoresurf, (0,255,0), (178*self.app.aspect_ratio, 0), (178*self.app.aspect_ratio, 62*self.app.aspect_ratio), self.linewidth)
-            pygame.draw.line(scoresurf, (0,255,0), (267*self.app.aspect_ratio, 0), (267*self.app.aspect_ratio, 62*self.app.aspect_ratio), self.linewidth)
-            pygame.draw.line(scoresurf, (0,255,0), (356*self.app.aspect_ratio, 0), (356*self.app.aspect_ratio, 62*self.app.aspect_ratio), self.linewidth)
-            pygame.draw.line(scoresurf, (0,255,0), (445*self.app.aspect_ratio, 0), (445*self.app.aspect_ratio, 62*self.app.aspect_ratio), self.linewidth)
-            pygame.draw.line(scoresurf, (0,255,0), (534*self.app.aspect_ratio, 0), (534*self.app.aspect_ratio, 62*self.app.aspect_ratio), self.linewidth)
-            pygame.draw.line(scoresurf, (0,255,0), (623*self.app.aspect_ratio, 0), (623*self.app.aspect_ratio, 62*self.app.aspect_ratio), self.linewidth)
+            pygame.draw.line(scoresurf, (0,255,0), (89*self.app.aspect_ratio, 0), (89*self.app.aspect_ratio, 62*self.app.aspect_ratio), self.app.linewidth)
+            pygame.draw.line(scoresurf, (0,255,0), (178*self.app.aspect_ratio, 0), (178*self.app.aspect_ratio, 62*self.app.aspect_ratio), self.app.linewidth)
+            pygame.draw.line(scoresurf, (0,255,0), (267*self.app.aspect_ratio, 0), (267*self.app.aspect_ratio, 62*self.app.aspect_ratio), self.app.linewidth)
+            pygame.draw.line(scoresurf, (0,255,0), (356*self.app.aspect_ratio, 0), (356*self.app.aspect_ratio, 62*self.app.aspect_ratio), self.app.linewidth)
+            pygame.draw.line(scoresurf, (0,255,0), (445*self.app.aspect_ratio, 0), (445*self.app.aspect_ratio, 62*self.app.aspect_ratio), self.app.linewidth)
+            pygame.draw.line(scoresurf, (0,255,0), (534*self.app.aspect_ratio, 0), (534*self.app.aspect_ratio, 62*self.app.aspect_ratio), self.app.linewidth)
+            pygame.draw.line(scoresurf, (0,255,0), (623*self.app.aspect_ratio, 0), (623*self.app.aspect_ratio, 62*self.app.aspect_ratio), self.app.linewidth)
         else: #draw frame in "eye-tracker-friendly" format
             half_width = self.app.SCREEN_WIDTH / 2
-            pygame.draw.rect(scoresurf, (0,255,0), (half_width - 355*self.app.aspect_ratio, 5*self.app.aspect_ratio, 710*self.app.aspect_ratio, 57*self.app.aspect_ratio), self.linewidth)
-            pygame.draw.rect(scoresurf, (0,255,0), (half_width + 366*self.app.aspect_ratio, 70*self.app.aspect_ratio, 130*self.app.aspect_ratio, 626*self.app.aspect_ratio), self.linewidth)
-            pygame.draw.rect(scoresurf, (0,255,0), (half_width - 355*self.app.aspect_ratio, 705*self.app.aspect_ratio, 710*self.app.aspect_ratio, 57*self.app.aspect_ratio), self.linewidth)
-            pygame.draw.rect(scoresurf, (0,255,0), (half_width - 495*self.app.aspect_ratio, 70*self.app.aspect_ratio, 130*self.app.aspect_ratio, 626*self.app.aspect_ratio), self.linewidth)
-            # pygame.draw.rect(scoresurf, (0,255,0), (157, 5, 710, 57), self.linewidth)
-            # pygame.draw.rect(scoresurf, (0,255,0), (878, 70, 130, 626), self.linewidth)
-            # pygame.draw.rect(scoresurf, (0,255,0), (157, 705, 710, 57), self.linewidth)
-            # pygame.draw.rect(scoresurf, (0,255,0), (17, 70, 130, 626), self.linewidth)
+            pygame.draw.rect(scoresurf, (0,255,0), (half_width - 355*self.app.aspect_ratio, 5*self.app.aspect_ratio, 710*self.app.aspect_ratio, 57*self.app.aspect_ratio), self.app.linewidth)
+            pygame.draw.rect(scoresurf, (0,255,0), (half_width + 366*self.app.aspect_ratio, 70*self.app.aspect_ratio, 130*self.app.aspect_ratio, 626*self.app.aspect_ratio), self.app.linewidth)
+            pygame.draw.rect(scoresurf, (0,255,0), (half_width - 355*self.app.aspect_ratio, 705*self.app.aspect_ratio, 710*self.app.aspect_ratio, 57*self.app.aspect_ratio), self.app.linewidth)
+            pygame.draw.rect(scoresurf, (0,255,0), (half_width - 495*self.app.aspect_ratio, 70*self.app.aspect_ratio, 130*self.app.aspect_ratio, 626*self.app.aspect_ratio), self.app.linewidth)
+            # pygame.draw.rect(scoresurf, (0,255,0), (157, 5, 710, 57), self.app.linewidth)
+            # pygame.draw.rect(scoresurf, (0,255,0), (878, 70, 130, 626), self.app.linewidth)
+            # pygame.draw.rect(scoresurf, (0,255,0), (157, 705, 710, 57), self.app.linewidth)
+            # pygame.draw.rect(scoresurf, (0,255,0), (17, 70, 130, 626), self.app.linewidth)
         #score labels
         scoresurf.blit(self.p1_surf, self.p1_rect)
         scoresurf.blit(self.p2_surf, self.p2_rect)
