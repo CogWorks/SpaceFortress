@@ -146,13 +146,22 @@ class Game(object):
         self.mine_list = tokens.mine.MineList(self)
         d = datetime.datetime.now().timetuple()
         if self.config.get_setting('Logging','logging'):
-            log_filename = "%d %d-%d-%d %d-%d-%d.dat"%(self.config.get_setting('General','id'), d[0], d[1], d[2], d[3], d[4], d[5])
+            if self.config.get_setting('Logging','R_friendly'):
+                log_filename = "%d_%d-%d-%d_%d-%d-%d.csv"%(self.config.get_setting('General','id'), d[0], d[1], d[2], d[3], d[4], d[5])
+            else:
+                log_filename = "%d_%d-%d-%d_%d-%d-%d.dat"%(self.config.get_setting('General','id'), d[0], d[1], d[2], d[3], d[4], d[5])
             logdir = self.config.get_setting('Logging','logdir')
             if len(logdir.strip()) == 0:
                 logdir = get_default_logdir()
             log_filename = os.path.join(logdir, log_filename)
             self.log = open(log_filename, "w")
-            self.log.write("# %s\n" % self.config)
+            if self.config.get_setting('Logging','R_friendly'):
+                self.log.write("event_type\tsystem_clock\tgame_time\te1\te2\te3\tfoes\tship_alive\tship_x\tship_y\tship_vel_x\tship_vel_y\tship_orientation\t"+
+                               "mine_alive\tmine_x\tmine_y\tfortress_alive\tfortress_orientation\tmissile\tshell\tbonus\tscore_pnts\tscore_cntrl\tscore_vlcty\t"+
+                               "score_vlner\tscore_iff\tscore_intrvl\tscore_speed\tscore_shots\tthrust_key\tleft_key\tright_key\tfire_key\tiff_key\tshots_key\tpnts_key\tconfig\n")
+                self.log.write("CONFIG\t%f\t%d\t%s%s\n" % (time.time(), pygame.time.get_ticks(), "\t"*33, self.config))
+            else:
+                self.log.write("# %s\n" % self.config)
         self.gameevents = GameEventList()
     
     def set_aspect_ratio(self):
@@ -291,7 +300,10 @@ class Game(object):
             obj = currentevent.obj
             target = currentevent.target
             if self.config.get_setting('Logging','logging'):
-                self.log.write("# %f %d %s %s %s\n"%(time.time(), pygame.time.get_ticks(), command, obj, target))
+                if self.config.get_setting('Logging','R_friendly'):
+                    self.log.write("EVENT\t%f\t%d\t%s\t%s\t%s\n"%(time.time(), pygame.time.get_ticks(), command, obj, target))
+                else:
+                    self.log.write("# %f %d %s %s %s\n"%(time.time(), pygame.time.get_ticks(), command, obj, target))
             if self.config.get_setting('Logging','print_events'):
                 print "time %d, command %s, object %s, target %s"%(pygame.time.get_ticks(), command, obj, target)
             if command == "press":
@@ -691,10 +703,16 @@ class Game(object):
             pnts_key = "y"
         else:
             pnts_key = "n"
-        self.log.write("%f\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%d\t%d\t%d\t%d\t%s\t%d\t%d\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n"%\
-        (system_clock, game_time, ship_alive, ship_x, ship_y, ship_vel_x, ship_vel_y, ship_orientation, mine_alive, mine_x, mine_y, fortress_alive, fortress_orientation,\
-        missile, shell, bonus, self.score.pnts, self.score.cntrl, self.score.vlcty, self.score.vlner, self.score.iff, self.score.intrvl,\
-        self.score.speed, self.score.shots, thrust_key, left_key, right_key, fire_key, iff_key, shots_key, pnts_key))
+        if self.config.get_setting('Logging','R_friendly'):
+            self.log.write("STATE\t%f\t%d\t\t\t\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%d\t%d\t%d\t%d\t%s\t%d\t%d\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n"%\
+                           (system_clock, game_time, " ".join(self.mine_list.foe_letters), ship_alive, ship_x, ship_y, ship_vel_x, ship_vel_y, ship_orientation, mine_alive, mine_x, mine_y, fortress_alive, fortress_orientation,\
+                            missile, shell, bonus, self.score.pnts, self.score.cntrl, self.score.vlcty, self.score.vlner, self.score.iff, self.score.intrvl,\
+                            self.score.speed, self.score.shots, thrust_key, left_key, right_key, fire_key, iff_key, shots_key, pnts_key))
+        else:
+            self.log.write("%f\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%d\t%d\t%d\t%d\t%s\t%d\t%d\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n"%\
+                           (system_clock, game_time, ship_alive, ship_x, ship_y, ship_vel_x, ship_vel_y, ship_orientation, mine_alive, mine_x, mine_y, fortress_alive, fortress_orientation,\
+                            missile, shell, bonus, self.score.pnts, self.score.cntrl, self.score.vlcty, self.score.vlner, self.score.iff, self.score.intrvl,\
+                            self.score.speed, self.score.shots, thrust_key, left_key, right_key, fire_key, iff_key, shots_key, pnts_key))
 
     def display_intro(self):
         """display intro scene"""
@@ -752,7 +770,10 @@ class Game(object):
         self.screen.blit(bottom, bottom_rect)
         pygame.display.flip()
         if self.config.get_setting('Logging','logging'):
-            self.log.write("# %f %d Foe mines: %s\n"%(time.time(), pygame.time.get_ticks(), " ".join(self.mine_list.foe_letters)))
+            if self.config.get_setting('Logging','R_friendly'):
+                self.log.write("EVENT\t%f\t%d\tdisplay_foes\t%s\tPlayer\n"%(time.time(), pygame.time.get_ticks(), " ".join(self.mine_list.foe_letters)))
+            else:
+                self.log.write("# %f %d Foe mines: %s\n"%(time.time(), pygame.time.get_ticks(), " ".join(self.mine_list.foe_letters)))
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
@@ -837,7 +858,7 @@ class Game(object):
         finalrect.centery = self.SCREEN_HEIGHT / 16 * 14
         self.screen.blit(finalsurf, finalrect)
         pygame.display.flip()
-        if self.config.get_setting('Logging','logging'):
+        if self.config.get_setting('Logging','logging') and not self.config.get_setting('Logging','R_friendly'):
             self.log.write("# pnts score %d\n"%self.score.pnts)
             self.log.write("# cntrl score %d\n"%self.score.cntrl)
             self.log.write("# vlcty score %d\n"%self.score.vlcty)
@@ -927,7 +948,7 @@ class Game(object):
         finalrect.centery = self.SCREEN_HEIGHT / 16 * 14
         self.screen.blit(finalsurf, finalrect)
         pygame.display.flip()
-        if self.config.get_setting('Logging','logging'):
+        if self.config.get_setting('Logging','logging') and not self.config.get_setting('Logging','R_friendly'):
             self.log.write("# pnts score %d\n"%self.score.pnts)
             self.log.write("# cntrl score %d\n"%self.score.cntrl)
             self.log.write("# vlcty score %d\n"%self.score.vlcty)
@@ -955,6 +976,11 @@ def main(cogworld, condition):
         g.display_foe_mines()
     g.setup_world()
     gameTimer = tokens.timer.Timer()
+    if g.config.get_setting('Logging','logging'):
+        if g.config.get_setting('Logging','R_friendly'):
+            g.log.write("EVENT\t%f\t%d\tstart_game\t%s\tPlayer\n"%(time.time(), pygame.time.get_ticks(), "0 0"))
+        else:
+            g.log.write("# %f %d Start game: %d of $d\n"%(time.time(), pygame.time.get_ticks(), 0, 0))
     while True:
         g.clock.tick(30)
         g.process_input()
