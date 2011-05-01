@@ -152,7 +152,7 @@ class Game(object):
                 logdir = get_default_logdir()
             log_filename = os.path.join(logdir, log_filename)
             self.log = open(log_filename, "w")
-            self.log.write("%s\n"%str(self.config.config.items()))
+            self.log.write("# %s\n" % self.config)
         self.gameevents = GameEventList()
     
     def set_aspect_ratio(self):

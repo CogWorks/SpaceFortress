@@ -76,3 +76,12 @@ class Config():
         if self.user_file and os.path.isfile(self.user_file):
             with open(self.user_file, 'r') as f:
                 return self.update_from_string(f.read())
+            
+    def __str__(self):
+        tmpCfg = copy.deepcopy(self.config)
+        for category in tmpCfg.keys():
+            for setting in tmpCfg[category].keys():
+                for info in tmpCfg[category][setting].keys():
+                    if info != 'value':
+                        del tmpCfg[category][setting][info]
+        return json.dumps(tmpCfg, separators=(',',':'),sort_keys=True)        
