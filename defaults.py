@@ -57,10 +57,11 @@ def get_config():
     cfg.add_setting('General', 'bonus_location', 'Probabilistic', alias='Bonus Location', type=config.constants.CT_COMBO, options=['Fixed','Random','Probabilistic'], about='Randomize bonus position?')
     cfg.add_setting('General', 'game_time', 300000, alias='Game Duration (ms)', about='Time in milliseconds for a game. NOTE! If you escape in the middle of a game, the log will have "short" prepended to the name')
     cfg.add_setting('General', 'sound', True, alias='Sound', type=config.constants.CT_CHECKBOX, about='Enable/disable sound')
-    cfg.add_setting('General', 'logging', True, alias='Logging', type=config.constants.CT_CHECKBOX, about='Enable/disable logging')
-    cfg.add_setting('General', 'logdir', '', alias='Log Directory', type=config.constants.CT_LINEEDIT, about='Directory for log files, leave blank for default.')
-    cfg.add_setting('General', 'print_events', False, alias='Print Events', type=config.constants.CT_CHECKBOX, about='Print events to stdout')
     
+    cfg.add_setting('Logging', 'logging', True, alias='Logging', type=config.constants.CT_CHECKBOX, about='Enable/disable logging')
+    cfg.add_setting('Logging', 'print_events', False, alias='Print Events', type=config.constants.CT_CHECKBOX, about='Print events to stdout')
+    cfg.add_setting('Logging', 'logdir', '', alias='Log Directory', type=config.constants.CT_LINEEDIT, about='Directory for log files, leave blank for default.')
+        
     cfg.add_setting('Keybindings', 'fire_key', 'SPACE', alias='Fire', type=config.constants.CT_COMBO, options=PYGAME_KEYS)
     cfg.add_setting('Keybindings', 'thrust_key', 'w', alias='Thrust', type=config.constants.CT_COMBO, options=PYGAME_KEYS)
     cfg.add_setting('Keybindings', 'left_turn_key', 'a', alias='Turn Left', type=config.constants.CT_COMBO, options=PYGAME_KEYS)
@@ -154,7 +155,7 @@ def get_config():
     cfg.add_setting('MOT', 'MOT_onset_time', 3000, 'Time to display "frozen" MOT mines on onset')
     cfg.add_setting('MOT', 'MOT_switch_time', 1000, 'Time in between direction changes while MOT mines are moving')
 
-    cfg.add_setting('Score', 'new_scoring', False, type=config.constants.CT_CHECKBOX, about='Use the new scoring system for Flight, Fortress, and Mines? (instead of PNTS, CNTRL, VLCTY and SPEED)')
+    cfg.add_setting('Score', 'new_scoring', True, type=config.constants.CT_CHECKBOX, about='Use the new scoring system for Flight, Fortress, and Mines? (instead of PNTS, CNTRL, VLCTY and SPEED)')
     cfg.add_setting('Score', 'new_scoring_pos', True, type=config.constants.CT_CHECKBOX, about='New scoring position is a more "eye-tracker friendly" format that places the scores around the perimeter of the gameworld, rather than just all along the bottom. Set to f for default positioning')
     cfg.add_setting('Score', 'PNTS_pos', 1, 'Set positions for the display elements. 1 = leftmost for original scoring position for new scoring position, 1 = left item on top row, proceeds clockwise PNTS position(or Flight, for new)')
     cfg.add_setting('Score', 'CNTRL_pos', 2, 'CNTRL position(or Fortress, for new)')

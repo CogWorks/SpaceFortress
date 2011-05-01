@@ -144,7 +144,7 @@ class Game(object):
             self.mine_exists = False
         self.mine_list = tokens.mine.MineList(self)
         d = datetime.datetime.now().timetuple()
-        if self.config.get_setting('General','logging'):
+        if self.config.get_setting('Logging','logging'):
             log_filename = "%d %d-%d-%d %d-%d-%d.dat"%(self.config.get_setting('General','id'), d[0], d[1], d[2], d[3], d[4], d[5])
             logdir = self.config.get_setting('General','logdir')
             if len(logdir.strip()) == 0:
@@ -269,13 +269,13 @@ class Game(object):
             command = currentevent.command
             obj = currentevent.obj
             target = currentevent.target
-            if self.config.get_setting('General','logging'):
+            if self.config.get_setting('Logging','logging'):
                 self.log.write("# %f %d %s %s %s\n"%(time.time(), pygame.time.get_ticks(), command, obj, target))
-            if self.config.get_setting('General','print_events'):
+            if self.config.get_setting('Logging','print_events'):
                 print "time %d, command %s, object %s, target %s"%(pygame.time.get_ticks(), command, obj, target)
             if command == "press":    
                 if obj == "quit":
-                    if self.config.get_setting('General','logging'):
+                    if self.config.get_setting('Logging','logging'):
                         self.log.close()
                     sys.exit(0)
                 elif obj == "left":
@@ -728,7 +728,7 @@ class Game(object):
         self.screen.blit(midbot, midbot_rect)
         self.screen.blit(bottom, bottom_rect)
         pygame.display.flip()
-        if self.config.get_setting('General','logging'):
+        if self.config.get_setting('Logging','logging'):
             self.log.write("# %f %d Foe mines: %s\n"%(time.time(), pygame.time.get_ticks(), " ".join(self.mine_list.foe_letters)))
         while True:
             for event in pygame.event.get():
@@ -814,7 +814,7 @@ class Game(object):
         finalrect.centery = self.SCREEN_HEIGHT / 16 * 14
         self.screen.blit(finalsurf, finalrect)
         pygame.display.flip()
-        if self.config.get_setting('General','logging'):
+        if self.config.get_setting('Logging','logging'):
             self.log.write("# pnts score %d\n"%self.score.pnts)
             self.log.write("# cntrl score %d\n"%self.score.cntrl)
             self.log.write("# vlcty score %d\n"%self.score.vlcty)
@@ -904,7 +904,7 @@ class Game(object):
         finalrect.centery = self.SCREEN_HEIGHT / 16 * 14
         self.screen.blit(finalsurf, finalrect)
         pygame.display.flip()
-        if self.config.get_setting('General','logging'):
+        if self.config.get_setting('Logging','logging'):
             self.log.write("# pnts score %d\n"%self.score.pnts)
             self.log.write("# cntrl score %d\n"%self.score.cntrl)
             self.log.write("# vlcty score %d\n"%self.score.vlcty)
@@ -939,7 +939,7 @@ def main(cogworld, condition):
         g.process_game_logic()
         g.process_events()              
         g.draw()
-        if g.config.get_setting('General','logging'):
+        if g.config.get_setting('Logging','logging'):
             g.log_world()
         if g.ship.alive == False:
             g.reset_position()
