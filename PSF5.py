@@ -995,7 +995,7 @@ def main(cogworld, condition):
             if g.config.get_setting('Logging','R_friendly'):
                 g.log.write("EVENT\t%f\t%d\t%d\tgame_start\tNone\tPlayer\n"%(time.time(), pygame.time.get_ticks(), g.current_game))
             else:
-                g.log.write("# %f %d Game Start: %d of $d\n"%(time.time(), pygame.time.get_ticks(), g.current_game, g.config.get_setting('General','games_per_session')))
+                g.log.write("# %f %d Game Start: %d of %d\n"%(time.time(), pygame.time.get_ticks(), g.current_game, g.config.get_setting('General','games_per_session')))
         while True:
             g.clock.tick(30)
             g.process_input()
@@ -1011,7 +1011,7 @@ def main(cogworld, condition):
                     if g.config.get_setting('Logging','R_friendly'):
                         g.log.write("EVENT\t%f\t%d\t%d\tgame_end\tNone\tPlayer\n"%(time.time(), pygame.time.get_ticks(), g.current_game))
                     else:
-                        g.log.write("# %f %d Game End: %d of $d\n"%(time.time(), pygame.time.get_ticks(), g.current_game, g.config.get_setting('General','games_per_session')))
+                        g.log.write("# %f %d Game End: %d of %d\n"%(time.time(), pygame.time.get_ticks(), g.current_game, g.config.get_setting('General','games_per_session')))
                 g.fade()
                 if g.config.get_setting('Logging','logging'):
                     if g.config.get_setting('Logging','R_friendly'):
