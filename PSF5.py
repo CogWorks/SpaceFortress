@@ -88,9 +88,9 @@ class Game(object):
             best_mode = mode_list[1]
         else:
             best_mode = mode_list[0]
-        self.aspect_ratio = best_mode[1]/768
-        self.SCREEN_WIDTH = best_mode[0]#int(768 * aspect_ratio)
-        self.SCREEN_HEIGHT = best_mode[1]#768
+        self.SCREEN_WIDTH = best_mode[0]
+        self.SCREEN_HEIGHT = best_mode[1]
+        self.set_aspect_ratio()
         os.environ['SDL_VIDEO_WINDOW_POS'] = str(int(mode_list[0][0]/2-self.SCREEN_WIDTH/2)) + "," + str(int(mode_list[0][1]/2-self.SCREEN_HEIGHT/2))
         self.WORLD_WIDTH = int(710 * self.aspect_ratio)
         self.WORLD_HEIGHT = int(626 * self.aspect_ratio)
@@ -153,6 +153,12 @@ class Game(object):
             self.log = open(log_filename, "w")
             self.log.write("%s\n"%str(self.config.config.items()))
         self.gameevents = GameEventList()
+    
+    def set_aspect_ratio(self):
+        self.aspect_ratio = self.SCREEN_HEIGHT/768
+        xover = self.SCREEN_WIDTH + 2 * (495 * self.aspect_ratio - self.SCREEN_WIDTH / 2)
+        if xover > self.SCREEN_WIDTH:
+            self.aspect_ratio = self.SCREEN_WIDTH / 1024
     
     def setup_world(self):
         """initializes gameplay"""
