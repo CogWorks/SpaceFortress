@@ -22,7 +22,7 @@ macosx: ce-macosx sf-macosx
 	ver=`cat build-info`;\
 	cd dist/macosx; \
 	arch -i386 /Developer/usr/bin/packagemaker -b -r bundle -v -i edu.rpi.cogsci.cogworks.spacefortress \
-		-o SpaceFortress-$$ver.mpkg --no-relocate -l /Applications -t SpaceFortress --target 10.4 --version $$ver
+		-o SpaceFortress-$$ver-i386-macosx10.6.mpkg --no-relocate -l /Applications -t SpaceFortress --target 10.5 --version $$ver
 
 sf-macosx: deps
 	rm -rf dist/macosx/SpaceFortress*
