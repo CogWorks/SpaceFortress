@@ -594,8 +594,8 @@ class Game(object):
         pygame.time.delay(1000)
         self.score.iff = ""
         self.ship.alive = True
-        self.ship.position.x = self.config.get_setting('Ship','ship_pos_x')
-        self.ship.position.y = self.config.get_setting('Ship','ship_pos_y')
+        self.ship.position.x = self.config.get_setting('Ship','ship_pos_x')*self.aspect_ratio
+        self.ship.position.y = self.config.get_setting('Ship','ship_pos_y')*self.aspect_ratio
         self.ship.velocity.x = self.config.get_setting('Ship','ship_vel_x')
         self.ship.velocity.y = self.config.get_setting('Ship','ship_vel_y')
         self.ship.orientation = self.config.get_setting('Ship','ship_orientation')
