@@ -2,3 +2,5 @@
 * Explosion transparency does not seem to work on Mac, works fine on Linux
 
 * Velocities seems different on different resolutions
+
+* Center world on non wide-screen displays that are windowed
