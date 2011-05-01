@@ -187,6 +187,16 @@ class Game(object):
             self.fortress_exists = True
         else:
             self.fortress_exists = False
+        self.score.pnts = 0
+        self.score.cntrl = 0
+        self.score.vlcty = 0
+        self.score.speed = 0
+        self.score.flight = 0
+        self.score.fortress = 0
+        self.score.mines = 0
+        self.score.bonus = 0
+        self.score.vlner = 0
+        self.score.shots = self.config.get_setting('Missle','missile_num')        
         self.gametimer.reset()
         self.flighttimer.reset()
         self.mine_list.timer.reset()
