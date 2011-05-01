@@ -1007,9 +1007,9 @@ def main(cogworld, condition):
                     else:
                         g.log.write("# %f %d Scores Show\n"%(time.time(), pygame.time.get_ticks()))
                 if g.config.get_setting('Score','new_scoring'):
-                    g.show_old_score()
-                else:
                     g.show_new_score()
+                else:
+                    g.show_old_score()
                 if g.config.get_setting('Logging','logging'):
                     if g.config.get_setting('Logging','R_friendly'):
                         g.log.write("EVENT\t%f\t%d\t%d\tscore_hide\tNone\tPlayer\n"%(time.time(), pygame.time.get_ticks(), g.current_game))
