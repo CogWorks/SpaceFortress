@@ -21,8 +21,8 @@ macosx: ce-macosx sf-macosx
 	mv dist/macosx/SpaceFortress\ 5.0 dist/macosx/bundle
 	ver=`cat build-info`;\
 	cd dist/macosx; \
-	arch -i386 /Developer/usr/bin/packagemaker -r bundle -v -i edu.rpi.cogsci.cogworks.spacefortress \
-		-o SpaceFortress-$$ver.mpkg --no-relocate -l /Applications -t SpaceFortress --target 10.5 --version $$ver
+	arch -i386 /Developer/usr/bin/packagemaker -b -r bundle -v -i edu.rpi.cogsci.cogworks.spacefortress \
+		-o SpaceFortress-$$ver.mpkg --no-relocate -l /Applications -t SpaceFortress --target 10.4 --version $$ver
 
 sf-macosx: deps
 	rm -rf dist/macosx/SpaceFortress*
@@ -64,6 +64,7 @@ sf-macosx: deps
 	mv build/exe.macosx-10.6-*-2.7/* dist/macosx/SpaceFortress.app/Contents/MacOS/
 	cd dist/macosx/SpaceFortress.app/Contents/MacOS; \
 	install_name_tool -id @executable_path/Python Python; \
+	install_name_tool -change /opt/local/Library/Frameworks/Python.framework/Versions/2.7/Python @executable_path/Python SpaceFortress; \
 	for f in $$morelibs; do \
 		libs=`otool -XL $$f | grep "/opt/local/lib" | cut -f 2 | cut -f 1 -d " "`; \
  		if [[ -n $$libs ]]; then \
