@@ -146,7 +146,7 @@ class Game(object):
         d = datetime.datetime.now().timetuple()
         if self.config.get_setting('Logging','logging'):
             log_filename = "%d %d-%d-%d %d-%d-%d.dat"%(self.config.get_setting('General','id'), d[0], d[1], d[2], d[3], d[4], d[5])
-            logdir = self.config.get_setting('General','logdir')
+            logdir = self.config.get_setting('Logging','logdir')
             if len(logdir.strip()) == 0:
                 logdir = get_default_logdir()
             log_filename = os.path.join(logdir, log_filename)
@@ -704,7 +704,7 @@ class Game(object):
     
     def display_foe_mines(self):
         """before game begins, present the list of IFF letters to target"""
-        if self.config.get_setting('General','print_events'):
+        if self.config.get_setting('Logging','print_events'):
             print self.config.get_setting('Mine','num_foes'), self.mine_list.foe_letters
         self.screen.fill((0,0,0))
         top = self.f24.render("The Type-2 mines for this session are:", True, (255,255,0))
