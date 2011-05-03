@@ -1,4 +1,4 @@
-.PHONY: build-info resources
+.PHONY: build-info resources docs
 
 help:
 	@echo "Valid options are: macosx"
@@ -7,15 +7,22 @@ all: clean macosx
 
 clean:
 	@rm -rf build dist
+	@cd docs; \
+	rm -rf *.log *.aux *.out *.pdf
 	
 build-info:
 	@git describe --dirty --always > build-info
 	
 deps: build-info
 
-macosx: ce-macosx sf-macosx
+docs:
+	cd docs; \
+	pdflatex -interaction=nonstopmode instructions.tex 
+
+macosx: docs ce-macosx sf-macosx
 	mkdir dist/macosx/Space\ Fortress\ 5
 	mkdir dist/macosx/bundle
+	cp docs/instructions.pdf dist/macosx/bundle/Instructions.pdf 
 	mv dist/macosx/*.app dist/macosx/Space\ Fortress\ 5/
 	python mac-tools/AssignIcon.py psf5.png dist/macosx/Space\ Fortress\ 5
 	mv dist/macosx/Space\ Fortress\ 5 dist/macosx/bundle
