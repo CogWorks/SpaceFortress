@@ -63,36 +63,40 @@ class Score(object):
     
         
     def draw(self, scoresurf):
-        """draws all score values to screen"""      
-        self.p1_surf = self.f.render("%d"%self.positions[1],0, (255,255,0))
+        """draws all score values to screen"""     
+        #get some floats from adding fractions. Change to int for font rendering
+        for item in range(1,9):
+            if isinstance(self.positions[item], float):
+                self.positions[item] = int(self.positions[item]) 
+        self.p1_surf = self.f.render("%s"%str(self.positions[1]),0, (255,255,0))
         self.p1_rect = self.p1_surf.get_rect()
         self.p1_rect.centery = 48*self.app.aspect_ratio
         self.p1_rect.centerx = 45*self.app.aspect_ratio
-        self.p2_surf = self.f.render("%d"%self.positions[2],0, (255,255,0))
+        self.p2_surf = self.f.render("%s"%str(self.positions[2]),0, (255,255,0))
         self.p2_rect = self.p2_surf.get_rect()
         self.p2_rect.centery = 48*self.app.aspect_ratio
         self.p2_rect.centerx = 134*self.app.aspect_ratio
-        self.p3_surf = self.f.render("%d"%self.positions[3],0, (255,255,0))
+        self.p3_surf = self.f.render("%s"%str(self.positions[3]),0, (255,255,0))
         self.p3_rect = self.p3_surf.get_rect()
         self.p3_rect.centery = 48*self.app.aspect_ratio
         self.p3_rect.centerx = 223*self.app.aspect_ratio
-        self.p4_surf = self.f.render("%d"%self.positions[4],0, (255,255,0))
+        self.p4_surf = self.f.render("%s"%str(self.positions[4]),0, (255,255,0))
         self.p4_rect = self.p4_surf.get_rect()
         self.p4_rect.centery = 48*self.app.aspect_ratio
         self.p4_rect.centerx = 312*self.app.aspect_ratio
-        self.p5_surf = self.f.render("%s"%self.positions[5],0, (255,255,0))
+        self.p5_surf = self.f.render("%s"%str(self.positions[5]),0, (255,255,0))
         self.p5_rect = self.p5_surf.get_rect()
         self.p5_rect.centery = 48*self.app.aspect_ratio
         self.p5_rect.centerx = 401*self.app.aspect_ratio
-        self.p6_surf = self.f.render("%d"%self.positions[6],0, (255,255,0))
+        self.p6_surf = self.f.render("%s"%str(self.positions[6]),0, (255,255,0))
         self.p6_rect = self.p6_surf.get_rect()
         self.p6_rect.centery = 48*self.app.aspect_ratio
         self.p6_rect.centerx = 490*self.app.aspect_ratio
-        self.p7_surf = self.f.render("%d"%self.positions[7],0, (255,255,0))
+        self.p7_surf = self.f.render("%s"%str(self.positions[7]),0, (255,255,0))
         self.p7_rect = self.p7_surf.get_rect()
         self.p7_rect.centery = 48*self.app.aspect_ratio
         self.p7_rect.centerx = 579*self.app.aspect_ratio
-        self.p8_surf = self.f.render("%d"%self.positions[8],0, (255,255,0))
+        self.p8_surf = self.f.render("%s"%str(self.positions[8]),0, (255,255,0))
         self.p8_rect = self.p8_surf.get_rect()
         self.p8_rect.centery = 48*self.app.aspect_ratio
         self.p8_rect.centerx = 668*self.app.aspect_ratio

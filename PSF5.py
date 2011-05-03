@@ -377,6 +377,7 @@ class Game(object):
                             self.bonus.axcpt_flag = False
                             self.sounds.bonus_fail.play()
                             self.gameevents.add("shots_bonus_failure")
+                            self.gameevents.add("score-", "bonus", self.config.get_setting('Score','bonus_points')/2)
                 elif obj == "pnts":
                     if self.config.get_setting('General','bonus_system') == "standard":
                     #if current symbol is bonus but previous wasn't, set flag to deny bonus if next symbol happens to be the bonus symbol
@@ -402,6 +403,7 @@ class Game(object):
                             self.bonus.axcpt_flag = False
                             self.sounds.bonus_fail.play()
                             self.gameevents.add("pnts_bonus_failure")
+                            self.gameevents.add("score-", "bonus", self.config.get_setting('Score','bonus_points')/2)
             elif command == "first_tag":
                 if obj == "foe":
                     self.mine_list.iff_flag = True
