@@ -19,8 +19,8 @@ class Missile(token.Token):
         self.orientation = self.app.ship.orientation
         self.position.x = self.app.ship.nose[0]
         self.position.y = self.app.ship.nose[1]
-        self.collision_radius = self.app.config.get_setting('Missle','missile_radius')*self.app.aspect_ratio
-        self.speed = self.app.config.get_setting('Missle','missile_speed')
+        self.collision_radius = self.app.config.get_setting('Missile','missile_radius')*self.app.aspect_ratio
+        self.speed = self.app.config.get_setting('Missile','missile_speed')
         self.velocity.x = math.cos(math.radians((self.orientation) % 360)) * self.speed
         self.velocity.y = -math.sin(math.radians((self.orientation) % 360)) * self.speed
         

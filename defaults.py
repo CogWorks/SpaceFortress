@@ -87,11 +87,11 @@ def get_config():
     cfg.add_setting('Ship', 'ship_vel_x', 0, 'Initial ship velocity in x direction')
     cfg.add_setting('Ship', 'ship_vel_y', 0, 'Initial ship velocity in y direction.')
     
-    cfg.add_setting('Missle', 'missile_max', 100, 'Maximum number of missiles possible')
-    cfg.add_setting('Missle', 'missile_num', 100, 'Number of missiles at start of game')
-    cfg.add_setting('Missle', 'missile_penalty', 3, 'Points lost when you fire a missile when none remain')
-    cfg.add_setting('Missle', 'missile_radius', 5, 'Missile collision radius')
-    cfg.add_setting('Missle', 'missile_speed', 20, 'Speed of missile fired from ship')
+    cfg.add_setting('Missile', 'missile_max', 100, 'Maximum number of missiles possible')
+    cfg.add_setting('Missile', 'missile_num', 100, 'Number of missiles at start of game')
+    cfg.add_setting('Missile', 'missile_penalty', 3, 'Points lost when you fire a missile when none remain')
+    cfg.add_setting('Missile', 'missile_radius', 5, 'Missile collision radius')
+    cfg.add_setting('Missile', 'missile_speed', 20, 'Speed of missile fired from ship')
     
     cfg.add_setting('Hexagon', 'hex_pos_x', 355, 'Hex x position')
     cfg.add_setting('Hexagon', 'hex_pos_y', 315, 'Hex y position')

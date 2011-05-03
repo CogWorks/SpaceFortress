@@ -23,8 +23,8 @@ class Ship(token.Token):
         self.velocity.x = self.app.config.get_setting('Ship','ship_vel_x')
         self.velocity.y = self.app.config.get_setting('Ship','ship_vel_y')
         self.orientation = self.app.config.get_setting('Ship','ship_orientation')
-        self.missile_capacity = self.app.config.get_setting('Missle','missile_max')
-        self.missile_count = self.app.config.get_setting('Missle','missile_num')
+        self.missile_capacity = self.app.config.get_setting('Missile','missile_max')
+        self.missile_count = self.app.config.get_setting('Missile','missile_num')
         self.thrust_flag = False
         self.thrust = 0
         self.turn_flag = False
@@ -84,8 +84,8 @@ class Ship(token.Token):
         if self.app.score.shots > 0:
             self.app.score.shots -= 1
         else:
-            self.app.score.pnts -= self.app.config.get_setting('Missle','missile_penalty')
-            self.app.score.bonus -= self.app.config.get_setting('Missle','missile_penalty')
+            self.app.score.pnts -= self.app.config.get_setting('Missile','missile_penalty')
+            self.app.score.bonus -= self.app.config.get_setting('Missile','missile_penalty')
             
     def draw(self, worldsurf):
         """draw ship to worldsurf"""

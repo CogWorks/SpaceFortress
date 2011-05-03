@@ -41,7 +41,7 @@ class Score(object):
         else:
             self.f = pygame.font.Font(self.app.fp, int(28*self.app.aspect_ratio))
         self.iff = ''
-        self.shots = self.app.config.get_setting('Missle','missile_num')
+        self.shots = self.app.config.get_setting('Missile','missile_num')
     
     vlner = ScoreAttr('VLNER_pos', both=True)
     iff = ScoreAttr('IFF_pos', both=True)

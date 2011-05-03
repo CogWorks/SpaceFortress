@@ -196,7 +196,7 @@ class Game(object):
         self.score.mines = 0
         self.score.bonus = 0
         self.score.vlner = 0
-        self.score.shots = self.config.get_setting('Missle','missile_num')        
+        self.score.shots = self.config.get_setting('Missile','missile_num')        
         self.gametimer.reset()
         self.flighttimer.reset()
         self.mine_list.timer.reset()
@@ -455,6 +455,8 @@ class Game(object):
                 self.gameevents.add("score-", "mines", self.config.get_setting('Score','mine_timeout_penalty'))
             elif command == "score+":
                 self.score.__setattr__(obj, self.score.__getattribute__(obj) + target)
+                if self.score.shots > self.config.get_setting('Missile','missile_max'):
+                    self.score.shots = self.config.get_setting('Missile','missile_max')
             elif command == "score-":
                 self.score.__setattr__(obj, self.score.__getattribute__(obj) - target)
             elif command == "collide":
@@ -879,7 +881,7 @@ class Game(object):
             self.log.write("# mine score %d\n"%self.score.mines)
             self.log.write("# bonus score %d\n"%self.score.bonus)
             self.log.write("# total standard score %d\n"%(self.score.pnts + self.score.cntrl + self.score.vlcty + self.score.speed))
-            self.log.write("# total new score %d"%(self.score.flight + self.score.fortress + self.score.mines + self.score.bonus))
+            self.log.write("# total new score %d\n"%(self.score.flight + self.score.fortress + self.score.mines + self.score.bonus))
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
