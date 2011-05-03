@@ -48,7 +48,7 @@ except ImportError:
 import defaults
 
 def get_psf_version_string():
-    return "SpaceFortress 5"
+    return "Space Fortress 5"
 
 def get_default_logdir():
     _home = os.environ.get('HOME', '/')
