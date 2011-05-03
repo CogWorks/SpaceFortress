@@ -14,15 +14,15 @@ build-info:
 deps: build-info
 
 macosx: ce-macosx sf-macosx
-	mkdir dist/macosx/SpaceFortress\ 5.0
+	mkdir dist/macosx/Space\ Fortress\ 5
 	mkdir dist/macosx/bundle
-	mv dist/macosx/*.app dist/macosx/SpaceFortress\ 5.0/
-	python mac-tools/AssignIcon.py psf5.png dist/macosx/SpaceFortress\ 5.0
-	mv dist/macosx/SpaceFortress\ 5.0 dist/macosx/bundle
+	mv dist/macosx/*.app dist/macosx/Space\ Fortress\ 5/
+	python mac-tools/AssignIcon.py psf5.png dist/macosx/Space\ Fortress\ 5
+	mv dist/macosx/Space\ Fortress\ 5 dist/macosx/bundle
 	ver=`cat build-info`;\
 	cd dist/macosx; \
 	arch -i386 /Developer/usr/bin/packagemaker -b -r bundle -v -i edu.rpi.cogsci.cogworks.spacefortress \
-		-o SpaceFortress-$$ver-i386-macosx10.6.mpkg --no-relocate -l /Applications -t SpaceFortress --target 10.5 --version $$ver
+		-o SpaceFortress-$$ver-i386-macosx10.6.mpkg --no-relocate -l /Applications -t "Space Fortress 5" --target 10.5 --version $$ver
 
 sf-macosx: deps
 	rm -rf dist/macosx/SpaceFortress*
@@ -75,9 +75,9 @@ sf-macosx: deps
  		fi; \
 	done
 	mv dist/macosx/SpaceFortress.app dist/macosx/SpaceFortress-fat.app
-	ditto --rsrc --arch i386 dist/macosx/SpaceFortress-fat.app dist/macosx/SpaceFortress.app
+	ditto --rsrc --arch i386 dist/macosx/SpaceFortress-fat.app dist/macosx/Space\ Fortress.app
 	rm -rf dist/macosx/SpaceFortress-fat.app
-	/Developer/Tools/SetFile -a B dist/macosx/SpaceFortress.app
+	/Developer/Tools/SetFile -a B dist/macosx/Space\ Fortress.app
 
 ce-macosx:
 	rm -rf dist/macosx/configEditor*
@@ -132,6 +132,6 @@ ce-macosx:
  		fi; \
 	done
 	mv dist/macosx/configEditor.app dist/macosx/configEditor-fat.app
-	ditto --rsrc --arch i386 dist/macosx/configEditor-fat.app dist/macosx/configEditor.app
+	ditto --rsrc --arch i386 dist/macosx/configEditor-fat.app dist/macosx/Config\ Editor.app
 	rm -rf dist/macosx/configEditor-fat.app
-	/Developer/Tools/SetFile -a B dist/macosx/configEditor.app
+	/Developer/Tools/SetFile -a B dist/macosx/Config\ Editor.app

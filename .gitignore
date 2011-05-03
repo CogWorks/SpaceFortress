@@ -12,3 +12,5 @@ build-info
 *.backup
 *.pdf
 *~
+*.html
+*.htm
