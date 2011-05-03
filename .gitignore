@@ -6,3 +6,9 @@ config.txt
 *.dat
 .directory
 build-info
+*.log
+*.aux
+*.out
+*.backup
+*.pdf
+*~
