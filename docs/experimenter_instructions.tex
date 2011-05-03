@@ -2,6 +2,15 @@
 \usepackage{indentfirst}
 \usepackage{fullpage}
 
+\usepackage[T1]{fontenc}
+\usepackage[scaled]{helvet}
+\renewcommand*\familydefault{\sfdefault}
+
+{\fontfamily{phv}\selectfont
+
+\usepackage{tikz}
+\usetikzlibrary{positioning, shapes.misc}
+
 \usepackage[pdftex, bookmarks, bookmarksopen=true, colorlinks=false,
 pdftitle={SpaceFortress 5: Subject Instructions}]{hyperref}
 \usepackage{graphicx}
@@ -14,7 +23,7 @@ pdftitle={SpaceFortress 5: Subject Instructions}]{hyperref}
 \begin{center}
 \null
 \vfill
-\textsc{\Large Subject Instructions}\\[0.5cm]
+\textsc{\Large Experimenter Instructions for Subjects}\\[0.5cm]
 \HRule \\[0.7cm]
 { \huge \bfseries Space Fortress 5}\\[0.4cm]
 \HRule \\[1.5cm]
@@ -35,6 +44,23 @@ Ryan \textsc{Hope}
 \vfill
 \includegraphics[width=\textwidth]{SF5.png}
 \vfill
+\begin{tikzpicture}[node distance=.5ex]
+
+\tikzstyle{key} = [draw=black, very thick, rectangle, rounded corners, minimum size=36pt,
+font=\Large]
+\tikzstyle{space key} = [key, minimum width=36ex]
+
+\node[space key] (Space) {\textbf{Space Bar}};
+
+\node[key] (J) [above right=of Space] {\textbf{J}};
+\node[key] (K) [right=of J] {\textbf{K}};
+\node[key] (L) [right=of K] {\textbf{L}};
+
+\node[key] (D) [above left=of Space] {\textbf{D}};
+\node[key] (W) [above left=of D] {\textbf{W}};
+\node[key] (A) [below left=of W] {\textbf{A}};
+
+\end{tikzpicture}
 \end{center}
 \newpage
 
@@ -349,10 +375,10 @@ it. BUT, if you press the IFF key, you will not be able to destroy the mine.
 \begin{itemize}
 \item You begin each new game with 100 missiles.
 \item During the game, various symbols will appear on the screen beneath the Fortress
-\item Every time an “A” is followed by an “X” symbol, you can select a bonus of 100 points
-by pressing the “L” key, or a bonus of 50 missiles and 50 points by pressing the “K”
+\item Every time an ``A'' is followed by an ``X'' symbol, you can select a bonus of 100 points
+by pressing the ``L'' key, or a bonus of 50 missiles and 50 points by pressing the ``K''
 key.
-\item BUT, if the “K” or “L” keys are pressed anytime before an “X” appears after an “A”,
+\item BUT, if the ``K'' or ``L'' keys are pressed anytime before an ``X'' appears after an ``A'',
 the bonus for that pair of symbols is forfeited and you must wait for the next pair to
 appear.
 \end{itemize}

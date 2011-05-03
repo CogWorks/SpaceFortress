@@ -17,12 +17,12 @@ deps: build-info
 
 docs:
 	cd docs; \
-	pdflatex -interaction=nonstopmode instructions.tex 
+	pdflatex -interaction=nonstopmode experimenter_instructions.tex 
 
 macosx: docs ce-macosx sf-macosx
 	mkdir dist/macosx/Space\ Fortress\ 5
 	mkdir dist/macosx/bundle
-	cp docs/instructions.pdf dist/macosx/Space\ Fortress\ 5/Instructions.pdf 
+	cp docs/experimenter_instructions.pdf dist/macosx/Space\ Fortress\ 5/Experimenter\ Instructions\ for\ Subjects.pdf 
 	mv dist/macosx/*.app dist/macosx/Space\ Fortress\ 5/
 	python mac-tools/AssignIcon.py psf5.png dist/macosx/Space\ Fortress\ 5
 	mv dist/macosx/Space\ Fortress\ 5 dist/macosx/bundle
