@@ -8,7 +8,7 @@ all: clean macosx
 clean:
 	@rm -rf build dist
 	@cd docs; \
-	rm -rf *.log *.aux *.out *.pdf
+	rm -rf *.log *.aux *.out *.pdf *.backup *~
 	
 build-info:
 	@git describe --dirty --always > build-info
