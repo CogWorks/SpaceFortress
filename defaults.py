@@ -48,7 +48,7 @@ def get_config():
     
     cfg = Config()
     
-    cfg.add_setting('General', 'player', True, alias='Player', options=['Human','Model'], type=config.constants.CT_COMBO, about='Will this game be played by a human or a cognitive model? Set to f to disable human control, enabling ACT-R')
+    cfg.add_setting('General', 'player', 'Human', alias='Player', options=['Human','Model'], type=config.constants.CT_COMBO, about='Will this game be played by a human or a cognitive model? Set to f to disable human control, enabling ACT-R')
     cfg.add_setting('General', 'psf', False, alias='Classic Mode', type=config.constants.CT_CHECKBOX, about='Original PSF (SF4) settings? If t, *ALL* further values are ignored')
     cfg.add_setting('General', 'id', 1234, alias='Subject ID#', about='Subject identifier used in log filename"')
     cfg.add_setting('General', 'games_per_session', 8, alias='Max # of Games', about='Number of games per "session"')
