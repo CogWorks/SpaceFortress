@@ -23,6 +23,11 @@ class ComboBox(QComboBox):
                 if info['options'][i] == info['value']:
                     self.setCurrentIndex(i)
         QObject.connect(self, SIGNAL('currentIndexChanged(int)'), self.stateChangeHandler)
+        
+    def updateValue(self, newVal):
+        for i in range(0,len(self.info['options'])):
+            if self.info['options'][i] == newVal:
+                self.setCurrentIndex(i)
             
     def stateChangeHandler(self, newVal):
         for i in range(0,len(self.info['options'])):
@@ -42,6 +47,9 @@ class DoubleSpinBox(QDoubleSpinBox):
         self.setMaximum(1000000)
         self.setValue(info['value'])
         QObject.connect(self, SIGNAL('valueChanged(double)'), self.stateChangeHandler)
+        
+    def updateValue(self, newVal):
+        self.setValue(newVal)
             
     def stateChangeHandler(self, newVal):
         self.cfg.update_setting_value(self.category, self.setting, newVal)
@@ -59,6 +67,9 @@ class SpinBox(QSpinBox):
         self.setMaximum(1000000)
         self.setValue(info['value'])
         QObject.connect(self, SIGNAL('valueChanged(int)'), self.stateChangeHandler)
+        
+    def updateValue(self, newVal):
+        self.setValue(newVal)
             
     def stateChangeHandler(self, newVal):
         self.cfg.update_setting_value(self.category, self.setting, newVal)
@@ -78,6 +89,12 @@ class CheckBox(QCheckBox):
         else:
             self.setCheckState(Qt.Unchecked)
         QObject.connect(self, SIGNAL('stateChanged(int)'), self.stateChangeHandler)
+        
+    def updateValue(self, newVal):
+        if newVal:
+            self.setCheckState(Qt.Checked)
+        else:
+            self.setCheckState(Qt.Unchecked)
             
     def stateChangeHandler(self, newVal):
         if newVal == Qt.Checked:
@@ -100,6 +117,9 @@ class LineEdit(QLineEdit):
             self.setMaxLength(info['n'])
             self.setFixedWidth(info['n']*self.minimumSizeHint().height())
         QObject.connect(self, SIGNAL('textChanged(QString)'), self.stateChangeHandler)
+        
+    def updateValue(self, newVal):
+        self.setText(newVal)
             
     def stateChangeHandler(self, newVal):
         self.cfg.update_setting_value(self.category, self.setting, newVal)
@@ -126,6 +146,9 @@ class ConfigEditor(QMainWindow):
         
         QObject.connect(self.categories, SIGNAL('itemSelectionChanged()'), self.category_selected)
         
+        self.widget_list = {}
+        for cat in self.cfg.get_categories():
+            self.widget_list[cat] = {}
         longest_cat = 0
         for cat in self.cfg.get_categories():
             if len(cat) > longest_cat:
@@ -158,6 +181,7 @@ class ConfigEditor(QMainWindow):
                 elif info['type'] == constants.CT_COMBO:
                     w = ComboBox(self, self.cfg,cat,setting,info)
                 w.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Fixed)
+                self.widget_list[cat][setting] = w
                 sl.addWidget(w)
                 s.setLayout(sl)
                 c = self.cfg.config[cat].index(setting) % 2
@@ -184,13 +208,11 @@ class ConfigEditor(QMainWindow):
         
         self.mainButtons = QDialogButtonBox(QDialogButtonBox.RestoreDefaults | QDialogButtonBox.Reset | QDialogButtonBox.Apply)
         self.main_apply = self.mainButtons.button(QDialogButtonBox.StandardButton.Apply)
-        self.main_apply.setEnabled(False)
         self.main_reset = self.mainButtons.button(QDialogButtonBox.StandardButton.Reset)
-        self.main_reset.setEnabled(False)
         self.main_defaults = self.mainButtons.button(QDialogButtonBox.StandardButton.LastButton)
-        if str(self.def_cfg) == str(self.cfg):
-            self.main_defaults.setEnabled(False)
         QObject.connect(self.mainButtons, SIGNAL('clicked(QAbstractButton *)'), self.mainbutton_clicked)
+        
+        self.dirty_check()
         
         self.main_layout.addLayout(self.config_layout)
         self.main_layout.addWidget(self.mainButtons)
@@ -229,9 +251,13 @@ class ConfigEditor(QMainWindow):
         
     def mainbutton_clicked(self, button):
         if button == self.main_reset:
-            print "Reset"
+            for cat in self.base_cfg.get_categories():
+                for setting in self.base_cfg.get_settings(cat):
+                    self.widget_list[cat][setting].updateValue(self.base_cfg.get_setting(cat,setting))
         elif button == self.main_defaults:
-            print "Restore Defaults"
+            for cat in self.def_cfg.get_categories():
+                for setting in self.def_cfg.get_settings(cat):
+                    self.widget_list[cat][setting].updateValue(self.def_cfg.get_setting(cat,setting))
         elif button == self.main_apply:
             bad_settings = self.validate_settings()
             if bad_settings == []:
