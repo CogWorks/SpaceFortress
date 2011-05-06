@@ -81,12 +81,22 @@ class Game(object):
         self.config.set_user_file(defaults.get_user_file())
         self.config.update_from_user_file()
         self.current_game = 0
+
+        d = datetime.datetime.now().timetuple()
+        base = "%d_%d-%d-%d_%d-%d-%d"%(self.config.get_setting('General','id'), d[0], d[1], d[2], d[3], d[4], d[5])
+        logdir = self.config.get_setting('Logging','logdir')
+        if len(logdir.strip()) == 0:
+            logdir = get_default_logdir()
+        self.log_basename = os.path.join(logdir, base)
         
         self.eg = None
         if self.config.get_setting('Eye Tracker','enabled'):
             self.eg = EyeGaze()
             if self.eg.connect(self.config.get_setting('Eye Tracker','eg_server')) != None:
                 self.eg = None
+            self.eg.gaze_log_fn = self.log_basename + ('.gaze.csv')
+            self.eg.fix_log_fn = self.log_basename + ('.fix.csv')
+            self.eg.start_logging()
         
         pygame.display.init()
         pygame.font.init()
@@ -158,16 +168,11 @@ class Game(object):
         else:
             self.mine_exists = False
         self.mine_list = tokens.mine.MineList(self)
-        d = datetime.datetime.now().timetuple()
         if self.config.get_setting('Logging','logging'):
             if self.config.get_setting('Logging','R_friendly'):
-                log_filename = "%d_%d-%d-%d_%d-%d-%d.csv"%(self.config.get_setting('General','id'), d[0], d[1], d[2], d[3], d[4], d[5])
+                log_filename = "%s.csv" % (self.log_basename)
             else:
-                log_filename = "%d_%d-%d-%d_%d-%d-%d.dat"%(self.config.get_setting('General','id'), d[0], d[1], d[2], d[3], d[4], d[5])
-            logdir = self.config.get_setting('Logging','logdir')
-            if len(logdir.strip()) == 0:
-                logdir = get_default_logdir()
-            log_filename = os.path.join(logdir, log_filename)
+                log_filename = "%s.dat" % (self.log_basename)
             self.log = open(log_filename, "w")
             if self.config.get_setting('Logging','R_friendly'):
                 self.log.write("event_type\tsystem_clock\tgame_time\tcurrent_game\te1\te2\te3\tfoes\tship_alive\tship_x\tship_y\tship_vel_x\tship_vel_y\tship_orientation\t"+
@@ -1004,6 +1009,7 @@ class Game(object):
         pygame.quit()
         if self.eg:
             self.eg.data_stop()
+            self.eg.stop_logging()
             self.eg.disconnect()
         sys.exit(ret)
 
