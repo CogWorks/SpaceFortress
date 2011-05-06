@@ -11,7 +11,7 @@ clean:
 	rm -rf *.log *.aux *.out *.pdf *.backup *~
 	
 build-info:
-	@git describe --dirty --always > build-info
+	@./build-info.sh
 	
 deps: build-info
 
