@@ -1013,10 +1013,10 @@ def main(cogworld, condition):
     g.display_intro()
     while g.current_game < g.config.get_setting('General','games_per_session'):
         g.current_game += 1
-        if self.eg and self.config.get_setting('Eye Tracker','calmode') == 'Every Game':
-            self.calibrated = self.eg.calibrate(self.screen)
-        if self.eg and self.calibrated:
-            self.eg.data_start()
+        if g.eg and g.config.get_setting('Eye Tracker','calmode') == 'Every Game':
+            g.calibrated = g.eg.calibrate(g.screen)
+        if g.eg and g.calibrated:
+            g.eg.data_start()
         if g.mine_exists:
             g.display_foe_mines()
         g.setup_world()
