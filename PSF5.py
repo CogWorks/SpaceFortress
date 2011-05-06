@@ -743,7 +743,7 @@ class Game(object):
                             missile, shell, bonus, self.score.pnts, self.score.cntrl, self.score.vlcty, self.score.vlner, self.score.iff, self.score.intrvl,\
                             self.score.speed, self.score.shots, thrust_key, left_key, right_key, fire_key, iff_key, shots_key, pnts_key))
         if self.eg and self.eg.fix_data and self.eg.fix_data.eye_motion_state == 1:
-            self.log.write("\t%d\t%d\t%d", self.eg.fix_data.fix_number, self.eg.fix_data.fix_x, self.eg.fix_data.fix_y)
+            self.log.write("\t%d\t%d\t%d" % (self.eg.fix_data.fix_number, self.eg.fix_data.fix_x, self.eg.fix_data.fix_y))
         self.log.write("\n")
 
     def display_intro(self):
