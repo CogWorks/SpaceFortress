@@ -42,6 +42,7 @@ except ImportError:
 
 try:
     from pycogworks.cogworld import *
+    from pycogworks.eyegaze import *
 except ImportError:
     pass
 
@@ -80,6 +81,13 @@ class Game(object):
         self.config.set_user_file(defaults.get_user_file())
         self.config.update_from_user_file()
         self.current_game = 0
+        
+        self.eg = None
+        if self.config.get_setting('Eye Tracker','enabled'):
+            self.eg = EyeGaze()
+            if self.eg.connect(self.config.get_setting('Eye Tracker','eg_server')) != None:
+                self.eg = None
+        
         pygame.display.init()
         pygame.font.init()
         pygame.mouse.set_visible(False)
@@ -120,6 +128,11 @@ class Game(object):
             self.screen = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT), pygame.NOFRAME)
         else:
             self.screen = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
+        
+        self.calibrated = False
+        if self.eg and self.config.get_setting('Eye Tracker','calmode') == 'Once':
+            self.calibrated = self.eg.calibrate(self.screen)
+            
         self.clock = pygame.time.Clock()
         self.gametimer = tokens.timer.Timer()
         self.flighttimer = tokens.timer.Timer()
@@ -159,7 +172,10 @@ class Game(object):
             if self.config.get_setting('Logging','R_friendly'):
                 self.log.write("event_type\tsystem_clock\tgame_time\tcurrent_game\te1\te2\te3\tfoes\tship_alive\tship_x\tship_y\tship_vel_x\tship_vel_y\tship_orientation\t"+
                                "mine_alive\tmine_x\tmine_y\tfortress_alive\tfortress_orientation\tmissile\tshell\tbonus\tscore_pnts\tscore_cntrl\tscore_vlcty\t"+
-                               "score_vlner\tscore_iff\tscore_intrvl\tscore_speed\tscore_shots\tthrust_key\tleft_key\tright_key\tfire_key\tiff_key\tshots_key\tpnts_key\tconfig\n")
+                               "score_vlner\tscore_iff\tscore_intrvl\tscore_speed\tscore_shots\tthrust_key\tleft_key\tright_key\tfire_key\tiff_key\tshots_key\tpnts_key\tconfig")
+                if self.eg:
+                    self.log.write("fixation_number\tfix_x\tfix_y")
+                self.log.write("\n")
                 self.log.write("CONFIG\t%f\t%d\t%d\t%s%s\n" % (time.time(), pygame.time.get_ticks(), self.current_game, "\t"*33, self.config))
             else:
                 self.log.write("# %s\n" % self.config)
@@ -717,15 +733,18 @@ class Game(object):
         else:
             pnts_key = "n"
         if self.config.get_setting('Logging','R_friendly'):
-            self.log.write("STATE\t%f\t%d\t%d\t\t\t\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%d\t%d\t%d\t%d\t%s\t%d\t%d\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n"%\
+            self.log.write("STATE\t%f\t%d\t%d\t\t\t\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%d\t%d\t%d\t%d\t%s\t%d\t%d\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s"%\
                            (system_clock, game_time, self.current_game, " ".join(self.mine_list.foe_letters), ship_alive, ship_x, ship_y, ship_vel_x, ship_vel_y, ship_orientation, mine_alive, mine_x, mine_y, fortress_alive, fortress_orientation,\
                             missile, shell, bonus, self.score.pnts, self.score.cntrl, self.score.vlcty, self.score.vlner, self.score.iff, self.score.intrvl,\
-                            self.score.speed, self.score.shots, thrust_key, left_key, right_key, fire_key, iff_key, shots_key, pnts_key))
+                            self.score.speed, self.score.shots, thrust_key, left_key, right_key, fire_key, iff_key, shots_key, pnts_key))                   
         else:
-            self.log.write("%f\t%d\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%d\t%d\t%d\t%d\t%s\t%d\t%d\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n"%\
+            self.log.write("%f\t%d\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%d\t%d\t%d\t%d\t%s\t%d\t%d\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s"%\
                            (system_clock, game_time, self.current_game, ship_alive, ship_x, ship_y, ship_vel_x, ship_vel_y, ship_orientation, mine_alive, mine_x, mine_y, fortress_alive, fortress_orientation,\
                             missile, shell, bonus, self.score.pnts, self.score.cntrl, self.score.vlcty, self.score.vlner, self.score.iff, self.score.intrvl,\
                             self.score.speed, self.score.shots, thrust_key, left_key, right_key, fire_key, iff_key, shots_key, pnts_key))
+        if self.eg and self.eg.fix_data and self.eg.fix_data.eye_motion_state == 1:
+            self.log.write("\t%d\t%d\t%d", self.eg.fix_data.fix_number, self.eg.fix_data.fix_x, self.eg.fix_data.fix_y)
+        self.log.write("\n")
 
     def display_intro(self):
         """display intro scene"""
@@ -983,6 +1002,9 @@ class Game(object):
         if self.config.get_setting('Logging','logging'):
             self.log.close()
         pygame.quit()
+        if self.eg:
+            self.eg.data_stop()
+            self.eg.disconnect()
         sys.exit(ret)
 
 def main(cogworld, condition):
@@ -991,6 +1013,10 @@ def main(cogworld, condition):
     g.display_intro()
     while g.current_game < g.config.get_setting('General','games_per_session'):
         g.current_game += 1
+        if self.eg and self.config.get_setting('Eye Tracker','calmode') == 'Every Game':
+            self.calibrated = self.eg.calibrate(self.screen)
+        if self.eg and self.calibrated:
+            self.eg.data_start()
         if g.mine_exists:
             g.display_foe_mines()
         g.setup_world()
@@ -1032,6 +1058,8 @@ def main(cogworld, condition):
                     else:
                         g.log.write("# %f %d Scores Hide\n"%(time.time(), pygame.time.get_ticks()))
                 break
+        if self.eg:
+            self.eg.data_stop()
     g.quit()
 
 if __name__ == '__main__':
