@@ -1,0 +1,157 @@
+event_type	system_clock	game_time	current_game	e1	e2	e3	foes	ship_alive	ship_x	ship_y	ship_vel_x	ship_vel_y	ship_orientation	mine_alive	mine_x	mine_y	fortress_alive	fortress_orientation	missile	shell	bonus	score_pnts	score_cntrl	score_vlcty	score_vlner	score_iff	score_intrvl	score_speed	score_shots	thrust_key	left_key	right_key	fire_key	iff_key	shots_key	pnts_key	configfixation_number	fix_x	fix_y
+CONFIG	1304955523.642959	431	0																																		{"AX-CPT":{"a_symbols":{"value":"A"},"ax_prob":{"value":0.40000000000000002},"ay_prob":{"value":0.20000000000000001},"b_symbols":{"value":"B"},"bx_prob":{"value":0.20000000000000001},"by_prob":{"value":0.20000000000000001},"cue_visibility":{"value":250},"isi_time":{"value":800},"iti_time":{"value":800},"state":{"value":"iti"},"target_visibility":{"value":250},"x_symbols":{"value":"X"},"y_symbols":{"value":"Y"}},"Bonus":{"bonus_exists":{"value":true},"bonus_pos_x":{"value":355},"bonus_pos_y":{"value":390},"bonus_probability":{"value":0.29999999999999999},"bonus_symbol":{"value":"$"},"non_bonus_symbols":{"value":"!&*%@"},"quadrant_probs":{"value":".2,.2,.2,.4"},"symbol_down_time":{"value":833},"symbol_up_time":{"value":2500}},"Display":{"display_mode":{"value":"Fullscreen"},"linewidth":{"value":1},"pause_overlay":{"value":true}},"Eye Tracker":{"calmode":{"value":"Every Game"},"eg_server":{"value":"1.0.0.31"},"enabled":{"value":true}},"Fortress":{"fortress_exists":{"value":true},"fortress_lock_time":{"value":1000},"fortress_pos_x":{"value":355},"fortress_pos_y":{"value":315},"fortress_radius":{"value":18},"fortress_sector_size":{"value":20},"hit_fortress_while_mine":{"value":false},"vlner_threshold":{"value":10},"vlner_time":{"value":250}},"General":{"allow_pause":{"value":true},"bonus_location":{"value":"Probabilistic"},"bonus_system":{"value":"AX-CPT"},"game_time":{"value":300000},"games_per_session":{"value":8},"id":{"value":1234},"player":{"value":"Human"},"psf":{"value":false},"sound":{"value":true}},"Hexagon":{"big_hex":{"value":200},"hex_pos_x":{"value":355},"hex_pos_y":{"value":315},"hex_shrink":{"value":false},"hex_shrink_radius":{"value":150},"small_hex":{"value":40}},"Keybindings":{"IFF_key":{"value":"j"},"fire_key":{"value":"SPACE"},"left_turn_key":{"value":"a"},"pause_key":{"value":"F12"},"pnts_key":{"value":"l"},"right_turn_key":{"value":"d"},"shots_key":{"value":"k"},"thrust_key":{"value":"w"}},"Logging":{"R_friendly":{"value":true},"logdir":{"value":""},"logging":{"value":true},"print_events":{"value":false}},"MOT":{"MOT_count":{"value":5},"MOT_identification_time":{"value":5000},"MOT_identification_type":{"value":"shots"},"MOT_max_deflection":{"value":15},"MOT_move_time":{"value":5000},"MOT_movement_style":{"value":"bounce"},"MOT_off_time":{"value":5000},"MOT_onset_time":{"value":3000},"MOT_switch_time":{"value":1000}},"Mine":{"fortress_resets_mine":{"value":true},"intrvl_max":{"value":400},"intrvl_min":{"value":250},"maximum_spawn_distance":{"value":700},"mine_exists":{"value":true},"mine_mode":{"value":"standard"},"mine_probability":{"value":0.29999999999999999},"mine_radius":{"value":20},"mine_spawn":{"value":5000},"mine_speed":{"value":3},"mine_timeout":{"value":10000},"minimum_spawn_distance":{"value":200},"num_foes":{"value":3}},"Missile":{"missile_max":{"value":100},"missile_num":{"value":100},"missile_penalty":{"value":3},"missile_radius":{"value":5},"missile_speed":{"value":20}},"Score":{"CNTRL_increment":{"value":6},"CNTRL_pos":{"value":2},"IFF_pos":{"value":3},"INTRVL_pos":{"value":4},"PNTS_pos":{"value":1},"SHOTS_pos":{"value":8},"SPEED_pos":{"value":5},"VLCTY_increment":{"value":7},"VLCTY_pos":{"value":6},"VLNER_pos":{"value":7},"bonus_missiles":{"value":50},"bonus_points":{"value":100},"destroy_foe":{"value":30},"destroy_fortress":{"value":100},"energize_friend":{"value":20},"mine_hit_penalty":{"value":50},"mine_timeout_penalty":{"value":50},"new_scoring":{"value":true},"new_scoring_pos":{"value":true},"shell_hit_penalty":{"value":50},"ship_death_penalty":{"value":100},"small_hex_penalty":{"value":5},"speed_threshold":{"value":4},"update_timer":{"value":1000},"warp_penalty":{"value":35}},"Shell":{"shell_radius":{"value":3},"shell_speed":{"value":6}},"Ship":{"ship_acceleration":{"value":0.29999999999999999},"ship_hit_points":{"value":4},"ship_max_vel":{"value":6},"ship_orientation":{"value":90},"ship_pos_x":{"value":245},"ship_pos_y":{"value":315},"ship_radius":{"value":12},"ship_turn_speed":{"value":6},"ship_vel_x":{"value":0},"ship_vel_y":{"value":0}}}
+EVENT	1304955544.088815	20878	1	display_foes	O V Y	Player
+EVENT	1304955544.616523	21405	1	game_start	None	Player
+STATE	1304955544.644833	21433	1				O V Y	y	306.250	393.750	0.000	0.000	90.000	n	-	-	y	180.0	""	""	None	0	0	0	0		0	0	100	n	n	n	y	n	n	n	1	607	727
+STATE	1304955544.668767	21457	1				O V Y	y	306.250	393.750	0.000	0.000	90.000	n	-	-	y	180.0	""	""	None	0	0	0	0		0	0	100	n	n	n	y	n	n	n	1	607	727
+STATE	1304955544.702532	21491	1				O V Y	y	306.250	393.750	0.000	0.000	90.000	n	-	-	y	180.0	""	""	None	0	0	0	0		0	0	100	n	n	n	y	n	n	n	1	607	727
+STATE	1304955544.735739	21524	1				O V Y	y	306.250	393.750	0.000	0.000	90.000	n	-	-	y	180.0	""	""	None	0	0	0	0		0	0	100	n	n	n	y	n	n	n
+EVENT	1304955544.749564	21538	1	release	fire	None
+STATE	1304955544.768868	21557	1				O V Y	y	306.250	393.750	0.000	0.000	90.000	n	-	-	y	180.0	""	""	None	0	0	0	0		0	0	100	n	n	n	n	n	n	n	2	586	576
+STATE	1304955544.801198	21590	1				O V Y	y	306.250	393.750	0.000	0.000	90.000	n	-	-	y	180.0	""	""	None	0	0	0	0		0	0	100	n	n	n	n	n	n	n	2	587	576
+STATE	1304955544.834321	21623	1				O V Y	y	306.250	393.750	0.000	0.000	90.000	n	-	-	y	180.0	""	""	None	0	0	0	0		0	0	100	n	n	n	n	n	n	n	2	587	575
+STATE	1304955544.867452	21656	1				O V Y	y	306.250	393.750	0.000	0.000	90.000	n	-	-	y	180.0	""	""	None	0	0	0	0		0	0	100	n	n	n	n	n	n	n	2	587	574
+STATE	1304955544.900792	21689	1				O V Y	y	306.250	393.750	0.000	0.000	90.000	n	-	-	y	180.0	""	""	None	0	0	0	0		0	0	100	n	n	n	n	n	n	n	2	587	574
+EVENT	1304955544.915508	21704	1	press	thrust	None
+STATE	1304955544.934873	21723	1				O V Y	y	306.250	393.750	0.000	0.000	90.000	n	-	-	y	180.0	""	""	None	0	0	0	0		0	0	100	y	n	n	n	n	n	n	2	587	574
+STATE	1304955544.967107	21756	1				O V Y	y	306.250	393.450	0.000	0.300	90.000	n	-	-	y	180.0	""	""	None	0	0	0	0		0	0	100	y	n	n	n	n	n	n	2	587	574
+STATE	1304955545.000364	21790	1				O V Y	y	306.250	392.850	0.000	0.600	90.000	n	-	-	y	160.0	""	""	None	0	0	0	0		0	0	100	y	n	n	n	n	n	n
+EVENT	1304955545.014077	21804	1	press	right	None
+STATE	1304955545.033426	21823	1				O V Y	y	306.250	391.950	0.000	0.900	90.000	n	-	-	y	160.0	""	""	None	0	0	0	0		0	0	100	y	n	y	n	n	n	n
+STATE	1304955545.065483	21855	1				O V Y	y	306.281	390.752	0.031	1.198	84.000	n	-	-	y	160.0	""	""	None	0	0	0	0		0	0	100	y	n	y	n	n	n	n
+STATE	1304955545.098566	21888	1				O V Y	y	306.375	389.260	0.094	1.492	78.000	n	-	-	y	160.0	""	""	None	0	0	0	0		0	0	100	y	n	y	n	n	n	n	3	492	453
+STATE	1304955545.131451	21921	1				O V Y	y	306.562	387.483	0.186	1.777	72.000	n	-	-	y	160.0	""	""	None	0	0	0	0		0	0	100	y	n	y	n	n	n	n	3	491	453
+STATE	1304955545.164474	21954	1				O V Y	y	306.870	385.432	0.308	2.051	66.000	n	-	-	y	160.0	""	""	None	0	0	0	0		0	0	100	y	n	y	n	n	n	n	3	490	452
+STATE	1304955545.197421	21987	1				O V Y	y	307.328	383.121	0.458	2.311	60.000	n	-	-	y	160.0	""	""	None	0	0	0	0		0	0	100	y	n	y	n	n	n	n	3	490	451
+STATE	1304955545.230138	22019	1				O V Y	y	307.963	380.567	0.635	2.554	54.000	n	-	-	y	160.0	""	""	None	0	0	0	0		0	0	100	y	n	y	n	n	n	n	3	490	450
+STATE	1304955545.263998	22053	1				O V Y	y	308.799	377.790	0.836	2.777	48.000	n	-	-	y	160.0	""	""	None	0	0	0	0		0	0	100	y	n	y	n	n	n	n	3	490	449
+STATE	1304955545.296760	22085	1				O V Y	y	309.857	374.813	1.058	2.977	42.000	n	-	-	y	160.0	""	""	None	0	0	0	0		0	0	100	y	n	y	n	n	n	n	3	490	449
+STATE	1304955545.330363	22119	1				O V Y	y	311.158	371.659	1.301	3.154	36.000	n	-	-	y	160.0	""	""	None	0	0	0	0		0	0	100	y	n	y	n	n	n	n	3	490	449
+STATE	1304955545.364464	22153	1				O V Y	y	312.719	368.355	1.561	3.304	30.000	n	-	-	y	160.0	""	""	None	0	0	0	0		0	0	100	y	n	y	n	n	n	n	3	490	449
+STATE	1304955545.397115	22186	1				O V Y	y	314.554	364.930	1.835	3.426	24.000	n	-	-	y	160.0	""	""	None	0	0	0	0		0	0	100	y	n	y	n	n	n	n	4	606	446
+STATE	1304955545.430043	22219	1				O V Y	y	316.675	361.411	2.120	3.518	18.000	n	-	-	y	160.0	""	""	None	0	0	0	0		0	0	100	y	n	y	n	n	n	n	4	608	447
+EVENT	1304955545.444044	22233	1	bonus	cue_appears	correct
+STATE	1304955545.463386	22252	1				O V Y	y	319.089	357.830	2.414	3.581	12.000	n	-	-	y	160.0	""	""	A	0	0	0	0		0	0	100	y	n	y	n	n	n	n	4	609	448
+STATE	1304955545.496405	22285	1				O V Y	y	321.801	354.218	2.712	3.612	6.000	n	-	-	y	160.0	""	""	A	0	0	0	0		0	0	100	y	n	y	n	n	n	n	4	609	448
+STATE	1304955545.530258	22319	1				O V Y	y	324.813	350.606	3.012	3.612	0.000	n	-	-	y	160.0	""	""	A	0	0	0	0		0	0	100	y	n	y	n	n	n	n	4	609	448
+STATE	1304955545.562531	22351	1				O V Y	y	328.124	347.025	3.311	3.581	354.000	n	-	-	y	140.0	""	""	A	0	0	0	0		0	0	100	y	n	y	n	n	n	n	4	609	447
+EVENT	1304955545.577737	22366	1	press	fire	None
+STATE	1304955545.597327	22386	1				O V Y	y	331.727	343.507	3.604	3.518	348.000	n	-	-	y	140.0	"350.500 349.377 "	""	A	0	0	0	0		0	0	99	y	n	y	y	n	n	n	4	609	447
+STATE	1304955545.628491	22417	1				O V Y	y	335.617	340.081	3.889	3.426	342.000	n	-	-	y	140.0	"370.063 353.535 "	""	A	0	0	0	0		0	0	99	y	n	y	y	n	n	n	4	609	448
+EVENT	1304955545.642604	22431	1	score-	vlcty	7
+EVENT	1304955545.642682	22431	1	score-	flight	7
+EVENT	1304955545.642753	22431	1	score+	cntrl	6
+EVENT	1304955545.642836	22431	1	score+	flight	6
+STATE	1304955545.662096	22451	1				O V Y	y	339.780	336.777	4.163	3.304	336.000	n	-	-	y	140.0	"389.626 357.694 "	""	A	0	0	0	0		0	0	99	y	n	y	y	n	n	n	4	609	448
+STATE	1304955545.694840	22483	1				O V Y	y	344.203	333.624	4.423	3.154	330.000	n	-	-	y	140.0	"409.189 361.852 "	""	A	0	0	0	0		0	0	99	y	n	y	y	n	n	n	4	609	448
+EVENT	1304955545.707951	22496	1	release	right	None
+EVENT	1304955545.708027	22497	1	release	fire	None
+EVENT	1304955545.708088	22497	1	bonus	cue_disappears	None
+STATE	1304955545.727543	22516	1				O V Y	y	348.869	330.646	4.666	2.977	324.000	n	-	-	y	140.0	"428.752 366.010 "	""	A	0	0	0	0		0	0	99	y	n	n	n	n	n	n	4	609	448
+EVENT	1304955545.741456	22530	1	collide	missile_0	fortress
+EVENT	1304955545.741624	22530	1	score+	vlner	1
+STATE	1304955545.760832	22549	1				O V Y	y	353.778	327.845	4.909	2.801	324.000	n	-	-	y	140.0	""	""	A	0	0	0	1		0	0	99	y	n	n	n	n	n	n	4	608	448
+STATE	1304955545.792832	22581	1				O V Y	y	358.929	325.221	5.151	2.625	324.000	n	-	-	y	140.0	""	""	A	0	0	0	1		0	0	99	y	n	n	n	n	n	n	4	609	448
+STATE	1304955545.825722	22614	1				O V Y	y	364.323	322.772	5.394	2.448	324.000	n	-	-	y	120.0	""	""	A	0	0	0	1		0	0	99	y	n	n	n	n	n	n	4	609	448
+STATE	1304955545.859766	22648	1				O V Y	y	369.960	320.500	5.637	2.272	324.000	n	-	-	y	120.0	""	""	A	0	0	0	1		0	0	99	y	n	n	n	n	n	n	4	608	447
+STATE	1304955545.892537	22681	1				O V Y	y	375.839	318.404	5.879	2.096	324.000	n	-	-	y	120.0	""	""	A	0	0	0	1		0	0	99	y	n	n	n	n	n	n	4	608	447
+STATE	1304955545.926430	22715	1				O V Y	y	381.839	316.485	6.000	1.919	324.000	n	-	-	y	120.0	""	""	A	0	0	0	1		0	0	99	y	n	n	n	n	n	n	4	608	448
+EVENT	1304955545.941031	22730	1	press	right	None
+STATE	1304955545.960089	22749	1				O V Y	y	387.839	314.742	6.000	1.743	324.000	n	-	-	y	120.0	""	""	A	0	0	0	1		0	0	99	y	n	y	n	n	n	n	4	608	448
+STATE	1304955545.992034	22781	1				O V Y	y	393.839	313.200	6.000	1.542	318.000	n	-	-	y	120.0	""	""	A	0	0	0	1		0	0	99	y	n	y	n	n	n	n	4	608	448
+STATE	1304955546.025549	22815	1				O V Y	y	399.839	311.880	6.000	1.319	312.000	n	-	-	y	100.0	""	""	A	0	0	0	1		0	0	99	y	n	y	n	n	n	n	4	608	448
+EVENT	1304955546.040418	22830	1	press	fire	None
+STATE	1304955546.060477	22850	1				O V Y	y	405.839	310.804	6.000	1.077	306.000	n	-	-	y	100.0	"414.894 328.601 "	""	A	0	0	0	1		0	0	98	y	n	y	y	n	n	n
+STATE	1304955546.092328	22882	1				O V Y	y	411.839	309.987	6.000	0.817	300.000	n	-	-	y	100.0	"426.650 344.782 "	""	A	0	0	0	1		0	0	98	y	n	y	y	n	n	n	5	631	436
+STATE	1304955546.124539	22914	1				O V Y	y	417.839	309.444	6.000	0.543	294.000	n	-	-	y	100.0	"438.406 360.962 "	""	A	0	0	0	1		0	0	98	y	n	y	y	n	n	n	5	632	435
+EVENT	1304955546.138744	22928	1	release	fire	None
+EVENT	1304955546.138815	22928	1	collide	missile_0	fortress
+EVENT	1304955546.138942	22928	1	score+	vlner	1
+STATE	1304955546.158583	22948	1				O V Y	y	423.839	309.187	6.000	0.257	288.000	n	-	-	y	100.0	""	""	A	0	0	0	2		0	0	98	y	n	y	n	n	n	n	5	632	435
+STATE	1304955546.190775	22980	1				O V Y	y	429.839	309.223	6.000	-0.036	282.000	n	-	-	y	80.0	""	""	A	0	0	0	2		0	0	98	y	n	y	n	n	n	n	5	632	435
+STATE	1304955546.223458	23012	1				O V Y	y	435.839	309.557	6.000	-0.334	276.000	n	-	-	y	80.0	""	""	A	0	0	0	2		0	0	98	y	n	y	n	n	n	n	5	632	434
+EVENT	1304955546.239288	23028	1	release	right	None
+STATE	1304955546.258431	23047	1				O V Y	y	441.839	310.191	6.000	-0.634	270.000	n	-	-	y	80.0	""	""	A	0	0	0	2		0	0	98	y	n	n	n	n	n	n	5	632	433
+STATE	1304955546.291230	23080	1				O V Y	y	447.839	311.126	6.000	-0.934	270.000	n	-	-	y	80.0	""	""	A	0	0	0	2		0	0	98	y	n	n	n	n	n	n	5	633	433
+STATE	1304955546.324145	23113	1				O V Y	y	453.839	312.360	6.000	-1.234	270.000	n	-	-	y	80.0	""	""	A	0	0	0	2		0	0	98	y	n	n	n	n	n	n	5	633	433
+STATE	1304955546.357367	23146	1				O V Y	y	459.839	313.894	6.000	-1.534	270.000	n	-	-	y	60.0	""	""	A	0	0	0	2		0	0	98	y	n	n	n	n	n	n	5	633	433
+EVENT	1304955546.371999	23160	1	press	right	None
+STATE	1304955546.391079	23180	1				O V Y	y	465.839	315.729	6.000	-1.834	270.000	n	-	-	y	60.0	""	""	A	0	0	0	2		0	0	98	y	n	y	n	n	n	n	5	633	433
+STATE	1304955546.422938	23211	1				O V Y	y	471.808	317.862	5.969	-2.133	264.000	n	-	-	y	60.0	""	""	A	0	0	0	2		0	0	98	y	n	y	n	n	n	n	5	634	432
+STATE	1304955546.456106	23245	1				O V Y	y	477.714	320.288	5.906	-2.426	258.000	n	-	-	y	60.0	""	""	A	0	0	0	2		0	0	98	y	n	y	n	n	n	n	5	634	432
+EVENT	1304955546.470923	23259	1	press	fire	None
+STATE	1304955546.490464	23279	1				O V Y	y	483.528	322.999	5.814	-2.711	252.000	n	-	-	y	40.0	"473.036 342.296 "	""	A	0	0	0	2		0	0	97	y	n	y	y	n	n	n	5	634	432
+STATE	1304955546.522510	23311	1				O V Y	y	489.219	325.985	5.692	-2.986	246.000	n	-	-	y	40.0	"466.856 361.317 "	""	A	0	0	0	2		0	0	97	y	n	y	y	n	n	n	5	634	432
+EVENT	1304955546.536407	23325	1	collide	missile_0	fortress
+EVENT	1304955546.536540	23325	1	bonus	target_appears	correct
+EVENT	1304955546.536603	23325	1	bonus_available	None	None
+EVENT	1304955546.536665	23325	1	score+	vlner	1
+STATE	1304955546.556253	23345	1				O V Y	y	494.761	329.230	5.542	-3.245	240.000	n	-	-	y	40.0	""	""	X	0	0	0	3		0	0	97	y	n	y	y	n	n	n	6	666	428
+EVENT	1304955546.569228	23358	1	release	fire	None
+STATE	1304955546.588273	23377	1				O V Y	y	500.126	332.718	5.365	-3.488	234.000	n	-	-	y	40.0	""	""	X	0	0	0	3		0	0	97	y	n	y	n	n	n	n	6	667	427
+STATE	1304955546.621138	23410	1				O V Y	y	505.290	336.429	5.164	-3.711	228.000	n	-	-	y	40.0	""	""	X	0	0	0	3		0	0	97	y	n	y	n	n	n	n	6	668	427
+STATE	1304955546.654206	23443	1				O V Y	y	510.232	340.341	4.942	-3.912	222.000	n	-	-	y	20.0	""	""	X	0	0	0	3		0	0	97	y	n	y	n	n	n	n	6	669	427
+EVENT	1304955546.668172	23457	1	score-	vlcty	7
+EVENT	1304955546.668269	23457	1	score-	flight	7
+EVENT	1304955546.668359	23457	1	score+	cntrl	6
+EVENT	1304955546.668512	23457	1	score+	flight	6
+STATE	1304955546.687833	23476	1				O V Y	y	514.931	344.429	4.699	-4.088	216.000	n	-	-	y	20.0	""	""	X	0	0	0	3		0	0	97	y	n	y	n	n	n	n	6	670	427
+STATE	1304955546.719819	23508	1				O V Y	y	519.370	348.667	4.439	-4.238	210.000	n	-	-	y	20.0	""	""	X	0	0	0	3		0	0	97	y	n	y	n	n	n	n	6	670	426
+STATE	1304955546.752816	23541	1				O V Y	y	523.535	353.027	4.165	-4.360	204.000	n	-	-	y	20.0	""	""	X	0	0	0	3		0	0	97	y	n	y	n	n	n	n	6	670	426
+STATE	1304955546.785999	23575	1				O V Y	y	527.414	357.480	3.880	-4.453	198.000	n	-	-	y	20.0	""	""	X	0	0	0	3		0	0	97	y	n	y	n	n	n	n	6	670	426
+EVENT	1304955546.800859	23589	1	press	fire	None
+EVENT	1304955546.801066	23590	1	release	right	None
+EVENT	1304955546.801148	23590	1	bonus	target_disappears	None
+STATE	1304955546.820448	23609	1				O V Y	y	531.000	361.995	3.586	-4.515	192.000	n	-	-	y	0.0	"506.015 364.433 "	""	X	0	0	0	3		0	0	96	y	n	n	y	n	n	n	6	670	426
+STATE	1304955546.852577	23641	1				O V Y	y	534.293	366.572	3.293	-4.578	192.000	n	-	-	y	0.0	"486.452 368.591 "	""	X	0	0	0	3		0	0	96	y	n	n	y	n	n	n	6	671	426
+STATE	1304955546.885774	23674	1				O V Y	y	537.292	371.212	2.999	-4.640	192.000	n	-	-	y	0.0	"466.890 372.749 "	""	X	0	0	0	3		0	0	96	y	n	n	y	n	n	n	6	671	426
+EVENT	1304955546.899669	23688	1	release	fire	None
+EVENT	1304955546.899743	23688	1	collide	missile_0	fortress
+EVENT	1304955546.899934	23688	1	score+	vlner	1
+STATE	1304955546.919456	23708	1				O V Y	y	539.998	375.915	2.706	-4.702	192.000	n	-	-	y	0.0	""	""	X	0	0	0	4		0	0	96	y	n	n	n	n	n	n	6	671	426
+STATE	1304955546.952392	23741	1				O V Y	y	542.411	380.679	2.412	-4.765	192.000	n	-	-	y	0.0	""	""	X	0	0	0	4		0	0	96	y	n	n	n	n	n	n
+STATE	1304955546.985354	23774	1				O V Y	y	544.530	385.506	2.119	-4.827	192.000	n	-	-	y	0.0	""	""	X	0	0	0	4		0	0	96	y	n	n	n	n	n	n	7	678	456
+STATE	1304955547.018834	23808	1				O V Y	y	546.355	390.396	1.826	-4.889	192.000	n	-	-	y	0.0	""	""	X	0	0	0	4		0	0	96	y	n	n	n	n	n	n	7	678	456
+EVENT	1304955547.031418	23821	1	press	fire	None
+STATE	1304955547.051014	23841	1				O V Y	y	547.887	395.348	1.532	-4.952	192.000	n	-	-	y	340.0	"524.347 395.074 "	""	X	0	0	0	4		0	0	95	y	n	n	y	n	n	n	7	678	456
+STATE	1304955547.082958	23872	1				O V Y	y	549.126	400.362	1.239	-5.014	192.000	n	-	-	y	340.0	"504.784 399.232 "	""	X	0	0	0	4		0	0	95	y	n	n	y	n	n	n	7	678	456
+STATE	1304955547.116017	23906	1				O V Y	y	550.071	405.438	0.945	-5.077	192.000	n	-	-	y	340.0	"485.221 403.390 "	""	X	0	0	0	4		0	0	95	y	n	n	y	n	n	n	7	678	456
+EVENT	1304955547.129720	23919	1	collide	missile_0	fortress
+EVENT	1304955547.129902	23919	1	reset	VLNER	None
+STATE	1304955547.149585	23939	1				O V Y	y	550.723	410.577	0.652	-5.139	192.000	n	-	-	y	340.0	""	""	X	0	0	0	0		0	0	95	y	n	n	y	n	n	n	7	677	456
+EVENT	1304955547.163473	23953	1	release	fire	None
+STATE	1304955547.182867	23972	1				O V Y	y	551.081	415.778	0.358	-5.201	192.000	n	-	-	y	340.0	""	""	X	0	0	0	0		0	0	95	y	n	n	n	n	n	n	7	677	456
+STATE	1304955547.214965	24003	1				O V Y	y	551.146	421.042	0.065	-5.264	192.000	n	-	-	y	340.0	""	""	X	0	0	0	0		0	0	95	y	n	n	n	n	n	n	7	677	456
+STATE	1304955547.248674	24037	1				O V Y	y	550.917	426.368	-0.229	-5.326	192.000	n	-	-	y	340.0	""	""	X	0	0	0	0		0	0	95	y	n	n	n	n	n	n	7	677	456
+STATE	1304955547.282350	24071	1				O V Y	y	550.395	431.756	-0.522	-5.388	192.000	n	-	-	y	340.0	""	""	X	0	0	0	0		0	0	95	y	n	n	n	n	n	n	7	677	456
+EVENT	1304955547.297203	24086	1	press	fire	None
+STATE	1304955547.316990	24105	1				O V Y	y	549.580	437.207	-0.815	-5.451	192.000	n	-	-	y	320.0	"528.387 436.434 "	""	X	0	0	0	0		0	0	94	y	n	n	y	n	n	n	7	676	456
+EVENT	1304955547.329808	24118	1	press	right	None
+STATE	1304955547.349319	24138	1				O V Y	y	548.471	442.720	-1.109	-5.513	192.000	n	-	-	y	320.0	"508.824 440.593 "	""	X	0	0	0	0		0	0	94	y	n	y	y	n	n	n	7	676	456
+STATE	1304955547.381485	24170	1				O V Y	y	547.064	448.265	-1.407	-5.544	186.000	n	-	-	y	320.0	"489.261 444.751 "	""	X	0	0	0	0		0	0	94	y	n	y	y	n	n	n	7	676	456
+EVENT	1304955547.395385	24184	1	release	fire	None
+STATE	1304955547.414809	24203	1				O V Y	y	545.356	453.809	-1.707	-5.544	180.000	n	-	-	y	320.0	"469.698 448.909 "	""	X	0	0	0	0		0	0	94	y	n	y	n	n	n	n	7	676	456
+STATE	1304955547.446905	24235	1				O V Y	y	543.351	459.322	-2.006	-5.513	174.000	n	-	-	y	320.0	"450.135 453.067 "	""	X	0	0	0	0		0	0	94	y	n	y	n	n	n	n	8	656	492
+STATE	1304955547.479862	24268	1				O V Y	y	541.052	464.773	-2.299	-5.451	168.000	n	-	-	y	320.0	"430.572 457.226 "	""	X	0	0	0	0		0	0	94	y	n	y	n	n	n	n	8	656	494
+STATE	1304955547.512916	24301	1				O V Y	y	538.467	470.131	-2.584	-5.358	162.000	n	-	-	y	320.0	"411.009 461.384 "	""	X	0	0	0	0		0	0	94	y	n	y	n	n	n	n	8	656	495
+STATE	1304955547.545739	24334	1				O V Y	y	535.609	475.367	-2.858	-5.236	156.000	n	-	-	y	300.0	"391.446 465.542 "	""	X	0	0	0	0		0	0	94	y	n	y	n	n	n	n	8	656	495
+STATE	1304955547.579702	24368	1				O V Y	y	532.491	480.453	-3.118	-5.086	150.000	n	-	-	y	300.0	"371.883 469.700 "	""	X	0	0	0	0		0	0	94	y	n	y	n	n	n	n	8	656	496
+STATE	1304955547.612450	24401	1				O V Y	y	529.130	485.363	-3.361	-4.910	144.000	n	-	-	y	300.0	"352.320 473.859 "	""	X	0	0	0	0		0	0	94	y	n	y	n	n	n	n	8	656	497
+EVENT	1304955547.626152	24415	1	bonus	cue_appears	correct
+STATE	1304955547.645445	24434	1				O V Y	y	525.546	490.072	-3.584	-4.709	138.000	n	-	-	y	300.0	"332.758 478.017 "	""	A	0	0	0	0		0	0	94	y	n	y	n	n	n	n	8	656	498
+STATE	1304955547.678338	24467	1				O V Y	y	521.761	494.558	-3.785	-4.486	132.000	n	-	-	y	300.0	"313.195 482.175 "	""	A	0	0	0	0		0	0	94	y	n	y	n	n	n	n	8	656	498
+EVENT	1304955547.692730	24481	1	release	right	None
+EVENT	1304955547.692802	24481	1	score-	vlcty	7
+EVENT	1304955547.692874	24481	1	score-	flight	7
+EVENT	1304955547.692945	24481	1	score+	cntrl	6
+EVENT	1304955547.693028	24482	1	score+	flight	6
+STATE	1304955547.712444	24501	1				O V Y	y	517.800	498.801	-3.961	-4.243	126.000	n	-	-	y	300.0	"293.632 486.333 "	""	A	0	0	0	0		0	0	94	y	n	n	n	n	n	n	8	656	498
+EVENT	1304955547.725313	24514	1	release	thrust	None
+STATE	1304955547.744766	24533	1				O V Y	y	513.663	502.802	-4.137	-4.001	126.000	n	-	-	y	300.0	"274.069 490.491 "	""	A	0	0	0	0		0	0	94	n	n	n	n	n	n	n
+STATE	1304955547.777875	24566	1				O V Y	y	509.525	506.803	-4.137	-4.001	126.000	n	-	-	y	300.0	"254.506 494.650 "	""	A	0	0	0	0		0	0	94	n	n	n	n	n	n	n
+STATE	1304955547.811025	24600	1				O V Y	y	505.388	510.803	-4.137	-4.001	126.000	n	-	-	y	280.0	"234.943 498.808 "	""	A	0	0	0	0		0	0	94	n	n	n	n	n	n	n	9	142	633
+STATE	1304955547.843907	24632	1				O V Y	y	501.251	514.804	-4.137	-4.001	126.000	n	-	-	y	280.0	"215.380 502.966 "	""	A	0	0	0	0		0	0	94	n	n	n	n	n	n	n	9	143	634
+STATE	1304955547.876908	24665	1				O V Y	y	497.113	518.804	-4.137	-4.001	126.000	n	-	-	y	280.0	"195.817 507.124 "	""	A	0	0	0	0		0	0	94	n	n	n	n	n	n	n	9	143	634
+EVENT	1304955547.890799	24679	1	bonus	cue_disappears	None
+STATE	1304955547.910408	24699	1				O V Y	y	492.976	522.805	-4.137	-4.001	126.000	n	-	-	y	280.0	"176.254 511.283 "	""	A	0	0	0	0		0	0	94	n	n	n	n	n	n	n	9	143	634
+EVENT	1304955547.924898	24713	1	press	quit	None
