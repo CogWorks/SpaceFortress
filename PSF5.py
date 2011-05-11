@@ -323,6 +323,15 @@ class Game(object):
                     self.gameevents.add("activate", "bonus")
                 elif self.bonus.visible == True and self.bonus.timer.elapsed() >= self.config.get_setting('Bonus','symbol_up_time'):
                     self.gameevents.add("deactivate", "bonus", self.bonus.current_symbol)
+        #update scores
+        self.score.pnts = self.score.__getattribute__("pnts")
+        self.score.vlcty = self.score.__getattribute__("vlcty")
+        self.score.cntrl = self.score.__getattribute__("cntrl")
+        self.score.speed = self.score.__getattribute__("speed")
+        self.score.flight = self.score.__getattribute__("flight")
+        self.score.fortress = self.score.__getattribute__("fortress")
+        self.score.mines = self.score.__getattribute__("mines")
+        self.score.bonus = self.score.__getattribute__("bonus")
     
     def process_events(self):
         """processes internal list of game events for this frame"""
