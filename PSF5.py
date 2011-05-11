@@ -863,6 +863,12 @@ class Game(object):
         # sessionrect.centerx = self.SCREEN_WIDTH / 2
         # sessionrect.y = 100
         # self.screen.blit(sessionsurf, sessionrect)
+        gamesurf = self.f36.render("Game %d" % (self.current_game), True, (255,255,0))
+        gamerect = gamesurf.get_rect()
+        gamerect.centery = self.SCREEN_HEIGHT / 16 * 2
+        gamerect.centerx = self.SCREEN_WIDTH / 2
+        self.screen.blit(gamesurf, gamerect)
+        pygame.draw.line(self.screen, (255, 255, 255), (self.SCREEN_WIDTH / 4 , self.SCREEN_HEIGHT / 16 * 3), (self.SCREEN_WIDTH / 4 * 3, self.SCREEN_HEIGHT / 16 * 3))
         pntssurf = self.f24.render("PNTS score:", True, (255, 255,0))
         pntsrect = pntssurf.get_rect()
         pntsrect.left = self.SCREEN_WIDTH / 3
@@ -916,7 +922,10 @@ class Game(object):
         totalnrect.centery = self.SCREEN_HEIGHT / 16 * 12
         self.screen.blit(totalnsurf, totalnrect)
         # if self.game_number == int(self.config["games_per_session"]):
-        finalsurf = self.f24.render("You're done! Press any key to exit", True, (0,255,0))
+        if self.current_game == self.config.get_setting('General','games_per_session'):
+            finalsurf = self.f24.render("You're done! Press any key to exit", True, (0,255,0))
+        else:
+            finalsurf = self.f24.render("Press any key for next game", True, (0,255,0))
         # else:
         #            finalsurf = self.f24.render("Press any key to continue to next game or ESC to exit", True, (255,255,255))
         finalrect = finalsurf.get_rect()
@@ -952,6 +961,12 @@ class Game(object):
         # sessionrect.centerx = self.SCREEN_WIDTH / 2
         # sessionrect.y = 100
         # self.screen.blit(sessionsurf, sessionrect)
+        gamesurf = self.f36.render("Game %d" % (self.current_game), True, (255,255,0))
+        gamerect = gamesurf.get_rect()
+        gamerect.centery = self.SCREEN_HEIGHT / 16 * 2
+        gamerect.centerx = self.SCREEN_WIDTH / 2
+        self.screen.blit(gamesurf, gamerect)
+        pygame.draw.line(self.screen, (255, 255, 255), (self.SCREEN_WIDTH / 4 , self.SCREEN_HEIGHT / 16 * 3), (self.SCREEN_WIDTH / 4 * 3, self.SCREEN_HEIGHT / 16 * 3))
         pntssurf = self.f24.render("Flight score:", True, (255, 255,0))
         pntsrect = pntssurf.get_rect()
         pntsrect.left = self.SCREEN_WIDTH / 3
@@ -1005,7 +1020,10 @@ class Game(object):
         totalnrect.centery = self.SCREEN_HEIGHT / 16 * 12
         self.screen.blit(totalnsurf, totalnrect)
         # if self.game_number == int(self.config["games_per_session"]):
-        finalsurf = self.f24.render("You're done! Press any key to exit", True, (0,255,0))
+        if self.current_game == self.config.get_setting('General','games_per_session'):
+            finalsurf = self.f24.render("You're done! Press any key to exit", True, (0,255,0))
+        else:
+            finalsurf = self.f24.render("Press any key for next game", True, (0,255,0))
         # else:
         #            finalsurf = self.f24.render("Press any key to continue to next game or ESC to exit", True, (255,255,255))
         finalrect = finalsurf.get_rect()
@@ -1093,8 +1111,8 @@ def main(cogworld, condition):
                     else:
                         g.log.write("# %f %d Scores Hide\n"%(time.time(), pygame.time.get_ticks()))
                 break
-        if self.eg:
-            self.eg.data_stop()
+        if g.eg:
+            g.eg.data_stop()
     g.quit()
 
 if __name__ == '__main__':
