@@ -125,8 +125,8 @@ def get_config():
     
     cfg.add_setting('AX-CPT', 'cue_visibility', 250, 'The time cue is visible in ms')
     cfg.add_setting('AX-CPT', 'target_visibility', 250, 'The time cue is visible in ms')
-    cfg.add_setting('AX-CPT', 'isi_time', 800, 'time between cue and target (variable)')
-    cfg.add_setting('AX-CPT', 'iti_time', 800, 'time between target and cue')
+    cfg.add_setting('AX-CPT', 'isi_time', 1250, 'time between cue and target (variable)')
+    cfg.add_setting('AX-CPT', 'iti_time', 1250, 'time between target and cue')
     cfg.add_setting('AX-CPT', 'ax_prob', .4, type=config.constants.CT_DBLSPINBOX, about="probability that next pair will be correct cue followed by correct target")
     cfg.add_setting('AX-CPT', 'ay_prob', .2, type=config.constants.CT_DBLSPINBOX)
     cfg.add_setting('AX-CPT', 'bx_prob', .2, type=config.constants.CT_DBLSPINBOX)
