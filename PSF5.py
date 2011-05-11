@@ -663,6 +663,8 @@ class Game(object):
                 self.bonus.draw(self.worldsurf)
         self.screen.blit(self.scoresurf, self.scorerect)
         self.screen.blit(self.worldsurf, self.worldrect)
+        if self.eg and self.config.get_setting('Eye Tracker','drawfix'):
+            self.draw_fixation_cross(self.screen)
         pygame.display.flip()
         
     def log_world(self):
@@ -768,6 +770,14 @@ class Game(object):
         if self.eg and self.eg.fix_data and self.eg.fix_data.eye_motion_state == 1:
             self.log.write("\t%d\t%d\t%d" % (self.eg.fix_count + 1, self.eg.fix_data.fix_x, self.eg.fix_data.fix_y))
         self.log.write("\n")
+
+    def draw_fixation_cross(self, surface, r=10, color=(255, 0, 0)):
+        pygame.draw.line(surface, color,
+                         (self.eg.fix_data.fix_x - r, self.eg.fix_data.fix_y),
+                         (self.eg.fix_data.fix_x + r, self.eg.fix_data.fix_y))
+        pygame.draw.line(surface, color,
+                         (self.eg.fix_data.fix_x, self.eg.fix_data.fix_y - r),
+                         (self.eg.fix_data.fix_x, self.eg.fix_data.fix_y + r))
 
     def display_intro(self):
         """display intro scene"""

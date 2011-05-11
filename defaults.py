@@ -192,5 +192,6 @@ def get_config():
     cfg.add_setting('Eye Tracker', 'enabled', False, type=config.constants.CT_CHECKBOX, about='Enable eye tracking')
     cfg.add_setting('Eye Tracker', 'eg_server', '1.0.0.21', type=config.constants.CT_LINEEDIT, about='EGServer Address')
     cfg.add_setting('Eye Tracker', 'calmode', 'Every Game', alias='When To Calibrate', options=['Every Game','Once'], type=config.constants.CT_COMBO, about='Set when eye tracker is calibrated')
+    cfg.add_setting('Eye Tracker', 'drawfix', False, alias="Draw Fixation Cross", type=config.constants.CT_CHECKBOX, about='Draw a fixation cross on the screen')
     
     return cfg
