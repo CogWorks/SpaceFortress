@@ -303,6 +303,9 @@ class Game(object):
         self.test_collisions()
         if self.flighttimer.elapsed() > self.config.get_setting('Score','update_timer'):
             self.flighttimer.reset()
+            distance = self.ship.get_distance_to_object(self.fortress)
+            factor = self.config.get_setting('Score', 'distance_factor')
+            self.gameevents.add("score+", "flight", factor*distance)
             if (self.ship.velocity.x **2 + self.ship.velocity.y **2)**0.5 < self.config.get_setting('Score','speed_threshold'):
                 self.gameevents.add("score+", "vlcty", self.config.get_setting('Score','VLCTY_increment'))
                 self.gameevents.add("score+", "flight", self.config.get_setting('Score','VLCTY_increment'))
@@ -835,8 +838,8 @@ class Game(object):
     def fade(self):
         """fade screen to show score"""
         fadesurf = pygame.Surface((self.SCREEN_WIDTH, self.SCREEN_HEIGHT)).convert_alpha()
-        fadesurf.fill((0,0,0,6))
-        for i in range(100):
+        fadesurf.fill((0,0,0,12))
+        for i in range(50):
             self.screen.blit(fadesurf, pygame.Rect(0,0, self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
             pygame.display.flip()
 

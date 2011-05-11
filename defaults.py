@@ -54,7 +54,7 @@ def get_config():
     cfg.add_setting('General', 'games_per_session', 8, alias='Max # of Games', about='Number of games per "session"')
     cfg.add_setting('General', 'bonus_system', "AX-CPT", alias="Bonus System", type=config.constants.CT_COMBO, options=['standard','AX-CPT'], about='Bonus system standard or AX-CPT?')
     cfg.add_setting('General', 'bonus_location', 'Probabilistic', alias='Bonus Location', type=config.constants.CT_COMBO, options=['Fixed','Random','Probabilistic'], about='Randomize bonus position?')
-    cfg.add_setting('General', 'game_time', 10000, alias='Game Duration (ms)', about='Time in milliseconds for a game. NOTE! If you escape in the middle of a game, the log will have "short" prepended to the name')
+    cfg.add_setting('General', 'game_time', 300000, alias='Game Duration (ms)', about='Time in milliseconds for a game. NOTE! If you escape in the middle of a game, the log will have "short" prepended to the name')
     cfg.add_setting('General', 'sound', True, alias='Sound', type=config.constants.CT_CHECKBOX, about='Enable/disable sound')
     cfg.add_setting('General', 'allow_pause', True, alias='Allow Pausing', type=config.constants.CT_CHECKBOX, about='Enable/disable whether or not pausing is allowed.')
     
@@ -172,6 +172,7 @@ def get_config():
     cfg.add_setting('Score', 'INTRVL_pos', 4, 'INTRVL')
     cfg.add_setting('Score', 'SPEED_pos', 5, 'SPEED position(or Bonus, for new)')
     cfg.add_setting('Score', 'SHOTS_pos', 8, 'SHOTS')
+    cfg.add_setting('Score', 'distance_factor', 0.1, 'The factor that is multiplied by the distance between ship and fortress which is added to the Flight score')
     cfg.add_setting('Score', 'update_timer', 1000, 'How often (in milliseconds) the VLCTY and CNTRL scores update (or Flight, for new)')
     cfg.add_setting('Score', 'speed_threshold', 4, 'Speed at which you\'re considered to be going "too fast", resulting in a VLCTY point penalty (or Flight, for new)')
     cfg.add_setting('Score', 'VLCTY_increment', 7, 'VLCTY bonus/penalty for going either slow enough or too fast (or Flight, for new)')
