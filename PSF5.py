@@ -772,12 +772,13 @@ class Game(object):
         self.log.write("\n")
 
     def draw_fixation_cross(self, surface, r=10, color=(255, 0, 0)):
-        pygame.draw.line(surface, color,
-                         (self.eg.fix_data.fix_x - r, self.eg.fix_data.fix_y),
-                         (self.eg.fix_data.fix_x + r, self.eg.fix_data.fix_y))
-        pygame.draw.line(surface, color,
-                         (self.eg.fix_data.fix_x, self.eg.fix_data.fix_y - r),
-                         (self.eg.fix_data.fix_x, self.eg.fix_data.fix_y + r))
+        if self.eg.fix_data:
+            pygame.draw.line(surface, color,
+                             (self.eg.fix_data.fix_x - r, self.eg.fix_data.fix_y),
+                             (self.eg.fix_data.fix_x + r, self.eg.fix_data.fix_y))
+            pygame.draw.line(surface, color,
+                             (self.eg.fix_data.fix_x, self.eg.fix_data.fix_y - r),
+                             (self.eg.fix_data.fix_x, self.eg.fix_data.fix_y + r))
 
     def display_intro(self):
         """display intro scene"""
