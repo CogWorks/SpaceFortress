@@ -480,6 +480,7 @@ class Game(object):
                     self.gameevents.add("new_mine", "friend")
             elif command == "timeout":
                 self.mine_list.flag = False
+                self.mine_list.iff_flag = False
                 self.mine_list.timer.reset()
                 if len(self.mine_list) > 0:
                     del self.mine_list[0]
@@ -555,6 +556,7 @@ class Game(object):
             self.score.iff = ''
             self.score.intrvl = 0
             self.mine_list.flag = False
+            self.mine_list.iff_flag = False
             self.mine_list.timer.reset()
             self.gameevents.add("score-", "pnts", self.config.get_setting('Score','mine_hit_penalty'))
             self.gameevents.add("score-", "mines", self.config.get_setting('Score','mine_hit_penalty'))
@@ -566,6 +568,7 @@ class Game(object):
         elif obj == "friend_mine":
             #get rid of mine
             self.mine_list.flag = False
+            self.mine_list.iff_flag = False
             self.mine_list.timer.reset()
             self.gameevents.add("score+", "mines", self.config.get_setting('Score','energize_friend'))
             #amazingly, missile can hit the mine in the same frame as the mine hits the ship
@@ -576,6 +579,7 @@ class Game(object):
         elif obj == "tagged_foe_mine":
             #get rid of mine
             self.mine_list.flag = False
+            self.mine_list.iff_flag = False
             self.mine_list.timer.reset()
             self.gameevents.add("score+", "mines", self.config.get_setting('Score','destroy_foe'))
             if len(self.mine_list) > 0:
