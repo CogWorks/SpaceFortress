@@ -175,9 +175,9 @@ class Game(object):
                 log_filename = "%s.dat" % (self.log_basename)
             self.log = open(log_filename, "w")
             if self.config.get_setting('Logging','R_friendly'):
-                self.log.write("event_type\tsystem_clock\tgame_time\tcurrent_game\te1\te2\te3\tfoes\tship_alive\tship_x\tship_y\tship_vel_x\tship_vel_y\tship_orientation\t"+
+                self.log.write("event_type\tsystem_clock\tgame_time\tcurrent_game\te1\te2\te3\tfoes\tship_alive\tship_x\tship_y\tship_vel_x\tship_vel_y\tship_orientation\tdistance\t"+
                                "mine_alive\tmine_x\tmine_y\tfortress_alive\tfortress_orientation\tmissile\tshell\tbonus\tscore_pnts\tscore_cntrl\tscore_vlcty\t"+
-                               "score_vlner\tscore_iff\tscore_intrvl\tscore_speed\tscore_shots\tthrust_key\tleft_key\tright_key\tfire_key\tiff_key\tshots_key\tpnts_key\tconfig")
+                               "score_vlner\tscore_iff\tscore_intrvl\tscore_speed\tscore_shots\tscore_flight\tscore_fortress\tscore_mine\tscore_bonus\tthrust_key\tleft_key\tright_key\tfire_key\tiff_key\tshots_key\tpnts_key\tconfig")
                 if self.eg:
                     self.log.write("fixation_number\tfix_x\tfix_y")
                 self.log.write("\n")
@@ -673,6 +673,7 @@ class Game(object):
             ship_vel_x = "%.3f"%(self.ship.velocity.x)
             ship_vel_y = "%.3f"%(self.ship.velocity.y)
             ship_orientation = "%.3f"%(self.ship.orientation)
+            distance = self.ship.get_distance_to_object(self.fortress)
         else:
             ship_alive = "n"
             ship_x = "-"
@@ -680,6 +681,7 @@ class Game(object):
             ship_vel_x = "-"
             ship_vel_y = "-"
             ship_orientation = "-"
+            distance = 0
         if len(self.mine_list) > 0:
             mine_alive = "y"
             mine_x = "%.3f"%(self.mine_list[0].position.x)
@@ -708,6 +710,10 @@ class Game(object):
             bonus = "-"
         else:
             bonus = self.bonus.current_symbol
+        if self.score.iff == '':
+            iff_score = '-'
+        else:
+            iff_score = self.score.iff
         keys = pygame.key.get_pressed()
         if keys[self.thrust_key]:
             thrust_key = "y"
@@ -738,15 +744,15 @@ class Game(object):
         else:
             pnts_key = "n"
         if self.config.get_setting('Logging','R_friendly'):
-            self.log.write("STATE\t%f\t%d\t%d\t\t\t\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%d\t%d\t%d\t%d\t%s\t%d\t%d\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s"%\
-                           (system_clock, game_time, self.current_game, " ".join(self.mine_list.foe_letters), ship_alive, ship_x, ship_y, ship_vel_x, ship_vel_y, ship_orientation, mine_alive, mine_x, mine_y, fortress_alive, fortress_orientation,\
-                            missile, shell, bonus, self.score.pnts, self.score.cntrl, self.score.vlcty, self.score.vlner, self.score.iff, self.score.intrvl,\
-                            self.score.speed, self.score.shots, thrust_key, left_key, right_key, fire_key, iff_key, shots_key, pnts_key))                   
+            self.log.write("STATE\t%f\t%d\t%d\t\t\t\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%d\t%d\t%d\t%d\t%s\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s"%\
+                           (system_clock, game_time, self.current_game, " ".join(self.mine_list.foe_letters), ship_alive, ship_x, ship_y, ship_vel_x, ship_vel_y, ship_orientation, distance, mine_alive, mine_x, mine_y, fortress_alive, fortress_orientation,\
+                            missile, shell, bonus, self.score.pnts, self.score.cntrl, self.score.vlcty, self.score.vlner, iff_score, self.score.intrvl,\
+                            self.score.speed, self.score.shots, self.score.flight, self.score.fortress, self.score.mines, self.score.bonus, thrust_key, left_key, right_key, fire_key, iff_key, shots_key, pnts_key))                   
         else:
-            self.log.write("%f\t%d\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%d\t%d\t%d\t%d\t%s\t%d\t%d\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s"%\
-                           (system_clock, game_time, self.current_game, ship_alive, ship_x, ship_y, ship_vel_x, ship_vel_y, ship_orientation, mine_alive, mine_x, mine_y, fortress_alive, fortress_orientation,\
-                            missile, shell, bonus, self.score.pnts, self.score.cntrl, self.score.vlcty, self.score.vlner, self.score.iff, self.score.intrvl,\
-                            self.score.speed, self.score.shots, thrust_key, left_key, right_key, fire_key, iff_key, shots_key, pnts_key))
+            self.log.write("%f\t%d\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%d\t%d\t%d\t%d\t%s\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s"%\
+                           (system_clock, game_time, self.current_game, ship_alive, ship_x, ship_y, ship_vel_x, ship_vel_y, ship_orientation, distance, mine_alive, mine_x, mine_y, fortress_alive, fortress_orientation,\
+                            missile, shell, bonus, self.score.pnts, self.score.cntrl, self.score.vlcty, self.score.vlner, iff_score, self.score.intrvl,\
+                            self.score.speed, self.score.shots, self.score.flight, self.score.fortress, self.score.mines, thrust_key, left_key, right_key, fire_key, iff_key, shots_key, pnts_key))
         if self.eg and self.eg.fix_data and self.eg.fix_data.eye_motion_state == 1:
             self.log.write("\t%d\t%d\t%d" % (self.eg.fix_count + 1, self.eg.fix_data.fix_x, self.eg.fix_data.fix_y))
         self.log.write("\n")

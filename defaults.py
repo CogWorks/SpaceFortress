@@ -65,7 +65,7 @@ def get_config():
     cfg.add_setting('Logging', 'logging', True, alias='Logging', type=config.constants.CT_CHECKBOX, about='Enable/disable logging')
     cfg.add_setting('Logging', 'print_events', False, alias='Print Events', type=config.constants.CT_CHECKBOX, about='Print events to stdout')
     cfg.add_setting('Logging', 'logdir', '', alias='Log Directory', type=config.constants.CT_LINEEDIT, about='Directory for log files, leave blank for default.')
-    cfg.add_setting('Logging', 'R_friendly', False, alias='R/Excel Friendly Format', type=config.constants.CT_CHECKBOX, about='Dont use # comments. Integrate all data.')
+    cfg.add_setting('Logging', 'R_friendly', True, alias='R/Excel Friendly Format', type=config.constants.CT_CHECKBOX, about='Dont use # comments. Integrate all data.')
         
     cfg.add_setting('Keybindings', 'fire_key', 'SPACE', alias='Fire', type=config.constants.CT_COMBO, options=PYGAME_KEYS)
     cfg.add_setting('Keybindings', 'thrust_key', 'w', alias='Thrust', type=config.constants.CT_COMBO, options=PYGAME_KEYS)
@@ -101,7 +101,7 @@ def get_config():
     cfg.add_setting('Hexagon', 'hex_shrink_radius', 150, 'If hex shrinks, to what minimum radius?')
     
     cfg.add_setting('Fortress', 'fortress_exists', True, type=config.constants.CT_CHECKBOX, about='Does the fortress exist?')
-    cfg.add_setting('Fortress', 'fortress_lock_time', 1000, 'Time in milliseconds it takes the fortress to lock on to the ship before firing')
+    cfg.add_setting('Fortress', 'fortress_lock_time', 800, 'Time in milliseconds it takes the fortress to lock on to the ship before firing')
     cfg.add_setting('Fortress', 'fortress_pos_x', 355, 'Fortress x position')
     cfg.add_setting('Fortress', 'fortress_pos_y', 315, 'Fortress y position')
     cfg.add_setting('Fortress', 'fortress_radius', 18, 'Fortress collision radius')
