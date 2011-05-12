@@ -22,6 +22,7 @@ class Hex(token.Token):
         self.shrink_radius = self.app.config.get_setting('Hexagon','hex_shrink_radius')
         self.set_points(self.radius)
         self.small_hex_flag = False #simple flag to prevent ship getting "stuck" in small hex
+        self.color = (0,255,0)
         
     def set_points(self, radius):
         """sets points of hex based on radius"""
@@ -64,7 +65,7 @@ class Hex(token.Token):
     def draw(self,worldsurf):
         """draws hex"""
         for i in range(6):
-            pygame.draw.line(worldsurf, (0,255,0), (self.points_x[i], self.points_y[i]), (self.points_x[(i + 1) % 6], self.points_y[(i + 1) % 6]), self.app.linewidth)
+            pygame.draw.line(worldsurf, self.color, (self.points_x[i], self.points_y[i]), (self.points_x[(i + 1) % 6], self.points_y[(i + 1) % 6]), self.app.linewidth)
             
     def collide(self, ship):
         """tests if point is within convex polygon"""

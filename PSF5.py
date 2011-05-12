@@ -162,7 +162,11 @@ class Game(object):
             self.scorerect = self.screen.get_rect()
             #self.scorerect.top = 5
         self.bighex = tokens.hexagon.Hex(self, self.config.get_setting('Hexagon','big_hex'))
-        self.smallhex = tokens.hexagon.Hex(self, self.config.get_setting('Hexagon','small_hex')) 
+        if not self.config.get_setting('Hexagon','draw_big_hex'):
+            self.bighex.color = (0,0,0)
+        self.smallhex = tokens.hexagon.Hex(self, self.config.get_setting('Hexagon','small_hex'))
+        if not self.config.get_setting('Hexagon','draw_small_hex'):
+            self.smallhex.color = (0,0,0) 
         if self.config.get_setting('Mine','mine_exists'):
             self.mine_exists = True
         else:

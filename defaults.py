@@ -105,6 +105,8 @@ def get_config():
     cfg.add_setting('Hexagon', 'small_hex', 40, '"Radius" of small hexagon')
     cfg.add_setting('Hexagon', 'hex_shrink', False, type=config.constants.CT_CHECKBOX, about='Does the outer hex shrink over time?')
     cfg.add_setting('Hexagon', 'hex_shrink_radius', 150, 'If hex shrinks, to what minimum radius?')
+    cfg.add_setting('Hexagon', 'draw_big_hex', True, type=config.constants.CT_CHECKBOX)
+    cfg.add_setting('Hexagon', 'draw_small_hex', True, type=config.constants.CT_CHECKBOX)
     
     cfg.add_setting('Fortress', 'fortress_exists', True, type=config.constants.CT_CHECKBOX, about='Does the fortress exist?')
     cfg.add_setting('Fortress', 'fortress_lock_time', 800, 'Time in milliseconds it takes the fortress to lock on to the ship before firing')
