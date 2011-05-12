@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from __future__ import division
-import subprocess, os, sys, platform
+import subprocess, os, sys, platform, math
 
 githash = None
 env = os.environ
@@ -303,21 +303,28 @@ class Game(object):
         self.test_collisions()
         if self.flighttimer.elapsed() > self.config.get_setting('Score','update_timer'):
             self.flighttimer.reset()
-            distance = self.ship.get_distance_to_object(self.fortress)
-            factor = self.config.get_setting('Score', 'distance_factor')
-            self.gameevents.add("score+", "flight", factor*distance)
+            distance = self.ship.get_distance_to_point(self.WORLD_WIDTH/2,self.WORLD_HEIGHT/2)
+            flight_max_inc = self.config.get_setting('Score', 'flight_max_increment')
+            dmod = 1 - distance/(self.WORLD_WIDTH/2 - self.smallhex.radius/self.WORLD_WIDTH)
+            smod = self.ship.current_px_per_tick() / self.ship.max_px_per_tick
+            r = self.config.get_setting('Score','flight_bias')
+            a = 1 + 1 + r
+            b = 1 + 1 - r
+            flight_mod = math.exp(a**dmod) * math.exp(b**smod) / math.exp(a*b)
+            print flight_max_inc, flight_mod * flight_max_inc
+            self.gameevents.add("score+", "flight", flight_mod * flight_max_inc)
             if (self.ship.velocity.x **2 + self.ship.velocity.y **2)**0.5 < self.config.get_setting('Score','speed_threshold'):
                 self.gameevents.add("score+", "vlcty", self.config.get_setting('Score','VLCTY_increment'))
-                self.gameevents.add("score+", "flight", self.config.get_setting('Score','VLCTY_increment'))
+                #self.gameevents.add("score+", "flight", self.config.get_setting('Score','VLCTY_increment'))
             else:
                 self.gameevents.add("score-", "vlcty", self.config.get_setting('Score','VLCTY_increment'))
-                self.gameevents.add("score-", "flight", self.config.get_setting('Score','VLCTY_increment'))
+                #self.gameevents.add("score-", "flight", self.config.get_setting('Score','VLCTY_increment'))
             if self.bighex.collide(self.ship):
                 self.gameevents.add("score+", "cntrl", self.config.get_setting('Score','CNTRL_increment'))
-                self.gameevents.add("score+", "flight", self.config.get_setting('Score','CNTRL_increment'))
+                #self.gameevents.add("score+", "flight", self.config.get_setting('Score','CNTRL_increment'))
             else:
                 self.gameevents.add("score+", "cntrl", self.config.get_setting('Score','CNTRL_increment')/2)
-                self.gameevents.add("score+", "flight", self.config.get_setting('Score','CNTRL_increment')/2)
+                #self.gameevents.add("score+", "flight", self.config.get_setting('Score','CNTRL_increment')/2)
         if self.bonus_exists:
             if self.config.get_setting('General','bonus_system') == "AX-CPT":
                 self.bonus.axcpt_update()
@@ -691,7 +698,7 @@ class Game(object):
             ship_vel_x = "%.3f"%(self.ship.velocity.x)
             ship_vel_y = "%.3f"%(self.ship.velocity.y)
             ship_orientation = "%.3f"%(self.ship.orientation)
-            distance = self.ship.get_distance_to_object(self.fortress)
+            distance = self.ship.get_distance_to_point(self.WORLD_WIDTH/2,self.WORLD_HEIGHT/2)
         else:
             ship_alive = "n"
             ship_x = "-"

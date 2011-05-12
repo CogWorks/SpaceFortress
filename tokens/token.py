@@ -42,9 +42,15 @@ class Token(object):
         return (math.degrees(math.atan2(dy,dx))) % 360
             
     def get_distance_to_object(self, target):
-        """Finds the distance between to a target object"""
+        """Finds the distance between self and some target object"""
         distance = (target.position.x - self.position.x)**2
         distance += (target.position.y - self.position.y)**2
+        return math.sqrt(distance)
+    
+    def get_distance_to_point(self, x, y):
+        """Finds the distance between self and some point"""
+        distance = (x - self.position.x)**2
+        distance += (y - self.position.y)**2
         return math.sqrt(distance)
         
     def collide(self, target):

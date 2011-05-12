@@ -33,6 +33,12 @@ def validate_string_len(info):
         return True
     else:
         return False
+    
+def validate_flight_bias(info):
+    if -1 <= info['value'] <= 1:
+        return True
+    else:
+        return False
 
 def validate_quadrant_probs(info):
     try:
@@ -172,7 +178,8 @@ def get_config():
     cfg.add_setting('Score', 'INTRVL_pos', 4, 'INTRVL')
     cfg.add_setting('Score', 'SPEED_pos', 5, 'SPEED position(or Bonus, for new)')
     cfg.add_setting('Score', 'SHOTS_pos', 8, 'SHOTS')
-    cfg.add_setting('Score', 'distance_factor', 0.1, 'The factor that is multiplied by the distance between ship and fortress which is added to the Flight score')
+    cfg.add_setting('Score', 'flight_bias', 0, type=config.constants.CT_DBLSPINBOX, validate=validate_flight_bias)
+    cfg.add_setting('Score', 'flight_max_increment', 25, 'The factor that is multiplied by the distance between ship and fortress which is added to the Flight score')
     cfg.add_setting('Score', 'update_timer', 1000, 'How often (in milliseconds) the VLCTY and CNTRL scores update (or Flight, for new)')
     cfg.add_setting('Score', 'speed_threshold', 4, 'Speed at which you\'re considered to be going "too fast", resulting in a VLCTY point penalty (or Flight, for new)')
     cfg.add_setting('Score', 'VLCTY_increment', 7, 'VLCTY bonus/penalty for going either slow enough or too fast (or Flight, for new)')

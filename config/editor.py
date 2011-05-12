@@ -265,10 +265,9 @@ class ConfigEditor(QMainWindow):
                 self.main_apply.setEnabled(False)
                 self.main_reset.setEnabled(False)
             else:
-                event.ignore()
                 msgBox = QMessageBox()
                 msgBox.setText("Must fix the following invalid settings before quitting:")
-                msgBox.setStandardButtons()
+                msgBox.setStandardButtons(QMessageBox.Ok)
                 info = ''
                 for setting in bad_settings:
                     new = '%s,%s<br>' % setting
