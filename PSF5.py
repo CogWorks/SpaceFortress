@@ -305,14 +305,17 @@ class Game(object):
             self.flighttimer.reset()
             distance = self.ship.get_distance_to_point(self.WORLD_WIDTH/2,self.WORLD_HEIGHT/2)
             flight_max_inc = self.config.get_setting('Score', 'flight_max_increment')
-            dmod = 1 - distance/(self.WORLD_WIDTH/2 - self.smallhex.radius/self.WORLD_WIDTH)
+            dmod = 1 - (distance-self.smallhex.radius*1.125)/(self.WORLD_WIDTH/2)
+            if dmod > 1.0: dmod = 1.0
+            if dmod < 0.0: dmod = 0.0
             smod = self.ship.current_px_per_tick() / self.ship.max_px_per_tick
-            r = self.config.get_setting('Score','flight_bias')
-            a = 1 + 1 + r
-            b = 1 + 1 - r
-            flight_mod = math.exp(a**dmod) * math.exp(b**smod) / math.exp(a*b)
-            print flight_max_inc, flight_mod * flight_max_inc
-            self.gameevents.add("score+", "flight", flight_mod * flight_max_inc)
+            #if smod > 1: smod = 1
+            #if smod < 0: smod = 0
+            #r = self.config.get_setting('Score','flight_bias')
+            def pointspace (a0,a1,a2,b0,b1,b2): return math.exp(a1**(a0*a2)) * math.exp(b1**(b0*b2))
+            points = 20 * pointspace(dmod,2,1,smod,2,1) / pointspace(1,2,1,1,2,1)
+            print dmod,smod,points
+            self.gameevents.add("score+", "flight", points)
             if (self.ship.velocity.x **2 + self.ship.velocity.y **2)**0.5 < self.config.get_setting('Score','speed_threshold'):
                 self.gameevents.add("score+", "vlcty", self.config.get_setting('Score','VLCTY_increment'))
                 #self.gameevents.add("score+", "flight", self.config.get_setting('Score','VLCTY_increment'))
