@@ -35,13 +35,9 @@ class Ship(token.Token):
         self.start_health = self.app.config.get_setting('Ship','ship_hit_points')
         self.health = self.app.config.get_setting('Ship','ship_hit_points')
         self.max_vel = self.app.config.get_setting('Ship','ship_max_vel')
-        self.max_px_per_tick = self.get_distance_to_point(self.position.x + self.max_vel, self.position.y + self.max_vel)
         self.alive = True
         self.small_hex_flag = False #did we hit the small hex?
         self.shot_timer = Timer() #time between shots, for VLNER assessment
-        
-    def current_px_per_tick(self):
-        return self.get_distance_to_point(self.position.x + self.velocity.x, self.position.y + self.velocity.y)
         
     def compute(self):
         """updates ship"""

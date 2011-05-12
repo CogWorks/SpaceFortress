@@ -162,10 +162,10 @@ class Game(object):
             self.scorerect = self.screen.get_rect()
             #self.scorerect.top = 5
         self.bighex = tokens.hexagon.Hex(self, self.config.get_setting('Hexagon','big_hex'))
-        if not self.config.get_setting('Hexagon','draw_big_hex'):
+        if self.config.get_setting('Hexagon','hide_big_hex'):
             self.bighex.color = (0,0,0)
         self.smallhex = tokens.hexagon.Hex(self, self.config.get_setting('Hexagon','small_hex'))
-        if not self.config.get_setting('Hexagon','draw_small_hex'):
+        if self.config.get_setting('Hexagon','hide_small_hex'):
             self.smallhex.color = (0,0,0) 
         if self.config.get_setting('Mine','mine_exists'):
             self.mine_exists = True
@@ -312,13 +312,9 @@ class Game(object):
             dmod = 1 - (distance-self.smallhex.radius*1.125)/(self.WORLD_WIDTH/2)
             if dmod > 1.0: dmod = 1.0
             if dmod < 0.0: dmod = 0.0
-            smod = self.ship.current_px_per_tick() / self.ship.max_px_per_tick
-            #if smod > 1: smod = 1
-            #if smod < 0: smod = 0
-            #r = self.config.get_setting('Score','flight_bias')
+            smod = max([abs(self.ship.velocity.x),abs(self.ship.velocity.y)]) / self.ship.max_vel
             def pointspace (a0,a1,a2,b0,b1,b2): return math.exp(a1**(a0*a2)) * math.exp(b1**(b0*b2))
-            points = 20 * pointspace(dmod,2,1,smod,2,1) / pointspace(1,2,1,1,2,1)
-            print dmod,smod,points
+            points = flight_max_inc * pointspace(dmod,2,1,smod,2,1.75) / pointspace(1,2,1,1,2,1.75)
             self.gameevents.add("score+", "flight", points)
             if (self.ship.velocity.x **2 + self.ship.velocity.y **2)**0.5 < self.config.get_setting('Score','speed_threshold'):
                 self.gameevents.add("score+", "vlcty", self.config.get_setting('Score','VLCTY_increment'))
