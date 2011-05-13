@@ -3,8 +3,6 @@
 
 * Center world on non wide-screen displays that are windowed
 
-* Seems to miss some keypress events, noticable if hold down thrust/turn keys
-
 * Fortress does not always make explosion sound when destroyed
 
 * Convert all raw x,y settings in config to ratios of world dimentions or screen dimensions
