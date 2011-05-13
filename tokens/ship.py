@@ -40,11 +40,17 @@ class Ship(token.Token):
         self.shot_timer = Timer() #time between shots, for VLNER assessment
         self.joy_turn = 0.0
         self.joy_thrust = 0.0
+        self.invert_x = 1.0
+        if self.app.config.get_setting('Joystick','invert_x'):
+            self.invert_x = -1.0
+        self.invert_y = 1.0
+        if self.app.config.get_setting('Joystick','invert_y'):
+            self.invert_y = -1.0
         
     def compute(self):
         """updates ship"""
         if self.app.joystick:
-            self.orientation = (self.orientation - self.turn_speed * self.joy_turn) % 360
+            self.orientation = (self.orientation - self.turn_speed * self.joy_turn * self.invert_x) % 360
         else:
             if self.turn_flag == 'right':
                 self.orientation = (self.orientation - self.turn_speed) % 360
@@ -54,8 +60,8 @@ class Ship(token.Token):
         #self.acceleration = self.thrust * -0.3
         
         if self.app.joystick:
-            if self.joy_turn < 0:
-                self.acceleration = self.acceleration_factor * self.joy_thrust * -1
+            if self.joy_thrust * self.invert_y > 0:
+                self.acceleration = self.acceleration_factor * self.joy_thrust * self.invert_y
             else:
                 self.acceleration = 0
         else:

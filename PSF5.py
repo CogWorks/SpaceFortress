@@ -120,11 +120,17 @@ class Game(object):
         self.f24 = pygame.font.Font(self.fp, int(20*self.aspect_ratio))
         self.f96 = pygame.font.Font(self.fp, int(72*self.aspect_ratio))
         self.f36 = pygame.font.Font(self.fp, int(36*self.aspect_ratio))
+        
         self.joystick = None
         if self.config.get_setting('Joystick','use_joystick'):
             pygame.joystick.init()
-            self.joystick = pygame.joystick.Joystick(0)
+            self.joystick = pygame.joystick.Joystick(self.config.get_setting('Joystick','joystick_id'))
             self.joystick.init()
+            self.fire_button = self.config.get_setting('Joystick','fire_button')
+            self.IFF_button = self.config.get_setting('Joystick','iff_button')
+            self.shots_button = self.config.get_setting('Joystick','shots_button')
+            self.pnts_button = self.config.get_setting('Joystick','pnts_button')
+            
         self.thrust_key = eval("pygame.K_%s" % self.config.get_setting('Keybindings','thrust_key'))
         self.left_turn_key = eval("pygame.K_%s" % self.config.get_setting('Keybindings','left_turn_key'))
         self.right_turn_key = eval("pygame.K_%s" % self.config.get_setting('Keybindings','right_turn_key'))
@@ -132,7 +138,9 @@ class Game(object):
         self.IFF_key = eval("pygame.K_%s" % self.config.get_setting('Keybindings','IFF_key'))
         self.shots_key = eval("pygame.K_%s" % self.config.get_setting('Keybindings','shots_key'))
         self.pnts_key = eval("pygame.K_%s" % self.config.get_setting('Keybindings','pnts_key'))
+            
         self.pause_key = eval("pygame.K_%s" % self.config.get_setting('Keybindings','pause_key'))
+        
         self.vector_explosion = pygame.image.load(os.path.join(self.approot, "gfx/exp.png"))
         self.vector_explosion.set_colorkey((0, 0, 0))
         self.vector_explosion_rect = self.vector_explosion.get_rect()
@@ -255,42 +263,63 @@ class Game(object):
     def process_input(self):
         """creates game events based on pygame events"""
         for event in pygame.event.get():
-            if event.type == pygame.JOYAXISMOTION:
-                self.gameevents.add("joystick", event.axis, event.value)
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_F12 and self.config.get_setting('General','allow_pause'):
-                    self.gameevents.add("press", "pause")
-                elif event.key == pygame.K_ESCAPE:
+            if self.joystick:
+                if event.type == pygame.JOYAXISMOTION:
+                    self.gameevents.add("joyaxismotion", event.axis, event.value)
+                elif event.type == pygame.JOYBUTTONDOWN:
+                    if event.button == self.fire_button:
+                        self.gameevents.add("press", "fire")
+                    elif event.button == self.IFF_button:
+                        self.gameevents.add("press", "iff")
+                    elif event.button == self.shots_button:
+                        self.gameevents.add("press", "shots")
+                    elif event.button == self.pnts_button:
+                        self.gameevents.add("press", "pnts")
+                elif event.type == pygame.JOYBUTTONUP:
+                    if event.button == self.fire_button:
+                        self.gameevents.add("release", "fire")
+                    elif event.button == self.IFF_button:
+                        self.gameevents.add("release", "iff")
+                    elif event.button == self.shots_button:
+                        self.gameevents.add("release", "shots")
+                    elif event.button == self.pnts_button:
+                        self.gameevents.add("release", "pnts")
+            else:
+                if event.type == pygame.KEYDOWN:
+                    if event.key == self.thrust_key:
+                        self.gameevents.add("press", "thrust")
+                    elif event.key == self.left_turn_key:
+                        self.gameevents.add("press", "left")
+                    elif event.key == self.right_turn_key:
+                        self.gameevents.add("press", "right")
+                    elif event.key == self.fire_key:
+                        self.gameevents.add("press", "fire")
+                    elif event.key == self.IFF_key:
+                        self.gameevents.add("press", "iff")
+                    elif event.key == self.shots_key:
+                        self.gameevents.add("press", "shots")
+                    elif event.key == self.pnts_key:
+                        self.gameevents.add("press", "pnts")
+                elif event.type == pygame.KEYUP:
+                    if event.key == self.thrust_key:
+                        self.gameevents.add("release", "thrust")
+                    elif event.key == self.left_turn_key:
+                        self.gameevents.add("release", "left")
+                    elif event.key == self.right_turn_key:
+                        self.gameevents.add("release", "right")
+                    elif event.key == self.fire_key:
+                        self.gameevents.add("release", "fire")
+                    elif event.key == self.IFF_key:
+                        self.gameevents.add("release", "iff")
+                    elif event.key == self.shots_key:
+                        self.gameevents.add("release", "shots")
+                    elif event.key == self.pnts_key:
+                        self.gameevents.add("release", "pnts")
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
                     self.gameevents.add("press", "quit")
-                elif event.key == self.thrust_key:
-                    self.gameevents.add("press", "thrust")
-                elif event.key == self.left_turn_key:
-                    self.gameevents.add("press", "left")
-                elif event.key == self.right_turn_key:
-                    self.gameevents.add("press", "right")
-                elif event.key == self.fire_key:
-                    self.gameevents.add("press", "fire")
-                elif event.key == self.IFF_key:
-                    self.gameevents.add("press", "iff")
-                elif event.key == self.shots_key:
-                    self.gameevents.add("press", "shots")
-                elif event.key == self.pnts_key:
-                    self.gameevents.add("press", "pnts")
-            elif event.type == pygame.KEYUP:
-                if event.key == self.thrust_key:
-                    self.gameevents.add("release", "thrust")
-                elif event.key == self.left_turn_key:
-                    self.gameevents.add("release", "left")
-                elif event.key == self.right_turn_key:
-                    self.gameevents.add("release", "right")
-                elif event.key == self.fire_key:
-                    self.gameevents.add("release", "fire")
-                elif event.key == self.IFF_key:
-                    self.gameevents.add("release", "iff")
-                elif event.key == self.shots_key:
-                    self.gameevents.add("release", "shots")
-                elif event.key == self.pnts_key:
-                    self.gameevents.add("release", "pnts")
+                elif event.key == self.pause_key and self.config.get_setting('General','allow_pause'):
+                    self.gameevents.add("press", "pause")
     
     def process_game_logic(self):
         """processes game logic to produce game events"""
@@ -512,7 +541,7 @@ class Game(object):
                 self.score.__setattr__(obj, self.score.__getattribute__(obj) - target)
             elif command == "collide":
                 self.process_collision(obj, target)
-            elif command == "joystick":
+            elif command == "joyaxismotion":
                 if obj == 0:
                     self.ship.joy_turn = target
                 elif obj == 1:
