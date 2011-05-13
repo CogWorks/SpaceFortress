@@ -180,7 +180,7 @@ def get_config():
     cfg.add_setting('Score', 'SPEED_pos', 5, 'SPEED position(or Bonus, for new)')
     cfg.add_setting('Score', 'SHOTS_pos', 8, 'SHOTS')
     cfg.add_setting('Score', 'flight_bias', 0, type=config.constants.CT_DBLSPINBOX, validate=validate_flight_bias)
-    cfg.add_setting('Score', 'flight_max_increment', 10, 'The max flight score increment')
+    cfg.add_setting('Score', 'flight_max_increment', 20, 'The max flight score increment')
     cfg.add_setting('Score', 'update_timer', 1000, 'How often (in milliseconds) the VLCTY and CNTRL scores update (or Flight, for new)')
     cfg.add_setting('Score', 'speed_threshold', 4, 'Speed at which you\'re considered to be going "too fast", resulting in a VLCTY point penalty (or Flight, for new)')
     cfg.add_setting('Score', 'VLCTY_increment', 7, 'VLCTY bonus/penalty for going either slow enough or too fast (or Flight, for new)')
