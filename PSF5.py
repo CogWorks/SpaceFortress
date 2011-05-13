@@ -411,9 +411,9 @@ class Game(object):
                 elif obj == "quit":
                     self.quit(1)
                 elif obj == "left":
-                    self.ship.turn_flag = "left"
+                    self.ship.turn_left_flag = True
                 elif obj == "right":
-                    self.ship.turn_flag = "right"
+                    self.ship.turn_right_flag = True
                 elif obj == "thrust":
                     self.ship.thrust_flag = True
                 elif obj == "fire":
@@ -503,8 +503,10 @@ class Game(object):
                 if obj == "foe":
                     self.mine_list[0].tagged = "tagged"                    
             elif command == "release":
-                if obj == "left" or obj == "right":
-                    self.ship.turn_flag = False
+                if obj == "left":
+                    self.ship.turn_left_flag = False
+                elif obj == "right":
+                    self.ship.turn_right_flag = False
                 elif obj == "thrust":
                     self.ship.thrust_flag = False
             elif command == "warp":

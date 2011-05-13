@@ -27,7 +27,8 @@ class Ship(token.Token):
         self.missile_count = self.app.config.get_setting('Missile','missile_num')
         self.thrust_flag = False
         self.thrust = 0
-        self.turn_flag = False
+        self.turn_left_flag = False
+        self.turn_right_flag = False
         self.fire_flag = False
         self.turn_speed = self.app.config.get_setting('Ship','ship_turn_speed')
         self.acceleration = 0
@@ -53,9 +54,9 @@ class Ship(token.Token):
         if self.app.joystick:
             self.orientation = (self.orientation - self.turn_speed * self.joy_turn * self.invert_x) % 360
         else:
-            if self.turn_flag == 'right':
+            if self.turn_right_flag:
                 self.orientation = (self.orientation - self.turn_speed) % 360
-            elif self.turn_flag == 'left':
+            if self.turn_left_flag:
                 self.orientation = (self.orientation + self.turn_speed) % 360
         #thrust is only changed if joystick is engaged. Thrust is calculated while processing joystick input
         #self.acceleration = self.thrust * -0.3
