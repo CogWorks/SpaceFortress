@@ -120,6 +120,11 @@ class Game(object):
         self.f24 = pygame.font.Font(self.fp, int(20*self.aspect_ratio))
         self.f96 = pygame.font.Font(self.fp, int(72*self.aspect_ratio))
         self.f36 = pygame.font.Font(self.fp, int(36*self.aspect_ratio))
+        self.joystick = None
+        if self.config.get_setting('Joystick','use_joystick'):
+            pygame.joystick.init()
+            self.joystick = pygame.joystick.Joystick(0)
+            self.joystick.init()
         self.thrust_key = eval("pygame.K_%s" % self.config.get_setting('Keybindings','thrust_key'))
         self.left_turn_key = eval("pygame.K_%s" % self.config.get_setting('Keybindings','left_turn_key'))
         self.right_turn_key = eval("pygame.K_%s" % self.config.get_setting('Keybindings','right_turn_key'))
@@ -250,7 +255,9 @@ class Game(object):
     def process_input(self):
         """creates game events based on pygame events"""
         for event in pygame.event.get():
-            if event.type == pygame.KEYDOWN:
+            if event.type == pygame.JOYAXISMOTION:
+                self.gameevents.add("joystick", event.axis, event.value)
+            elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_F12 and self.config.get_setting('General','allow_pause'):
                     self.gameevents.add("press", "pause")
                 elif event.key == pygame.K_ESCAPE:
@@ -505,6 +512,11 @@ class Game(object):
                 self.score.__setattr__(obj, self.score.__getattribute__(obj) - target)
             elif command == "collide":
                 self.process_collision(obj, target)
+            elif command == "joystick":
+                if obj == 0:
+                    self.ship.joy_turn = target
+                elif obj == 1:
+                    self.ship.joy_thrust = target
                     
     
     def process_collision(self, obj, target):

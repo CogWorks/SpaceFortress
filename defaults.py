@@ -203,4 +203,6 @@ def get_config():
     cfg.add_setting('Eye Tracker', 'calmode', 'Every Game', alias='When To Calibrate', options=['Every Game','Once'], type=config.constants.CT_COMBO, about='Set when eye tracker is calibrated')
     cfg.add_setting('Eye Tracker', 'drawfix', False, alias="Draw Fixation Cross", type=config.constants.CT_CHECKBOX, about='Draw a fixation cross on the screen')
     
+    cfg.add_setting('Joystick', 'use_joystick', True, type=config.constants.CT_CHECKBOX)
+    
     return cfg

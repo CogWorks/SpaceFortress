@@ -38,26 +38,40 @@ class Ship(token.Token):
         self.alive = True
         self.small_hex_flag = False #did we hit the small hex?
         self.shot_timer = Timer() #time between shots, for VLNER assessment
+        self.joy_turn = 0.0
+        self.joy_thrust = 0.0
         
     def compute(self):
         """updates ship"""
-        if self.turn_flag == 'right':
-            self.orientation = (self.orientation - self.turn_speed) % 360
-        elif self.turn_flag == 'left':
-            self.orientation = (self.orientation + self.turn_speed) % 360
+        if self.app.joystick:
+            self.orientation = (self.orientation - self.turn_speed * self.joy_turn) % 360
+        else:
+            if self.turn_flag == 'right':
+                self.orientation = (self.orientation - self.turn_speed) % 360
+            elif self.turn_flag == 'left':
+                self.orientation = (self.orientation + self.turn_speed) % 360
         #thrust is only changed if joystick is engaged. Thrust is calculated while processing joystick input
         #self.acceleration = self.thrust * -0.3
         
-        if self.thrust_flag == True:
-            self.acceleration = self.acceleration_factor
+        if self.app.joystick:
+            if self.joy_turn < 0:
+                self.acceleration = self.acceleration_factor * self.joy_thrust * -1
+            else:
+                self.acceleration = 0
         else:
-            self.acceleration = 0
+            if self.thrust_flag == True:
+                self.acceleration = self.acceleration_factor
+            else:
+                self.acceleration = 0
+                
         self.velocity.x += self.acceleration * math.cos(math.radians(self.orientation))
+        self.velocity.y += self.acceleration * math.sin(math.radians(self.orientation))
+        
         if self.velocity.x > self.max_vel:
             self.velocity.x = self.max_vel
         elif self.velocity.x < -self.max_vel:
             self.velocity.x = -self.max_vel
-        self.velocity.y += self.acceleration * math.sin(math.radians(self.orientation))
+        
         if self.velocity.y > self.max_vel:
             self.velocity.y = self.max_vel
         elif self.velocity.y < -self.max_vel:
