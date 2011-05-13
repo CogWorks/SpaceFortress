@@ -40,7 +40,8 @@ sf-macosx: deps
 	cp psf5.png dist/macosx/SpaceFortress.app/Contents/MacOS
 	mkdir dist/macosx/SpaceFortress.app/Contents/Resources
 	cp psf5.icns dist/macosx/SpaceFortress.app/Contents/Resources
-	cp Info.plist.sf dist/macosx/SpaceFortress.app/Contents/Info.plist
+	ver=`cat build-info`;\
+	cat Info.plist.sf | sed s/SFVERSION/"$$ver"/ > dist/macosx/SpaceFortress.app/Contents/Info.plist
 	echo "APPL????" > dist/macosx/SpaceFortress.app/Contents/PkgInfo
 	mv build/exe.macosx-10.6-*-2.7/PSF5 dist/macosx/SpaceFortress.app/Contents/MacOS/SpaceFortress
 	mv build/exe.macosx-10.6-*-2.7/PSF5.zip dist/macosx/SpaceFortress.app/Contents/MacOS/SpaceFortress.zip
