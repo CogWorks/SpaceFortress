@@ -187,18 +187,31 @@ class Game(object):
         self.mine_list = tokens.mine.MineList(self)
         if self.config.get_setting('Logging','logging'):
             if self.config.get_setting('Logging','R_friendly'):
-                log_filename = "%s.csv" % (self.log_basename)
+                log_filename = "%s.txt" % (self.log_basename)
             else:
                 log_filename = "%s.dat" % (self.log_basename)
             self.log = open(log_filename, "w")
             if self.config.get_setting('Logging','R_friendly'):
-                self.log.write("event_type\tsystem_clock\tgame_time\tcurrent_game\te1\te2\te3\tfoes\tship_alive\tship_x\tship_y\tship_vel_x\tship_vel_y\tship_orientation\tdistance\t"+
-                               "mine_alive\tmine_x\tmine_y\tfortress_alive\tfortress_orientation\tmissile\tshell\tbonus\tscore_pnts\tscore_cntrl\tscore_vlcty\t"+
-                               "score_vlner\tscore_iff\tscore_intrvl\tscore_speed\tscore_shots\tscore_flight\tscore_fortress\tscore_mine\tscore_bonus\tthrust_key\tleft_key\tright_key\tfire_key\tiff_key\tshots_key\tpnts_key\tconfig")
+                self.log.write("event_type\tsystem_clock\tgame_time\tcurrent_game\te1\te2\te3\tfoes\tship_alive\tship_x\t"+
+                               "ship_y\tship_vel_x\tship_vel_y\tship_orientation\tdistance\tmine_alive\tmine_x\tmine_y\tfortress_alive\tfortress_orientation\t"+
+                               "missile\tshell\tbonus\tscore_pnts\tscore_cntrl\tscore_vlcty\tscore_vlner\tscore_iff\tscore_intrvl\tscore_speed\t"+
+                               "score_shots\tscore_flight\tscore_fortress\tscore_mine\tscore_bonus\tthrust_key\tleft_key\tright_key\tfire_key\tiff_key\t"+
+                               "shots_key\tpnts_key")
+                ncol = 42
                 if self.eg:
-                    self.log.write("fixation_number\tfix_x\tfix_y")
+                    self.log.write("\tfixation_number\tfix_x\tfix_y")
+                    ncol += 3
+                #self.log.write("\tscore1x\tscore1y\tscore2x\tscore2y\tscore3x\tscore3y\tscore4x\tscore4y\tscore5x\tscore5y\tscore6x\tscore6y\tscore7x\tscore7y\tscore8x\tscore8y")
+                self.log.write("\tconfig")
                 self.log.write("\n")
-                self.log.write("CONFIG\t%f\t%d\t%d\t%s%s\n" % (time.time(), pygame.time.get_ticks(), self.current_game, "\t"*33, self.config))
+                self.log.write("CONFIG\t%f\t%d\t%d" % (time.time(), pygame.time.get_ticks(), self.current_game))
+                self.log.write("%s" % ("\t"* (ncol-4)))
+                #self.log.write("\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d" %
+                #               (self.score.p1_rect.centerx, self.score.p1_rect.centery, self.score.p2_rect.centerx, self.score.p2_rect.centery,
+                #                self.score.p3_rect.centerx, self.score.p3_rect.centery, self.score.p4_rect.centerx, self.score.p4_rect.centery,
+                #                self.score.p5_rect.centerx, self.score.p5_rect.centery, self.score.p6_rect.centerx, self.score.p6_rect.centery,
+                #                self.score.p7_rect.centerx, self.score.p7_rect.centery, self.score.p8_rect.centerx, self.score.p8_rect.centery))
+                self.log.write("\t%s\n" % (self.config))
             else:
                 self.log.write("# %s\n" % self.config)
         self.gameevents = GameEventList()
