@@ -2,6 +2,7 @@
 ---------------------
 * Joystick support
 * Colored ship damage option (default: on)
+* Fix turning bug
 * Bump max flight increment to 20
 * Improved bonus logging
 * Mac app bundle hides dock and menubar
