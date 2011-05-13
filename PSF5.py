@@ -754,11 +754,11 @@ class Game(object):
             distance = self.ship.get_distance_to_point(self.WORLD_WIDTH/2,self.WORLD_HEIGHT/2)
         else:
             ship_alive = "n"
-            ship_x = "-"
-            ship_y = "-"
-            ship_vel_x = "-"
-            ship_vel_y = "-"
-            ship_orientation = "-"
+            ship_x = ""
+            ship_y = ""
+            ship_vel_x = ""
+            ship_vel_y = ""
+            ship_orientation = ""
             distance = 0
         if len(self.mine_list) > 0:
             mine_alive = "y"
@@ -766,14 +766,14 @@ class Game(object):
             mine_y = "%.3f"%(self.mine_list[0].position.y)
         else:
             mine_alive = "n"
-            mine_x = "-"
-            mine_y = "-"
+            mine_x = ""
+            mine_y = ""
         if self.fortress_exists and self.fortress.alive:
             fortress_alive = "y"
             fortress_orientation = str(self.fortress.orientation)
         else:
             fortress_alive = "n"
-            fortress_orientation = "-"
+            fortress_orientation = ""
         missile = '"'
         for m in self.missile_list:
             missile += "%.3f %.3f "%(m.position.x, m.position.y)
@@ -787,23 +787,23 @@ class Game(object):
         if self.config.get_setting('General','bonus_system') == "AX-CPT":
             bonus_isi = str(self.bonus.isi_time)
         else:
-            bonus_isi = '-'
+            bonus_isi = ''
         if self.bonus.visible:
             bonus_cur_x = self.bonus.x
             bonus_cur_y = self.bonus.y
         else:
-            bonus_cur_x = "-"
-            bonus_cur_y =  "-"
+            bonus_cur_x = ""
+            bonus_cur_y =  ""
         if self.bonus.current_symbol == '':
-            bonus_cur = "-"
+            bonus_cur = ""
         else:
             bonus_cur = self.bonus.current_symbol
         if self.bonus.prior_symbol == '':
-            bonus_prev = "-"
+            bonus_prev = ""
         else:
             bonus_prev = self.bonus.prior_symbol
         if self.score.iff == '':
-            iff_score = '-'
+            iff_score = ''
         else:
             iff_score = self.score.iff
         keys = pygame.key.get_pressed()
