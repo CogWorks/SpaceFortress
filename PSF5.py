@@ -575,6 +575,11 @@ class Game(object):
                 self.gameevents.add("destroyed", "ship", "shell")
                 self.gameevents.add("score-", "pnts", self.config.get_setting('Score','ship_death_penalty'))
                 self.gameevents.add("score-", "fortress", self.config.get_setting('Score','ship_death_penalty'))
+                self.ship.color = (255,255,0)
+            elif self.config.get_setting('Ship','colored_damage'):
+                g = 255 / self.ship.start_health * (self.ship.health-1)
+                self.ship.color = (255,g,0)
+                
         elif obj.startswith("missile_"):
             #if missile hits fortress, need to check if it takes damage when mine is onscreen
             if target == "fortress" and (len(self.mine_list) == 0 or self.config.get_setting('Fortress','hit_fortress_while_mine')):
@@ -625,6 +630,10 @@ class Game(object):
                 self.gameevents.add("destroyed", "ship", "shell")
                 self.gameevents.add("score-", "pnts", self.config.get_setting('Score','ship_death_penalty'))
                 self.gameevents.add("score-", "mines", self.config.get_setting('Score','ship_death_penalty'))
+                self.ship.color = (255,255,0)
+            elif self.config.get_setting('Ship','colored_damage'):
+                g = 255 / self.ship.start_health * (self.ship.health-1)
+                self.ship.color = (255,g,0)
         elif obj == "friend_mine":
             #get rid of mine
             self.mine_list.flag = False

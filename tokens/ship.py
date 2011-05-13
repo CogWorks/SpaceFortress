@@ -46,6 +46,7 @@ class Ship(token.Token):
         self.invert_y = 1.0
         if self.app.config.get_setting('Joystick','invert_y'):
             self.invert_y = -1.0
+        self.color = (255,255,0)
         
     def compute(self):
         """updates ship"""
@@ -133,7 +134,7 @@ class Ship(token.Token):
         x5 = (-18 * self.cosphi - -18 * self.sinphi)*self.app.aspect_ratio + self.position.x
         y5 = (-((-18 * self.cosphi) + (-18 * self.sinphi)))*self.app.aspect_ratio + self.position.y
         
-        pygame.draw.line(worldsurf, (255,255,0), (x1,y1), (x2,y2), self.app.linewidth)
-        pygame.draw.line(worldsurf, (255,255,0), (x3,y3), (x4,y4), self.app.linewidth)
-        pygame.draw.line(worldsurf, (255,255,0), (x3,y3), (x5,y5), self.app.linewidth)
+        pygame.draw.line(worldsurf, self.color, (x1,y1), (x2,y2), self.app.linewidth)
+        pygame.draw.line(worldsurf, self.color, (x3,y3), (x4,y4), self.app.linewidth)
+        pygame.draw.line(worldsurf, self.color, (x3,y3), (x5,y5), self.app.linewidth)
  
