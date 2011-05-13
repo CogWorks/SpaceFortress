@@ -194,10 +194,10 @@ class Game(object):
             if self.config.get_setting('Logging','R_friendly'):
                 self.log.write("event_type\tsystem_clock\tgame_time\tcurrent_game\te1\te2\te3\tfoes\tship_alive\tship_x\t"+
                                "ship_y\tship_vel_x\tship_vel_y\tship_orientation\tdistance\tmine_alive\tmine_x\tmine_y\tfortress_alive\tfortress_orientation\t"+
-                               "missile\tshell\tbonus\tscore_pnts\tscore_cntrl\tscore_vlcty\tscore_vlner\tscore_iff\tscore_intrvl\tscore_speed\t"+
-                               "score_shots\tscore_flight\tscore_fortress\tscore_mine\tscore_bonus\tthrust_key\tleft_key\tright_key\tfire_key\tiff_key\t"+
-                               "shots_key\tpnts_key")
-                ncol = 42
+                               "missile\tshell\tbonus_prev\tbonus_cur\tbonus_cur_x\tbonus_cur_y\tscore_pnts\tscore_cntrl\tscore_vlcty\tscore_vlner\t"+
+                               "score_iff\tscore_intrvl\tscore_speed\tscore_shots\tscore_flight\tscore_fortress\tscore_mine\tscore_bonus\tthrust_key\tleft_key\t"+
+                               "right_key\tfire_key\tiff_key\tshots_key\tpnts_key")
+                ncol = 45
                 if self.eg:
                     self.log.write("\tfixation_number\tfix_x\tfix_y")
                     ncol += 3
@@ -788,10 +788,20 @@ class Game(object):
             shell += "%.3f %.3f "%(s.position.x, s.position.y)
         shell.rstrip()
         shell += '"'
-        if self.bonus.current_symbol == '':
-            bonus = "-"
+        if self.bonus.visible:
+            bonus_cur_x = self.bonus.x
+            bonus_cur_y = self.bonus.y
         else:
-            bonus = self.bonus.current_symbol
+            bonus_cur_x = "-"
+            bonus_cur_y =  "-"
+        if self.bonus.current_symbol == '':
+            bonus_cur = "-"
+        else:
+            bonus_cur = self.bonus.current_symbol
+        if self.bonus.prior_symbol == '':
+            bonus_prev = "-"
+        else:
+            bonus_prev = self.bonus.prior_symbol
         if self.score.iff == '':
             iff_score = '-'
         else:
@@ -826,15 +836,18 @@ class Game(object):
         else:
             pnts_key = "n"
         if self.config.get_setting('Logging','R_friendly'):
-            self.log.write("STATE\t%f\t%d\t%d\t\t\t\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%d\t%d\t%d\t%d\t%s\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s"%\
-                           (system_clock, game_time, self.current_game, " ".join(self.mine_list.foe_letters), ship_alive, ship_x, ship_y, ship_vel_x, ship_vel_y, ship_orientation, distance, mine_alive, mine_x, mine_y, fortress_alive, fortress_orientation,\
-                            missile, shell, bonus, self.score.pnts, self.score.cntrl, self.score.vlcty, self.score.vlner, iff_score, self.score.intrvl,\
-                            self.score.speed, self.score.shots, self.score.flight, self.score.fortress, self.score.mines, self.score.bonus, thrust_key, left_key, right_key, fire_key, iff_key, shots_key, pnts_key))                   
+            self.log.write("STATE\t%f\t%d\t%d\t\t\t\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%d\t%d\t%d\t%d\t%s\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s"%\
+                           (system_clock, game_time, self.current_game, " ".join(self.mine_list.foe_letters), ship_alive, ship_x, ship_y, ship_vel_x, ship_vel_y, ship_orientation,
+                            distance, mine_alive, mine_x, mine_y, fortress_alive, fortress_orientation, missile, shell, bonus_prev, bonus_cur, 
+                            bonus_cur_x, bonus_cur_y, self.score.pnts, self.score.cntrl, self.score.vlcty, self.score.vlner, iff_score, self.score.intrvl, self.score.speed, self.score.shots, 
+                            self.score.flight, self.score.fortress, self.score.mines, self.score.bonus, thrust_key, left_key, right_key, fire_key, iff_key, shots_key,
+                            pnts_key))                   
         else:
-            self.log.write("%f\t%d\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%d\t%d\t%d\t%d\t%s\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s"%\
-                           (system_clock, game_time, self.current_game, ship_alive, ship_x, ship_y, ship_vel_x, ship_vel_y, ship_orientation, distance, mine_alive, mine_x, mine_y, fortress_alive, fortress_orientation,\
-                            missile, shell, bonus, self.score.pnts, self.score.cntrl, self.score.vlcty, self.score.vlner, iff_score, self.score.intrvl,\
-                            self.score.speed, self.score.shots, self.score.flight, self.score.fortress, self.score.mines, thrust_key, left_key, right_key, fire_key, iff_key, shots_key, pnts_key))
+            self.log.write("%f\t%d\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%d\t%d\t%d\t%d\t%s\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s"%\
+                           (system_clock, game_time, self.current_game, ship_alive, ship_x, ship_y, ship_vel_x, ship_vel_y, ship_orientation, distance,
+                            mine_alive, mine_x, mine_y, fortress_alive, fortress_orientation, missile, shell, bonus_prev, bonus_cur, bonus_cur_x, 
+                            bonus_cur_y, self.score.pnts, self.score.cntrl, self.score.vlcty, self.score.vlner, iff_score, self.score.intrvl, self.score.speed, self.score.shots, self.score.flight,
+                            self.score.fortress, self.score.mines, thrust_key, left_key, right_key, fire_key, iff_key, shots_key, pnts_key))
         if self.eg and self.eg.fix_data and self.eg.fix_data.eye_motion_state == 1:
             self.log.write("\t%d\t%d\t%d" % (self.eg.fix_count + 1, self.eg.fix_data.fix_x, self.eg.fix_data.fix_y))
         self.log.write("\n")

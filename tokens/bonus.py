@@ -118,6 +118,7 @@ class Bonus(object):
             self.state = "isi"
             self.visible = False
             self.app.gameevents.add("bonus", "cue_disappears")
+            self.prior_symbol = self.current_symbol
         elif self.state == "isi" and self.timer.elapsed() > self.isi_time: #make target appear
             self.timer.reset()
             if self.isi_time == 800:
@@ -138,5 +139,6 @@ class Bonus(object):
             self.state = "iti"
             self.visible = False
             self.app.gameevents.add("bonus", "target_disappears")
+            self.prior_symbol = self.current_symbol
             
         
