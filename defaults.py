@@ -71,7 +71,6 @@ def get_config():
     cfg.add_setting('Logging', 'logging', True, alias='Logging', type=config.constants.CT_CHECKBOX, about='Enable/disable logging')
     cfg.add_setting('Logging', 'print_events', False, alias='Print Events', type=config.constants.CT_CHECKBOX, about='Print events to stdout')
     cfg.add_setting('Logging', 'logdir', '', alias='Log Directory', type=config.constants.CT_LINEEDIT, about='Directory for log files, leave blank for default.')
-    cfg.add_setting('Logging', 'R_friendly', True, alias='R/Excel Friendly Format', type=config.constants.CT_CHECKBOX, about='Dont use # comments. Integrate all data.')
         
     cfg.add_setting('Keybindings', 'fire_key', 'SPACE', alias='Fire', type=config.constants.CT_COMBO, options=PYGAME_KEYS)
     cfg.add_setting('Keybindings', 'thrust_key', 'w', alias='Thrust', type=config.constants.CT_COMBO, options=PYGAME_KEYS)
