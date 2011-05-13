@@ -25,6 +25,24 @@ class ScoreAttr(object):
 
 class Score(object):
     """collection of game scores"""
+
+    vlner = ScoreAttr('VLNER_pos', both=True)
+    iff = ScoreAttr('IFF_pos', both=True)
+    intrvl = ScoreAttr('INTRVL_pos', both=True)
+    shots = ScoreAttr('SHOTS_pos', both=True)
+    
+    # Old scoring
+    pnts = ScoreAttr('PNTS_pos', old=True)
+    cntrl = ScoreAttr('CNTRL_pos', old=True)
+    vlcty = ScoreAttr('VLCTY_pos', old=True)
+    speed = ScoreAttr('SPEED_pos', old=True)
+    
+    # New scoring
+    flight = ScoreAttr('PNTS_pos')
+    fortress = ScoreAttr('CNTRL_pos')
+    mines = ScoreAttr('VLCTY_pos')
+    bonus = ScoreAttr('SPEED_pos')
+    
     def __init__(self, app):
         self.app = app
         #if we're using the new scoring system, PNTS == Flight, CNTRL == Fortress, VLCTY == Mines, SPEED == Bonus
@@ -42,25 +60,6 @@ class Score(object):
             self.f = pygame.font.Font(self.app.fp, int(28*self.app.aspect_ratio))
         self.iff = ''
         self.shots = self.app.config.get_setting('Missile','missile_num')
-    
-    vlner = ScoreAttr('VLNER_pos', both=True)
-    iff = ScoreAttr('IFF_pos', both=True)
-    intrvl = ScoreAttr('INTRVL_pos', both=True)
-    shots = ScoreAttr('SHOTS_pos', both=True)
-    
-    # Old scoring
-    pnts = ScoreAttr('PNTS_pos', old=True)
-    cntrl = ScoreAttr('CNTRL_pos', old=True)
-    vlcty = ScoreAttr('VLCTY_pos', old=True)
-    speed = ScoreAttr('SPEED_pos', old=True)
-    
-    # New scoring
-    flight = ScoreAttr('PNTS_pos')
-    fortress = ScoreAttr('CNTRL_pos')
-    mines = ScoreAttr('VLCTY_pos')
-    bonus = ScoreAttr('SPEED_pos')
-
-    
         
     def draw(self, scoresurf):
         """draws all score values to screen"""     
