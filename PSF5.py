@@ -201,16 +201,16 @@ class Game(object):
                 if self.eg:
                     self.log.write("\tfixation_number\tfix_x\tfix_y")
                     ncol += 3
-                #self.log.write("\tscore1x\tscore1y\tscore2x\tscore2y\tscore3x\tscore3y\tscore4x\tscore4y\tscore5x\tscore5y\tscore6x\tscore6y\tscore7x\tscore7y\tscore8x\tscore8y")
+                self.log.write("\tscore1x\tscore1y\tscore2x\tscore2y\tscore3x\tscore3y\tscore4x\tscore4y\tscore5x\tscore5y\tscore6x\tscore6y\tscore7x\tscore7y\tscore8x\tscore8y")
                 self.log.write("\tconfig")
                 self.log.write("\n")
                 self.log.write("CONFIG\t%f\t%d\t%d" % (time.time(), pygame.time.get_ticks(), self.current_game))
                 self.log.write("%s" % ("\t"* (ncol-4)))
-                #self.log.write("\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d" %
-                #               (self.score.p1_rect.centerx, self.score.p1_rect.centery, self.score.p2_rect.centerx, self.score.p2_rect.centery,
-                #                self.score.p3_rect.centerx, self.score.p3_rect.centery, self.score.p4_rect.centerx, self.score.p4_rect.centery,
-                #                self.score.p5_rect.centerx, self.score.p5_rect.centery, self.score.p6_rect.centerx, self.score.p6_rect.centery,
-                #                self.score.p7_rect.centerx, self.score.p7_rect.centery, self.score.p8_rect.centerx, self.score.p8_rect.centery))
+                self.log.write("\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d" %
+                               (self.frame.p1_rect.centerx, self.frame.p1_rect.centery, self.frame.p2_rect.centerx, self.frame.p2_rect.centery,
+                                self.frame.p3_rect.centerx, self.frame.p3_rect.centery, self.frame.p4_rect.centerx, self.frame.p4_rect.centery,
+                                self.frame.p5_rect.centerx, self.frame.p5_rect.centery, self.frame.p6_rect.centerx, self.frame.p6_rect.centery,
+                                self.frame.p7_rect.centerx, self.frame.p7_rect.centery, self.frame.p8_rect.centerx, self.frame.p8_rect.centery))
                 self.log.write("\t%s\n" % (self.config))
             else:
                 self.log.write("# %s\n" % self.config)
