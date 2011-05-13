@@ -22,7 +22,8 @@ docs:
 macosx: docs ce-macosx sf-macosx
 	mkdir -p dist/macosx/Space\ Fortress\ 5/Documentation
 	mkdir dist/macosx/bundle
-	cp docs/experimenter_instructions.pdf dist/macosx/Space\ Fortress\ 5/Documentation/Experimenter\ Instructions\ for\ Subjects.pdf 
+	cp docs/experimenter_instructions.pdf dist/macosx/Space\ Fortress\ 5/Documentation/Experimenter\ Instructions\ for\ Subjects.pdf
+	cp Changelog dist/macosx/Space\ Fortress\ 5/Documentation/
 	mv dist/macosx/*.app dist/macosx/Space\ Fortress\ 5/
 	python mac-tools/AssignIcon.py psf5.png dist/macosx/Space\ Fortress\ 5
 	mv dist/macosx/Space\ Fortress\ 5 dist/macosx/bundle
