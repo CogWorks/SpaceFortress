@@ -215,11 +215,6 @@ def get_config():
     cfg.add_setting('Score', 'bonus_points', 100, 'Points added for selecting points bonus')
     cfg.add_setting('Score', 'bonus_missiles', 50, 'Missiles added for selecting missile bonus')
     
-    cfg.add_setting('Eye Tracker', 'enabled', False, type=config.constants.CT_CHECKBOX, about='Enable eye tracking')
-    cfg.add_setting('Eye Tracker', 'eg_server', '1.0.0.21', type=config.constants.CT_LINEEDIT, about='EGServer Address')
-    cfg.add_setting('Eye Tracker', 'calmode', 'Every Game', alias='When To Calibrate', options=['Every Game','Once'], type=config.constants.CT_COMBO, about='Set when eye tracker is calibrated')
-    cfg.add_setting('Eye Tracker', 'drawfix', False, alias="Draw Fixation Cross", type=config.constants.CT_CHECKBOX, about='Draw a fixation cross on the screen')
-    
     cfg.add_setting('Joystick', 'use_joystick', False, type=config.constants.CT_CHECKBOX)
     cfg.add_setting('Joystick', 'joystick_id', 0)
     cfg.add_setting('Joystick', 'invert_x', False, type=config.constants.CT_CHECKBOX)

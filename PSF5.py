@@ -102,15 +102,6 @@ class Game(object):
             logdir = get_default_logdir()
         self.log_basename = os.path.join(logdir, base)
         
-        self.eg = None
-        if self.config.get_setting('Eye Tracker','enabled'):
-            self.eg = EyeGaze()
-            if self.eg.connect(self.config.get_setting('Eye Tracker','eg_server')) != None:
-                self.eg = None
-            self.eg.gaze_log_fn = self.log_basename + ('.gaze.csv')
-            self.eg.fix_log_fn = self.log_basename + ('.fix.csv')
-            self.eg.start_logging()
-        
         pygame.display.init()
         pygame.font.init()
         pygame.mouse.set_visible(False)
@@ -165,9 +156,7 @@ class Game(object):
         else:
             self.screen = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
         
-        self.calibrated = False
-        if self.eg and self.config.get_setting('Eye Tracker','calmode') == 'Once':
-            self.calibrated = self.eg.calibrate(self.screen)
+        self.gameevents.add("display", 'setmode', (self.SCREEN_WIDTH, self.SCREEN_HEIGHT, self.aspect_ratio))
             
         self.clock = pygame.time.Clock()
         self.gametimer = tokens.timer.Timer()
@@ -211,9 +200,12 @@ class Game(object):
             self.log.write("score_pnts\tscore_cntrl\tscore_vlcty\tscore_vlner\t"+
                            "score_iff\tscore_intrvl\tscore_speed\tscore_shots\tscore_flight\tscore_fortress\tscore_mine\tscore_bonus\tthrust_key\tleft_key\t"+
                            "right_key\tfire_key\tiff_key\tshots_key\tpnts_key")
-            if self.eg:
-                self.log.write("\tfixation_number\tfix_x\tfix_y")
-                ncol += 3
+            ##
+            ## Need to figure out a good way to handle this! ~RMH
+            ##
+            #if self.eg:
+            #    self.log.write("\tfixation_number\tfix_x\tfix_y")
+            #    ncol += 3
             self.log.write("\tscore1x\tscore1y\tscore2x\tscore2y\tscore3x\tscore3y\tscore4x\tscore4y\tscore5x\tscore5y\tscore6x\tscore6y\tscore7x\tscore7y\tscore8x\tscore8y")
             self.log.write("\tconfig")
             self.log.write("\n")
@@ -234,7 +226,7 @@ class Game(object):
     
     def setup_world(self):
         """initializes gameplay"""
-        self.gameevents.add("Start", "game")
+        self.gameevents.add("game", "start")
         self.missile_list = []
         self.shell_list = []
         self.ship = tokens.ship.Ship(self)
@@ -412,7 +404,7 @@ class Game(object):
             command = currentevent.command
             obj = currentevent.obj
             target = currentevent.target
-            if self.config.get_setting('Logging','logging'):
+            if self.config.get_setting('Logging','logging') and currentevent.log:
                 self.log.write("EVENT\t%f\t%d\t%d\t%s\t%s\t%s\n"%(time.time(), pygame.time.get_ticks(), self.current_game, command, obj, target))
             if command == "press":
                 if obj == "pause":
@@ -747,8 +739,7 @@ class Game(object):
                 self.bonus.draw(self.worldsurf)
         self.screen.blit(self.scoresurf, self.scorerect)
         self.screen.blit(self.worldsurf, self.worldrect)
-        if self.eg and self.config.get_setting('Eye Tracker','drawfix'):
-            self.draw_fixation_cross(self.screen)
+        self.gameevents.add("display", 'preflip', 'main', False)
         pygame.display.flip()
         
     def log_world(self):
@@ -868,18 +859,12 @@ class Game(object):
         self.log.write("%d\t%d\t%d\t%d\t%s\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s" %
                        (self.score.pnts, self.score.cntrl, self.score.vlcty, self.score.vlner, iff_score, self.score.intrvl, self.score.speed, self.score.shots, self.score.flight, self.score.fortress, 
                         self.score.mines, self.score.bonus, thrust_key, left_key, right_key, fire_key, iff_key, shots_key, pnts_key))
-        if self.eg and self.eg.fix_data and self.eg.fix_data.eye_motion_state == 1:
-            self.log.write("\t%d\t%d\t%d" % (self.eg.fix_count + 1, self.eg.fix_data.fix_x, self.eg.fix_data.fix_y))
+        ##
+        ## Need to figure out a good way to handle this ~RMH
+        ##
+        #if self.eg and self.eg.fix_data and self.eg.fix_data.eye_motion_state == 1:
+        #    self.log.write("\t%d\t%d\t%d" % (self.eg.fix_count + 1, self.eg.fix_data.fix_x, self.eg.fix_data.fix_y))
         self.log.write("\n")
-
-    def draw_fixation_cross(self, surface, r=10, color=(255, 0, 0)):
-        if self.eg.fix_data:
-            pygame.draw.line(surface, color,
-                             (self.eg.fix_data.fix_x - r, self.eg.fix_data.fix_y),
-                             (self.eg.fix_data.fix_x + r, self.eg.fix_data.fix_y))
-            pygame.draw.line(surface, color,
-                             (self.eg.fix_data.fix_x, self.eg.fix_data.fix_y - r),
-                             (self.eg.fix_data.fix_x, self.eg.fix_data.fix_y + r))
 
     def display_intro(self):
         """display intro scene"""
@@ -1123,13 +1108,10 @@ class Game(object):
                         return
     
     def quit(self, ret=0):
+        self.gameevents.add("game", "quit", ret)
         if self.config.get_setting('Logging','logging'):
             self.log.close()
         pygame.quit()
-        if self.eg:
-            self.eg.data_stop()
-            self.eg.stop_logging()
-            self.eg.disconnect()
         sys.exit(ret)
 
 def main(cogworld, condition):
@@ -1138,10 +1120,7 @@ def main(cogworld, condition):
     g.display_intro()
     while g.current_game < g.config.get_setting('General','games_per_session'):
         g.current_game += 1
-        if g.eg and g.config.get_setting('Eye Tracker','calmode') == 'Every Game':
-            g.calibrated = g.eg.calibrate(g.screen)
-        if g.eg and g.calibrated:
-            g.eg.data_start()
+        g.gameevents.add("game", "ready")
         if g.mine_exists:
             g.display_foe_mines()
         g.setup_world()
@@ -1171,8 +1150,7 @@ def main(cogworld, condition):
                 if g.config.get_setting('Logging','logging'):
                     g.log.write("EVENT\t%f\t%d\t%d\tscore_hide\tNone\tPlayer\n"%(time.time(), pygame.time.get_ticks(), g.current_game))
                 break
-        if g.eg:
-            g.eg.data_stop()
+        g.gameevents.add("game", "over")
     g.quit()
 
 if __name__ == '__main__':
