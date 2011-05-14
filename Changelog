@@ -1,3 +1,9 @@
+ v5.0.0_rc10
+---------------------
+* Disable joystick by default
+* Update instructions with new AC-CPT instructions
+* New plugin framework for things like ACT-R and EEG
+
  v5.0.0_rc9
 ---------------------
 * Joystick support
