@@ -65,6 +65,10 @@ def get_default_logdir():
 
 release_build = False
 
+class EventDump(object):
+    def notify(self, *args, **kwargs):
+        print args
+
 class Game(object):
     """Main game application"""
     def __init__(self, cogworld, condition):
@@ -222,6 +226,8 @@ class Game(object):
     def setup_world(self):
         """initializes gameplay"""
         self.gameevents = GameEventList()
+        if self.config.get_setting('Logging','print_events'):
+            self.gameevents.addObserver(EventDump())
         self.gameevents.add("Start", "game")
         self.missile_list = []
         self.shell_list = []
@@ -402,8 +408,6 @@ class Game(object):
             target = currentevent.target
             if self.config.get_setting('Logging','logging'):
                 self.log.write("EVENT\t%f\t%d\t%d\t%s\t%s\t%s\n"%(time.time(), pygame.time.get_ticks(), self.current_game, command, obj, target))
-            if self.config.get_setting('Logging','print_events'):
-                print "time %d, command %s, object %s, target %s"%(pygame.time.get_ticks(), command, obj, target)
             if command == "press":
                 if obj == "pause":
                     self.pause_game()
@@ -899,11 +903,8 @@ class Game(object):
                 if event.type == pygame.KEYDOWN:
                     return
         
-    
     def display_foe_mines(self):
         """before game begins, present the list of IFF letters to target"""
-        if self.config.get_setting('Logging','print_events'):
-            print self.config.get_setting('Mine','num_foes'), self.mine_list.foe_letters
         self.screen.fill((0,0,0))
         top = self.f24.render("The Type-2 mines for this session are:", True, (255,255,0))
         top_rect = top.get_rect()

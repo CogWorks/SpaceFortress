@@ -5,6 +5,8 @@
 #Rensselaer Polytechnic Institute
 #Fall 2010
 
+import pygame, time
+
 class GameEvent(object):
     """an event that happens during gameplay"""
     def __init__(self, command, obj=None, target=None):
