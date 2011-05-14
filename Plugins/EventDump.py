@@ -19,5 +19,5 @@ class SF5Plugin(object):
             elif args[4] == 'user':
                 self.print_events = self.app.config.get_setting('Logging','print_events')
 
-        if self.print_events:
+        if self.print_events and kwargs['log']:
             print args

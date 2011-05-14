@@ -38,4 +38,4 @@ class GameEventList(list):
     def add(self, command, target=None, obj=None, log=True):
         """adds an event to the list"""
         self.append(GameEvent(command, target, obj, log))
-        self.notify(time.time(), pygame.time.get_ticks(), command, target, obj)
+        self.notify(time.time(), pygame.time.get_ticks(), command, target, obj, log=log)
