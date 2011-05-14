@@ -10,7 +10,6 @@ class Frame(object):
     def __init__(self, app):
         self.app = app
         super(Frame, self).__init__()
-        self.f = pygame.font.Font(self.app.fp, int(14*self.app.aspect_ratio))
         #if we're using the new scoring system, PNTS == Flight, CNTRL == Fortress, VLCTY == Mines, SPEED == Bonus
         #indexed array of what score goes in which position. Setting it to 9 to use indicies 1-8
         positions = [0]*9
@@ -29,35 +28,35 @@ class Frame(object):
             positions[self.app.config.get_setting('Score','VLCTY_pos')] = "MINES"
             positions[self.app.config.get_setting('Score','SPEED_pos')] = "BONUS"
         #score labels
-        self.p1_surf = self.f.render(positions[1],0, (0,255,0))
+        self.p1_surf = self.app.f.render(positions[1],0, (0,255,0))
         self.p1_rect = self.p1_surf.get_rect()
         self.p1_rect.centery = 16*self.app.aspect_ratio
         self.p1_rect.centerx = 45*self.app.aspect_ratio
-        self.p2_surf = self.f.render(positions[2],0, (0,255,0))
+        self.p2_surf = self.app.f.render(positions[2],0, (0,255,0))
         self.p2_rect = self.p2_surf.get_rect()
         self.p2_rect.centery = 16*self.app.aspect_ratio
         self.p2_rect.centerx = 134*self.app.aspect_ratio
-        self.p3_surf = self.f.render(positions[3],0, (0,255,0))
+        self.p3_surf = self.app.f.render(positions[3],0, (0,255,0))
         self.p3_rect = self.p3_surf.get_rect()
         self.p3_rect.centery = 16*self.app.aspect_ratio
         self.p3_rect.centerx = 223*self.app.aspect_ratio
-        self.p4_surf = self.f.render(positions[4],0, (0,255,0))
+        self.p4_surf = self.app.f.render(positions[4],0, (0,255,0))
         self.p4_rect = self.p4_surf.get_rect()
         self.p4_rect.centery = 16*self.app.aspect_ratio
         self.p4_rect.centerx = 312*self.app.aspect_ratio
-        self.p5_surf = self.f.render(positions[5],0, (0,255,0))
+        self.p5_surf = self.app.f.render(positions[5],0, (0,255,0))
         self.p5_rect = self.p5_surf.get_rect()
         self.p5_rect.centery = 16*self.app.aspect_ratio
         self.p5_rect.centerx = 401*self.app.aspect_ratio
-        self.p6_surf = self.f.render(positions[6],0, (0,255,0))
+        self.p6_surf = self.app.f.render(positions[6],0, (0,255,0))
         self.p6_rect = self.p6_surf.get_rect()
         self.p6_rect.centery = 16*self.app.aspect_ratio
         self.p6_rect.centerx = 490*self.app.aspect_ratio
-        self.p7_surf = self.f.render(positions[7],0, (0,255,0))
+        self.p7_surf = self.app.f.render(positions[7],0, (0,255,0))
         self.p7_rect = self.p7_surf.get_rect()
         self.p7_rect.centery = 16*self.app.aspect_ratio
         self.p7_rect.centerx = 579*self.app.aspect_ratio
-        self.p8_surf = self.f.render(positions[8],0, (0,255,0))
+        self.p8_surf = self.app.f.render(positions[8],0, (0,255,0))
         self.p8_rect = self.p8_surf.get_rect()
         self.p8_rect.centery = 16*self.app.aspect_ratio
         self.p8_rect.centerx = 668*self.app.aspect_ratio

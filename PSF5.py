@@ -35,17 +35,6 @@ import pygame
 import picture
 import time
 import datetime
-try:
-    import argparse
-except ImportError:
-    import argparser as argparse
-
-try:
-    from pycogworks.cogworld import *
-    from pycogworks.eyegaze import *
-except ImportError:
-    pass
-
 import defaults
 
 def get_psf_version_string():
@@ -67,16 +56,14 @@ release_build = False
 
 class Game(object):
     """Main game application"""
-    def __init__(self, cogworld, condition):
+    def __init__(self):
         super(Game, self).__init__()
+
         i = sys.argv[0].rfind('/')
         if i != -1:
             self.approot = sys.argv[0][:sys.argv[0].rfind('/')]
         else:
             self.approot = './'
-        self.fp = os.path.join(self.approot, "fonts/freesansbold.ttf")
-        self.cw = cogworld
-        self.cond = condition
 
         self.gameevents = GameEventList()
         self.plugins = defaults.load_plugins(self, defaults.get_plugin_home())
@@ -118,12 +105,16 @@ class Game(object):
         self.WORLD_WIDTH = int(710 * self.aspect_ratio)
         self.WORLD_HEIGHT = int(626 * self.aspect_ratio)
         self.linewidth = self.config.get_setting('Display','linewidth')
-        self.frame = tokens.frame.Frame(self)
-        self.score = tokens.score.Score(self)
+        
+        self.fp = os.path.join(self.approot, "fonts/freesansbold.ttf")
         self.f = pygame.font.Font(self.fp, int(14*self.aspect_ratio))
         self.f24 = pygame.font.Font(self.fp, int(20*self.aspect_ratio))
+        self.f28 = pygame.font.Font(self.fp, int(28*self.aspect_ratio))
         self.f96 = pygame.font.Font(self.fp, int(72*self.aspect_ratio))
         self.f36 = pygame.font.Font(self.fp, int(36*self.aspect_ratio))
+        
+        self.frame = tokens.frame.Frame(self)
+        self.score = tokens.score.Score(self)
         
         self.joystick = None
         if self.config.get_setting('Joystick','use_joystick'):
@@ -1114,9 +1105,9 @@ class Game(object):
         pygame.quit()
         sys.exit(ret)
 
-def main(cogworld, condition):
+def main():
     
-    g = Game(cogworld, condition)
+    g = Game()
     g.display_intro()
     while g.current_game < g.config.get_setting('General','games_per_session'):
         g.current_game += 1
@@ -1154,36 +1145,6 @@ def main(cogworld, condition):
     g.quit()
 
 if __name__ == '__main__':
-    
-    cogworld = None
-    args = None
-    
-    if len(sys.argv) > 1:
-        if sys.argv[1][:5] != '-psn_':
-    
-            parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-            parser.add_argument('--version', action='version', version="%s %s" % (get_psf_version_string(), githash))
-            parser.add_argument('--generate-config', action="store_true", dest="genconfig", help='Generate a full default config file.', default=argparse.SUPPRESS)
-            parser.add_argument('--condition', action="store", dest="condition", help='Task Condition', metavar='COND')
-            parser.add_argument('--port', action="store", dest="port", help='CogWorld RPC port')
-            args = parser.parse_args()
-            
-            try:
-                if args.genconfig:
-                    if gen_config("config.txt.new"):
-                        print 'The new config file "config.txt.new" needs to be renamed before it can be used.'
-                    else:
-                        print 'Error creating config file.'
-                    sys.exit(0)
-                elif args.port:
-                    cogworld = CogWorld('localhost', args.port, 'SpaceFortress')
-                    ret = cogworld.connect()
-                    if (ret!=None):
-                        print 'Failed connecting to CogWorld: %s' % (ret)
-                        sys.exit()
-            except AttributeError:
-                pass
-            
-    main(cogworld, args)
+    main()
         
 

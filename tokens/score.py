@@ -55,9 +55,9 @@ class Score(object):
         self.positions = [0] * num_positions
         self.old_positions = not self.app.config.get_setting('Score','new_scoring_pos')
         if self.old_positions:
-            self.f = pygame.font.Font(self.app.fp, int(14*self.app.aspect_ratio))
+            self.f = self.app.f
         else:
-            self.f = pygame.font.Font(self.app.fp, int(28*self.app.aspect_ratio))
+            self.f = self.app.f28
         self.iff = ''
         self.shots = self.app.config.get_setting('Missile','missile_num')
         
