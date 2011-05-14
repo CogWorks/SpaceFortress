@@ -13,7 +13,7 @@ class ComboBox(QComboBox):
     def __init__(self, editor, config, category, setting, info):
         super(ComboBox, self).__init__()
         self.editor = editor
-        self.cfg = config
+        self.config = config
         self.category = category
         self.setting = setting
         self.info = info
@@ -32,7 +32,7 @@ class ComboBox(QComboBox):
     def stateChangeHandler(self, newVal):
         for i in range(0,len(self.info['options'])):
             if self.info['options'][i] == self.info['value']:
-                self.cfg.update_setting_value(self.category, self.setting, self.info['options'][newVal])
+                self.config.update_setting_value(self.category, self.setting, self.info['options'][newVal])
         self.editor.dirty_check()
 
 class DoubleSpinBox(QDoubleSpinBox):
@@ -40,7 +40,7 @@ class DoubleSpinBox(QDoubleSpinBox):
     def __init__(self, editor, config, category, setting, info):
         super(DoubleSpinBox, self).__init__()
         self.editor = editor
-        self.cfg = config
+        self.config = config
         self.category = category
         self.setting = setting
         self.info = info
@@ -52,7 +52,7 @@ class DoubleSpinBox(QDoubleSpinBox):
         self.setValue(newVal)
             
     def stateChangeHandler(self, newVal):
-        self.cfg.update_setting_value(self.category, self.setting, newVal)
+        self.config.update_setting_value(self.category, self.setting, newVal)
         self.editor.dirty_check()
         
 class SpinBox(QSpinBox):
@@ -60,7 +60,7 @@ class SpinBox(QSpinBox):
     def __init__(self, editor, config, category, setting, info):
         super(SpinBox, self).__init__()
         self.editor = editor
-        self.cfg = config
+        self.config = config
         self.category = category
         self.setting = setting
         self.info = info
@@ -72,7 +72,7 @@ class SpinBox(QSpinBox):
         self.setValue(newVal)
             
     def stateChangeHandler(self, newVal):
-        self.cfg.update_setting_value(self.category, self.setting, newVal)
+        self.config.update_setting_value(self.category, self.setting, newVal)
         self.editor.dirty_check()
     
 class CheckBox(QCheckBox):
@@ -80,7 +80,7 @@ class CheckBox(QCheckBox):
     def __init__(self, editor, config, category, setting, info):
         super(CheckBox, self).__init__()
         self.editor = editor
-        self.cfg = config
+        self.config = config
         self.category = category
         self.setting = setting
         self.info = info
@@ -98,9 +98,9 @@ class CheckBox(QCheckBox):
             
     def stateChangeHandler(self, newVal):
         if newVal == Qt.Checked:
-            self.cfg.update_setting_value(self.category, self.setting, True)
+            self.config.update_setting_value(self.category, self.setting, True)
         else:
-            self.cfg.update_setting_value(self.category, self.setting, False)
+            self.config.update_setting_value(self.category, self.setting, False)
         self.editor.dirty_check()
             
 class LineEdit(QLineEdit):
@@ -108,7 +108,7 @@ class LineEdit(QLineEdit):
     def __init__(self, editor, config, category, setting, info):
         super(LineEdit, self).__init__()
         self.editor = editor
-        self.cfg = config
+        self.config = config
         self.category = category
         self.setting = setting
         self.info = info
@@ -122,7 +122,7 @@ class LineEdit(QLineEdit):
         self.setText(newVal)
             
     def stateChangeHandler(self, newVal):
-        self.cfg.update_setting_value(self.category, self.setting, newVal)
+        self.config.update_setting_value(self.category, self.setting, newVal)
         self.editor.dirty_check()
     
 class ConfigEditor(QMainWindow):
@@ -131,13 +131,16 @@ class ConfigEditor(QMainWindow):
         super(ConfigEditor, self).__init__()
         
         self.app = app
-        self.cfg = cfg
+        self.config = cfg
+        self.title = title
+        
+    def setup(self):
         
         self.dirty = False
         
-        self.def_cfg = copy.deepcopy(self.cfg)
-        self.cfg.update_from_user_file()
-        self.base_cfg = copy.deepcopy(self.cfg)
+        self.def_cfg = copy.deepcopy(self.config)
+        self.config.update_from_user_file()
+        self.base_cfg = copy.deepcopy(self.config)
         
         self.categories = QListWidget()
         #self.categories.setSizePolicy(QSizePolicy.Fixed,QSizePolicy.Expanding)
@@ -147,18 +150,18 @@ class ConfigEditor(QMainWindow):
         QObject.connect(self.categories, SIGNAL('itemSelectionChanged()'), self.category_selected)
         
         self.widget_list = {}
-        for cat in self.cfg.get_categories():
+        for cat in self.config.get_categories():
             self.widget_list[cat] = {}
         longest_cat = 0
-        for cat in self.cfg.get_categories():
+        for cat in self.config.get_categories():
             if len(cat) > longest_cat:
                 longest_cat = len(cat)
             self.categories.addItem(cat)
             settings_layout = QGridLayout()
             r = 0
             c = 0
-            for setting in self.cfg.get_settings(cat):
-                info = self.cfg.get_setting(cat, setting, True)
+            for setting in self.config.get_settings(cat):
+                info = self.config.get_setting(cat, setting, True)
                 s = QWidget()
                 s.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Fixed)
                 sl = QVBoxLayout()
@@ -171,20 +174,20 @@ class ConfigEditor(QMainWindow):
                     label.setToolTip(info['about'])
                 sl.addWidget(label)
                 if info['type'] == constants.CT_LINEEDIT:
-                    w = LineEdit(self, self.cfg,cat,setting,info)
+                    w = LineEdit(self, self.config,cat,setting,info)
                 elif info['type'] == constants.CT_CHECKBOX:
-                    w = CheckBox(self, self.cfg,cat,setting,info)
+                    w = CheckBox(self, self.config,cat,setting,info)
                 elif info['type'] == constants.CT_SPINBOX:
-                    w = SpinBox(self, self.cfg,cat,setting,info)
+                    w = SpinBox(self, self.config,cat,setting,info)
                 elif info['type'] == constants.CT_DBLSPINBOX:
-                    w = DoubleSpinBox(self, self.cfg,cat,setting,info)
+                    w = DoubleSpinBox(self, self.config,cat,setting,info)
                 elif info['type'] == constants.CT_COMBO:
-                    w = ComboBox(self, self.cfg,cat,setting,info)
+                    w = ComboBox(self, self.config,cat,setting,info)
                 w.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Fixed)
                 self.widget_list[cat][setting] = w
                 sl.addWidget(w)
                 s.setLayout(sl)
-                c = self.cfg.config[cat].index(setting) % 2
+                c = self.config.config[cat].index(setting) % 2
                 settings_layout.addWidget(s, r, c)
                 if c == 1:
                     r += 1
@@ -220,7 +223,7 @@ class ConfigEditor(QMainWindow):
         self.main.setLayout(self.main_layout)
         
         self.setCentralWidget(self.main)
-        self.setWindowTitle(title)
+        self.setWindowTitle(self.title)
         self.setUnifiedTitleAndToolBarOnMac(True)
         
         self.categories.setCurrentItem(self.categories.item(0))
@@ -247,7 +250,7 @@ class ConfigEditor(QMainWindow):
         self.move((screen.width()-size.width())/2, (screen.height()-size.height())/2)
         
     def category_selected(self):
-        self.settings.setCurrentIndex(self.cfg.config.index(self.categories.selectedItems()[0].text()))
+        self.settings.setCurrentIndex(self.config.config.index(self.categories.selectedItems()[0].text()))
         
     def mainbutton_clicked(self, button):
         if button == self.main_reset:
@@ -281,30 +284,30 @@ class ConfigEditor(QMainWindow):
         
     def get_changes(self):
         enc = MyEncoder()
-        if enc.encode(self.def_cfg.config) == enc.encode(self.cfg.config):
+        if enc.encode(self.def_cfg.config) == enc.encode(self.config.config):
             return False
-        if enc.encode(self.base_cfg.config) != enc.encode(self.cfg.config):
+        if enc.encode(self.base_cfg.config) != enc.encode(self.config.config):
             newC = Config()
-            for c in self.cfg.config.keys():
-                for s in self.cfg.config[c].keys():
-                    if self.cfg.config[c][s]['value'] != self.def_cfg.config[c][s]['value']:
-                        newC.add_setting(c, s, self.cfg.config[c][s]['value'], stub=True)    
+            for c in self.config.config.keys():
+                for s in self.config.config[c].keys():
+                    if self.config.config[c][s]['value'] != self.def_cfg.config[c][s]['value']:
+                        newC.add_setting(c, s, self.config.config[c][s]['value'], stub=True)    
             return json.dumps(newC.config, separators=(',',': '), indent=4, sort_keys=True)
         else:
             return None
         
     def validate_settings(self):
         ret = []
-        for cat in self.cfg.get_categories():
-            for setting in self.cfg.get_settings(cat):
-                info = self.cfg.get_setting(cat, setting, True)
+        for cat in self.config.get_categories():
+            for setting in self.config.get_settings(cat):
+                info = self.config.get_setting(cat, setting, True)
                 if info.has_key('validate'):
                     if not info['validate'](info):
                         ret.append((cat,setting))
         return ret
     
     def dirty_check(self):
-        if str(self.base_cfg) != str(self.cfg):
+        if str(self.base_cfg) != str(self.config):
             self.dirty = True
             self.main_apply.setEnabled(True)
             self.main_reset.setEnabled(True)
@@ -312,7 +315,7 @@ class ConfigEditor(QMainWindow):
             self.dirty = False
             self.main_apply.setEnabled(False)
             self.main_reset.setEnabled(False)
-        if str(self.def_cfg) == str(self.cfg):
+        if str(self.def_cfg) == str(self.config):
             self.main_defaults.setEnabled(False)
         else:
             self.main_defaults.setEnabled(True)
@@ -320,12 +323,12 @@ class ConfigEditor(QMainWindow):
     def save_settings(self):
         config = self.get_changes()
         if config == False:
-            if os.path.isfile(self.cfg.user_file):
-                os.remove(self.cfg.user_file)
+            if os.path.isfile(self.config.user_file):
+                os.remove(self.config.user_file)
         elif config != None:
-            with open(self.cfg.user_file, 'w+') as f:
+            with open(self.config.user_file, 'w+') as f:
                 f.write(config)
-        self.base_cfg = copy.deepcopy(self.cfg)
+        self.base_cfg = copy.deepcopy(self.config)
             
     def closeEvent(self, event=None):
         self.quitApp()

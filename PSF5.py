@@ -77,23 +77,22 @@ class Game(object):
         self.fp = os.path.join(self.approot, "fonts/freesansbold.ttf")
         self.cw = cogworld
         self.cond = condition
-        self.config = defaults.get_config()
 
         self.gameevents = GameEventList()
-                
-        self.plugins = defaults.load_plugins(defaults.get_plugin_home())
+        self.plugins = defaults.load_plugins(self, defaults.get_plugin_home())
         for name in self.plugins:
             try:
-                self.plugins[name].registerConfig(self.config)
-            except AttributeError, e:
-                print e
-            try:
                 self.gameevents.addCallback(self.plugins[name].eventCallback)
-            except AttributeError, e:
-                print e
+            except AttributeError:
+                pass
+                
+        self.config = defaults.get_config()
+        self.gameevents.add("config", "load", "defaults")
         
         self.config.set_user_file(defaults.get_user_file())
         self.config.update_from_user_file()
+        self.gameevents.add("config", "load", "user")
+        
         self.current_game = 0
 
         d = datetime.datetime.now().timetuple()

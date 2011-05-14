@@ -9,12 +9,13 @@ from config.editor import ConfigEditor
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     cfg = defaults.get_config()
-    plugins = defaults.load_plugins(defaults.get_plugin_home())
-    for name in plugins:
-        try:
-            plugins[name].registerConfig(cfg)
-        except AttributeError, e:
-            print e
     cfg.set_user_file(defaults.get_user_file())
     editor = ConfigEditor(app, cfg, 'Spacefortress Config Editor')
+    plugins = defaults.load_plugins(editor, defaults.get_plugin_home())
+    for name in plugins:
+        try:
+            plugins[name].eventCallback(None, None, "config", "load", "defaults")
+        except AttributeError:
+            pass
+    editor.setup()
     sys.exit(app.exec_())
