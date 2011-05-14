@@ -65,10 +65,6 @@ def get_default_logdir():
 
 release_build = False
 
-class EventDump(object):
-    def notify(self, *args, **kwargs):
-        print args
-
 class Game(object):
     """Main game application"""
     def __init__(self, cogworld, condition):
@@ -82,6 +78,20 @@ class Game(object):
         self.cw = cogworld
         self.cond = condition
         self.config = defaults.get_config()
+
+        self.gameevents = GameEventList()
+                
+        self.plugins = defaults.load_plugins(defaults.get_plugin_home())
+        for name in self.plugins:
+            try:
+                self.plugins[name].registerConfig(self.config)
+            except AttributeError, e:
+                print e
+            try:
+                self.gameevents.addCallback(self.plugins[name].eventCallback)
+            except AttributeError, e:
+                print e
+        
         self.config.set_user_file(defaults.get_user_file())
         self.config.update_from_user_file()
         self.current_game = 0
@@ -225,9 +235,6 @@ class Game(object):
     
     def setup_world(self):
         """initializes gameplay"""
-        self.gameevents = GameEventList()
-        if self.config.get_setting('Logging','print_events'):
-            self.gameevents.addObserver(EventDump())
         self.gameevents.add("Start", "game")
         self.missile_list = []
         self.shell_list = []

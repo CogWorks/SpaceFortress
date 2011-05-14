@@ -19,22 +19,22 @@ class GameEventList(list):
     """a list that holds the game events"""
     def __init__(self):
         super(GameEventList, self).__init__()
-        self.observers = []
+        self.callbacks = []
         
-    def addObserver(self, observer):
-        self.observers.append(observer)
+    def addCallback(self, callback):
+        self.callbacks.append(callback)
         
-    def deleteObserver(self, observer):
-        self.observers.remove(observer)
+    def deleteCallback(self, callback):
+        self.callbacks.remove(callback)
         
-    def deleteObservers(self):
+    def deleteCallbacks(self):
         self.observers[:] = []
     
-    def notifyObservers(self, *args, **kwargs):
-        for observer in self.observers:
-            observer.notify(*args, **kwargs)
+    def notify(self, *args, **kwargs):
+        for callback in self.callbacks:
+            callback(*args, **kwargs)
         
     def add(self, command, target=None, obj=None):
         """adds an event to the list"""
         self.append(GameEvent(command, target, obj))
-        self.notifyObservers(time.time(), pygame.time.get_ticks(), command, target, obj)
+        self.notify(time.time(), pygame.time.get_ticks(), command, target, obj)

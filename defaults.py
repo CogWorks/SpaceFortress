@@ -1,4 +1,4 @@
-import os, platform
+import sys, os, platform
 from config import Config
 import config.constants
 
@@ -25,8 +25,26 @@ def get_config_home():
         os.makedirs(config_home)
     return config_home
 
+def get_plugin_home():
+    return os.path.join(get_config_home(), 'Plugins')
+
 def get_user_file():
     return os.path.join(get_config_home(),'config')
+
+def load_plugins(dir):
+    dir = os.path.abspath(dir)
+    sys.path.append(dir)
+    plugins = {}
+    for f in os.listdir(dir):
+        module_name, ext = os.path.splitext(f)
+        if ext == '.py':
+            module = __import__(module_name)            
+            if not plugins.has_key(module_name):
+                try:
+                    plugins[module_name] = module.SF5Plugin()
+                except AttributeError:
+                    pass
+    return plugins
 
 def validate_string_len(info):
     if len(info['value']) == info['n']:
@@ -69,7 +87,6 @@ def get_config():
     cfg.add_setting('Display', 'pause_overlay', True, alias='Pause Overlay', type=config.constants.CT_CHECKBOX, about='Blank screen and show "Paused!" when game is paused.')
     
     cfg.add_setting('Logging', 'logging', True, alias='Logging', type=config.constants.CT_CHECKBOX, about='Enable/disable logging')
-    cfg.add_setting('Logging', 'print_events', False, alias='Print Events', type=config.constants.CT_CHECKBOX, about='Print events to stdout')
     cfg.add_setting('Logging', 'logdir', '', alias='Log Directory', type=config.constants.CT_LINEEDIT, about='Directory for log files, leave blank for default.')
         
     cfg.add_setting('Keybindings', 'fire_key', 'SPACE', alias='Fire', type=config.constants.CT_COMBO, options=PYGAME_KEYS)
