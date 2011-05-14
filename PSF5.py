@@ -212,8 +212,6 @@ class Game(object):
                             self.frame.p5_rect.centerx, self.frame.p5_rect.centery, self.frame.p6_rect.centerx, self.frame.p6_rect.centery,
                             self.frame.p7_rect.centerx, self.frame.p7_rect.centery, self.frame.p8_rect.centerx, self.frame.p8_rect.centery))
             self.log.write("\t%s\n" % (self.config))
-
-        self.gameevents = GameEventList()
     
     def set_aspect_ratio(self):
         self.aspect_ratio = self.SCREEN_HEIGHT/768
@@ -224,6 +222,7 @@ class Game(object):
     def setup_world(self):
         """initializes gameplay"""
         self.gameevents = GameEventList()
+        self.gameevents.add("Start", "game")
         self.missile_list = []
         self.shell_list = []
         self.ship = tokens.ship.Ship(self)
@@ -932,7 +931,6 @@ class Game(object):
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
-                    self.gameevents.add("Start", "game")
                     return
                     
     def fade(self):
