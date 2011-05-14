@@ -2,6 +2,7 @@
 LC Technologies, Inc. Eyegaze Integration
 """
 import pygame
+from pycogworks.eyegaze import *
 
 class SF5Plugin(object):
     
