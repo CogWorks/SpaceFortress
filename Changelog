@@ -3,6 +3,7 @@
 * Disable joystick by default
 * Update instructions with new AC-CPT symbols
 * New plugin framework for things like ACT-R and EEG
+* Move Eyegaze code into external plugin
 
  v5.0.0_rc9
 ---------------------
