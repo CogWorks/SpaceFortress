@@ -20,6 +20,18 @@ class SF5Plugin(object):
             pygame.draw.line(surface, color,
                              (self.eg.fix_data.fix_x, self.eg.fix_data.fix_y - r),
                              (self.eg.fix_data.fix_x, self.eg.fix_data.fix_y + r))
+            
+    def logHeader(self):
+        if self.eg:
+            return '\tfixation_number\tfix_x\tfix_y', 3
+        else:
+            return None, 0
+            
+    def logCallback(self):
+        if self.eg and self.eg.fix_data and self.eg.fix_data.eye_motion_state == 1:
+            return "\t%d\t%d\t%d" % (self.eg.fix_count + 1, self.eg.fix_data.fix_x, self.eg.fix_data.fix_y)
+        else:
+            return None
     
     def eventCallback(self, *args, **kwargs):
         

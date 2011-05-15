@@ -191,12 +191,15 @@ class Game(object):
             self.log.write("score_pnts\tscore_cntrl\tscore_vlcty\tscore_vlner\t"+
                            "score_iff\tscore_intrvl\tscore_speed\tscore_shots\tscore_flight\tscore_fortress\tscore_mine\tscore_bonus\tthrust_key\tleft_key\t"+
                            "right_key\tfire_key\tiff_key\tshots_key\tpnts_key")
-            ##
-            ## Need to figure out a good way to handle this! ~RMH
-            ##
-            #if self.eg:
-            #    self.log.write("\tfixation_number\tfix_x\tfix_y")
-            #    ncol += 3
+            for name in self.plugins:
+                print name
+                try:
+                    header, cols = self.plugins[name].logHeader()
+                    if header:
+                        self.log.write(header)
+                        ncol += cols
+                except AttributeError:
+                    pass
             self.log.write("\tscore1x\tscore1y\tscore2x\tscore2y\tscore3x\tscore3y\tscore4x\tscore4y\tscore5x\tscore5y\tscore6x\tscore6y\tscore7x\tscore7y\tscore8x\tscore8y")
             self.log.write("\tconfig")
             self.log.write("\n")
@@ -852,11 +855,13 @@ class Game(object):
         self.log.write("%d\t%d\t%d\t%d\t%s\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s" %
                        (self.score.pnts, self.score.cntrl, self.score.vlcty, self.score.vlner, iff_score, self.score.intrvl, self.score.speed, self.score.shots, self.score.flight, self.score.fortress, 
                         self.score.mines, self.score.bonus, thrust_key, left_key, right_key, fire_key, iff_key, shots_key, pnts_key))
-        ##
-        ## Need to figure out a good way to handle this ~RMH
-        ##
-        #if self.eg and self.eg.fix_data and self.eg.fix_data.eye_motion_state == 1:
-        #    self.log.write("\t%d\t%d\t%d" % (self.eg.fix_count + 1, self.eg.fix_data.fix_x, self.eg.fix_data.fix_y))
+        for name in self.plugins:
+            try:
+                data = self.plugins[name].logCallback()
+                if data:
+                    self.log.write(data)
+            except AttributeError:
+                pass
         self.log.write("\n")
 
     def display_intro(self):
