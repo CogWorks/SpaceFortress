@@ -2,7 +2,9 @@
 ---------------------
 * Disable joystick by default
 * Update instructions with new AC-CPT symbols
-* New plugin framework for things like ACT-R and EEG
+* New plugin framework for things like ACT-R and EEG, plugins can register new
+  config options, perform actions on events and contribute to the main log
+* Implement example plugin which prints events to stdout
 * Move Eyegaze code into external plugin
 
  v5.0.0_rc9
