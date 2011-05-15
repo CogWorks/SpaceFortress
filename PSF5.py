@@ -217,7 +217,7 @@ class Game(object):
     
     def setup_world(self):
         """initializes gameplay"""
-        self.gameevents.add("game", "start")
+        self.gameevents.add("game", "setup")
         self.missile_list = []
         self.shell_list = []
         self.ship = tokens.ship.Ship(self)
@@ -392,11 +392,13 @@ class Game(object):
         """processes internal list of game events for this frame"""
         while len(self.gameevents) > 0:
             currentevent = self.gameevents.pop(0)
+            time = currentevent.time
+            ticks = currentevent.ticks
             command = currentevent.command
             obj = currentevent.obj
             target = currentevent.target
             if self.config.get_setting('Logging','logging') and currentevent.log:
-                self.log.write("EVENT\t%f\t%d\t%d\t%s\t%s\t%s\n"%(time.time(), pygame.time.get_ticks(), self.current_game, command, obj, target))
+                self.log.write("EVENT\t%f\t%d\t%d\t%s\t%s\t%s\n"%(time, ticks, self.current_game, command, obj, target))
             if command == "press":
                 if obj == "pause":
                     self.pause_game()
@@ -909,8 +911,7 @@ class Game(object):
         self.screen.blit(midbot, midbot_rect)
         self.screen.blit(bottom, bottom_rect)
         pygame.display.flip()
-        if self.config.get_setting('Logging','logging'):
-            self.log.write("EVENT\t%f\t%d\t%d\tdisplay_foes\t%s\tPlayer\n"%(time.time(), pygame.time.get_ticks(), self.current_game, " ".join(self.mine_list.foe_letters)))
+        self.gameevents.add("display_foes", " ".join(self.mine_list.foe_letters), "player")
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
@@ -1116,8 +1117,7 @@ def main():
             g.display_foe_mines()
         g.setup_world()
         gameTimer = tokens.timer.Timer()
-        if g.config.get_setting('Logging','logging'):
-            g.log.write("EVENT\t%f\t%d\t%d\tgame_start\tNone\tPlayer\n"%(time.time(), pygame.time.get_ticks(), g.current_game))
+        g.gameevents.add("game","start")
         while True:
             g.clock.tick(30)
             g.process_input()
@@ -1129,17 +1129,14 @@ def main():
             if g.ship.alive == False:
                 g.reset_position()
             if gameTimer.elapsed() > g.config.get_setting('General','game_time'):
-                if g.config.get_setting('Logging','logging'):
-                    g.log.write("EVENT\t%f\t%d\t%d\tgame_end\tNone\tPlayer\n"%(time.time(), pygame.time.get_ticks(), g.current_game))
+                g.gameevents.add("game","end")
                 g.fade()
-                if g.config.get_setting('Logging','logging'):
-                    g.log.write("EVENT\t%f\t%d\t%d\tscores_show\tNone\tPlayer\n"%(time.time(), pygame.time.get_ticks(), g.current_game))
+                g.gameevents.add("scores","show")
                 if g.config.get_setting('Score','new_scoring'):
                     g.show_new_score()
                 else:
                     g.show_old_score()
-                if g.config.get_setting('Logging','logging'):
-                    g.log.write("EVENT\t%f\t%d\t%d\tscore_hide\tNone\tPlayer\n"%(time.time(), pygame.time.get_ticks(), g.current_game))
+                g.gameevents.add("scores","hide")
                 break
         g.gameevents.add("game", "over")
     g.quit()

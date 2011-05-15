@@ -9,8 +9,10 @@ import pygame, time
 
 class GameEvent(object):
     """an event that happens during gameplay"""
-    def __init__(self, command, obj=None, target=None, log=True):
+    def __init__(self, time, ticks, command, obj=None, target=None, log=True):
         super(GameEvent, self).__init__()
+        self.time = time
+        self.ticks = ticks
         self.command = command
         self.obj = obj
         self.target = target
@@ -37,5 +39,7 @@ class GameEventList(list):
         
     def add(self, command, target=None, obj=None, log=True):
         """adds an event to the list"""
-        self.append(GameEvent(command, target, obj, log))
-        self.notify(time.time(), pygame.time.get_ticks(), command, target, obj, log=log)
+        etime = time.time()
+        eticks = pygame.time.get_ticks()
+        self.append(GameEvent(etime, eticks, command, target, obj, log))
+        self.notify(etime, eticks, command, target, obj, log=log)
