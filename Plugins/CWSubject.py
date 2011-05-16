@@ -114,9 +114,11 @@ class SF5Plugin(object):
                     
             elif args[5] == 'user':
                 
-                self.subjectInfo = getSubjectInfo()
-                if self.subjectInfo:
-                    self.app.config.update_setting_value("General","id",int(self.subjectInfo[2]))
+                if self.app.config.get_setting('CogWorks Subject','subject_window'):
+                
+                    self.subjectInfo = getSubjectInfo()
+                    if self.subjectInfo:
+                        self.app.config.update_setting_value("General","id",int(self.subjectInfo[2]))
             
         elif args[3] == 'log' and args[4] == 'ready':
             
