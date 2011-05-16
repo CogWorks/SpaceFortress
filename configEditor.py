@@ -14,7 +14,7 @@ if __name__ == '__main__':
     plugins = defaults.load_plugins(editor, defaults.get_plugin_home())
     for name in plugins:
         try:
-            plugins[name].eventCallback(None, None, "config", "load", "defaults")
+            plugins[name].eventCallback(None, None, None, "config", "load", "defaults")
         except AttributeError:
             pass
     editor.setup()

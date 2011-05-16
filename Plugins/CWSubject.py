@@ -107,8 +107,13 @@ class SF5Plugin(object):
     def eventCallback(self, *args, **kwargs):
         
         if args[3] == 'config' and args[4] == 'load':
+            
+            if args[5] == 'defaults':
+            
+                self.app.config.add_setting('CogWorks Subject', 'subject_window', False, type=2, about='Prompt for subject information')
                     
-            if args[5] == 'user':
+            elif args[5] == 'user':
+                
                 self.subjectInfo = getSubjectInfo()
                 if self.subjectInfo:
                     self.app.config.update_setting_value("General","id",int(self.subjectInfo[2]))
