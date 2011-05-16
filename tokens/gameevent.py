@@ -43,7 +43,6 @@ class GameEventList(list):
         """adds an event to the list"""
         etime = time.time()
         eticks = pygame.time.get_ticks()
-        if log:
-            self.nevents += 1
+        self.nevents += 1
         self.append(GameEvent(etime, eticks, self.nevents, command, target, obj, log))
         self.notify(etime, eticks, self.nevents, command, target, obj, log=log)
