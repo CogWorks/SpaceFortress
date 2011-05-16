@@ -41,7 +41,7 @@ class Fortress(token.Token):
             self.last_orientation = self.orientation
             self.timer.reset()
         if self.timer.elapsed() >= self.lock_time and self.app.ship.alive and self.app.fortress.alive:
-            self.app.gameevents.append(GameEvent("fire", "fortress", "ship"))
+            self.app.gameevents.add("fire", "fortress", "ship")
             self.fire()
             self.timer.reset()
         if not self.alive and self.reset_timer.elapsed() > 1000:
