@@ -44,12 +44,14 @@ class SF5Plugin(object):
                 self.app.config.add_setting('Eyegaze', 'calmode', 'Every Game', type=1, alias='When To Calibrate', options=['Every Game','Once'], about='Set when eye tracker is calibrated')
                 self.app.config.add_setting('Eyegaze', 'drawfix', False, type=2, alias="Draw Fixation Cross", about='Draw a fixation cross on the screen')
                 
-            elif args[4] == 'user':
+        elif args[2] == 'log' and args[3] == 'ready':
                 
-                if self.app.config.get_setting('Eyegaze','enabled'):
-                    self.eg = EyeGaze()
-                    if self.eg.connect(self.config.get_setting('Eyegaze','eg_server')) != None:
-                        self.eg = None
+            if self.app.config.get_setting('Eyegaze','enabled'):
+                self.eg = EyeGaze()
+                ret = self.eg.connect(self.app.config.get_setting('Eyegaze','eg_server'))
+                if ret != None:
+                    self.eg = None
+                else:
                     self.eg.gaze_log_fn = self.app.log_basename + ('.gaze.csv')
                     self.eg.fix_log_fn = self.app.log_basename + ('.fix.csv')
                     self.eg.start_logging()

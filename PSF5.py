@@ -88,6 +88,7 @@ class Game(object):
         if len(logdir.strip()) == 0:
             logdir = get_default_logdir()
         self.log_basename = os.path.join(logdir, base)
+        self.gameevents.add("log", "ready")
         
         pygame.display.init()
         pygame.font.init()
@@ -192,7 +193,6 @@ class Game(object):
                            "score_iff\tscore_intrvl\tscore_speed\tscore_shots\tscore_flight\tscore_fortress\tscore_mine\tscore_bonus\tthrust_key\tleft_key\t"+
                            "right_key\tfire_key\tiff_key\tshots_key\tpnts_key")
             for name in self.plugins:
-                print name
                 try:
                     header, cols = self.plugins[name].logHeader()
                     if header:
