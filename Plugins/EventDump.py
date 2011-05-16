@@ -12,11 +12,11 @@ class SF5Plugin(object):
     
     def eventCallback(self, *args, **kwargs):
         
-        if args[2] == 'config' and args[3] == 'load':
-            if args[4] == 'defaults':
+        if args[3] == 'config' and args[4] == 'load':
+            if args[5] == 'defaults':
                 self.app.config.add_setting('Logging', 'print_events', False, alias='Print Events', type=2, about='Print events to stdout')
                 
-            elif args[4] == 'user':
+            elif args[5] == 'user':
                 self.print_events = self.app.config.get_setting('Logging','print_events')
 
         if self.print_events and kwargs['log']:

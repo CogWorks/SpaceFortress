@@ -35,16 +35,16 @@ class SF5Plugin(object):
     
     def eventCallback(self, *args, **kwargs):
         
-        if args[2] == 'config' and args[3] == 'load':
+        if args[3] == 'config' and args[4] == 'load':
             
-            if args[4] == 'defaults':
+            if args[5] == 'defaults':
             
                 self.app.config.add_setting('Eyegaze', 'enabled', False, type=2, about='Enable eye tracking')
                 self.app.config.add_setting('Eyegaze', 'eg_server', '1.0.0.21', type=3, about='EGServer Address')
                 self.app.config.add_setting('Eyegaze', 'calmode', 'Every Game', type=1, alias='When To Calibrate', options=['Every Game','Once'], about='Set when eye tracker is calibrated')
                 self.app.config.add_setting('Eyegaze', 'drawfix', False, type=2, alias="Draw Fixation Cross", about='Draw a fixation cross on the screen')
                 
-        elif args[2] == 'log' and args[3] == 'ready':
+        elif args[3] == 'log' and args[4] == 'ready':
                 
             if self.app.config.get_setting('Eyegaze','enabled'):
                 self.eg = EyeGaze()
@@ -52,34 +52,34 @@ class SF5Plugin(object):
                 if ret != None:
                     self.eg = None
                 else:
-                    self.eg.gaze_log_fn = self.app.log_basename + ('.gaze.csv')
-                    self.eg.fix_log_fn = self.app.log_basename + ('.fix.csv')
+                    self.eg.gaze_log_fn = self.app.log_basename + ('.gaze.txt')
+                    self.eg.fix_log_fn = self.app.log_basename + ('.fix.txt')
                     self.eg.start_logging()
                     
-        elif args[2] == 'game':
+        elif args[3] == 'game':
             
-            if args[3] == 'ready':
+            if args[4] == 'ready':
                 if self.eg and self.app.config.get_setting('Eyegaze','calmode') == 'Every Game':
                     self.calibrated = self.eg.calibrate(self.app.screen)
                 if self.eg and self.calibrated:
                     self.eg.data_start()
                     
-            elif args[3] == 'over':
+            elif args[4] == 'over':
                 if self.eg:
                     self.eg.data_stop()
                     
-            elif args[3] == 'quit':
+            elif args[4] == 'quit':
                 if self.eg:
                     self.eg.data_stop()
                     self.eg.stop_logging()
                     self.eg.disconnect()
         
-        elif args[2] == 'display':
+        elif args[3] == 'display':
             
-            if args[3] == 'setmode':
+            if args[4] == 'setmode':
                 if self.eg and self.app.config.get_setting('Eyegaze','calmode') == 'Once':
                     self.calibrated = self.eg.calibrate(self.app.screen)
             
-            if args[3] == 'preflip' and args[4] == 'main':
+            if args[4] == 'preflip' and args[4] == 'main':
                 if self.eg and self.app.config.get_setting('Eyegaze','drawfix'):
                     self.draw_fixation_cross(self.app.screen)

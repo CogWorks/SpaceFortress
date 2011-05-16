@@ -182,8 +182,8 @@ class Game(object):
         if self.config.get_setting('Logging','logging'):
             log_filename = "%s.txt" % (self.log_basename)
             self.log = open(log_filename, "w")
-            ncol = 45
-            self.log.write("event_type\tsystem_clock\tgame_time\tcurrent_game\te1\te2\te3\tfoes\tship_alive\tship_x\t"+
+            ncol = 46
+            self.log.write("event_type\tsystem_clock\tgame_time\tcurrent_game\teid\te1\te2\te3\tfoes\tship_alive\tship_x\t"+
                            "ship_y\tship_vel_x\tship_vel_y\tship_orientation\tdistance\tmine_alive\tmine_x\tmine_y\tfortress_alive\tfortress_orientation\t"+
                            "missile\tshell\tbonus_prev\tbonus_cur\tbonus_cur_x\tbonus_cur_y\t")
             if self.config.get_setting('General','bonus_system') == "AX-CPT":
@@ -397,11 +397,12 @@ class Game(object):
             currentevent = self.gameevents.pop(0)
             time = currentevent.time
             ticks = currentevent.ticks
+            eid = currentevent.eid
             command = currentevent.command
             obj = currentevent.obj
             target = currentevent.target
             if self.config.get_setting('Logging','logging') and currentevent.log:
-                self.log.write("EVENT\t%f\t%d\t%d\t%s\t%s\t%s\n"%(time, ticks, self.current_game, command, obj, target))
+                self.log.write("EVENT\t%f\t%d\t%d\t%d\t%s\t%s\t%s\n"%(time, ticks, self.current_game, eid, command, obj, target))
             if command == "press":
                 if obj == "pause":
                     self.pause_game()
@@ -843,7 +844,7 @@ class Game(object):
         else:
             pnts_key = "n"
         
-        self.log.write("STATE\t%f\t%d\t%d\t\t\t\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t" %
+        self.log.write("STATE\t%f\t%d\t%d\t\t\t\t\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t" %
                        (system_clock, game_time, self.current_game, " ".join(self.mine_list.foe_letters), ship_alive, ship_x, ship_y, ship_vel_x, ship_vel_y, ship_orientation,
                         distance, mine_alive, mine_x, mine_y, fortress_alive, fortress_orientation, missile, shell))
         if self.config.get_setting('General','bonus_system') == "AX-CPT":
