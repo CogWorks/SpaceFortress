@@ -74,9 +74,8 @@ class Game(object):
                 pass
                 
         self.config = defaults.get_config()
-        self.gameevents.add("config", "load", "defaults")
-        
         self.config.set_user_file(defaults.get_user_file())
+        self.gameevents.add("config", "load", "defaults")
         self.config.update_from_user_file()
         self.gameevents.add("config", "load", "user")
         
