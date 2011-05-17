@@ -110,6 +110,7 @@ class Game(object):
                     pass
             self.log.write("\n")
             self.gameevents.add("log", "header", "ready", log=False)
+            self.gameevents.add("log", "version", "1.0", log=False)
         
         self.gameevents.add("config","running",str(self.config))
         
