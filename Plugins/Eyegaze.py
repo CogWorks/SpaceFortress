@@ -23,9 +23,9 @@ class SF5Plugin(object):
             
     def logHeader(self):
         if self.eg:
-            return '\tfixation_number\tfix_x\tfix_y', 3
+            return '\tfixation_number\tfix_x\tfix_y'
         else:
-            return None, 0
+            return None
             
     def logCallback(self):
         if self.eg and self.eg.fix_data and self.eg.fix_data.eye_motion_state == 1:
@@ -44,7 +44,7 @@ class SF5Plugin(object):
                 self.app.config.add_setting('Eyegaze', 'calmode', 'Every Game', type=1, alias='When To Calibrate', options=['Every Game','Once'], about='Set when eye tracker is calibrated')
                 self.app.config.add_setting('Eyegaze', 'drawfix', False, type=2, alias="Draw Fixation Cross", about='Draw a fixation cross on the screen')
                 
-        elif args[3] == 'log' and args[4] == 'ready':
+        elif args[3] == 'log' and args[4] == "basename" and args[5] == 'ready':
                 
             if self.app.config.get_setting('Eyegaze','enabled'):
                 self.eg = EyeGaze()

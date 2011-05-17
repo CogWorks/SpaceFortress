@@ -7,6 +7,8 @@ import sys
 from PySide.QtCore import *
 from PySide.QtGui import *
 
+from pycogworks.util import rin2id
+
 class SubjectWindow(QDialog):
     
     def __init__(self, app):
@@ -60,7 +62,6 @@ class SubjectWindow(QDialog):
         self.setLayout(self.main_layout)
         
         self.setWindowTitle('Participant Information')
-        #self.setSizeGripEnabled(False)
         
         self.show()
         self.activateWindow()
@@ -98,31 +99,37 @@ def getSubjectInfo():
     return sw.values
 
 class SF5Plugin(object):
-    
+
     def __init__(self, app):
         super(SF5Plugin, self).__init__()
         self.app = app
         self.subjectInfo = None
-    
+
     def eventCallback(self, *args, **kwargs):
-        
+
         if args[3] == 'config' and args[4] == 'load':
-            
+
             if args[5] == 'defaults':
-            
+
                 self.app.config.add_setting('CogWorks Subject', 'subject_window', False, type=2, about='Prompt for subject information')
-                    
+                self.app.config.add_setting('CogWorks Subject', 'history_file', False, type=2, about='Write history file')
+
             elif args[5] == 'user':
-                
+
                 if self.app.config.get_setting('CogWorks Subject','subject_window'):
-                
+
                     self.subjectInfo = getSubjectInfo()
                     if self.subjectInfo:
-                        self.app.config.update_setting_value("General","id",int(self.subjectInfo[2]))
-            
-        elif args[3] == 'log' and args[4] == 'ready':
-            
-            pass
-        
-if __name__ == '__main__':
-    print getSubjectInfo()
+                        self.app.config.update_setting_value("General","id",rin2id(self.subjectInfo[2])[:16])
+    
+        elif args[3] == 'log':
+    
+            if args[4] == 'basename' and args[5] == 'ready':
+                if self.app.config.get_setting('CogWorks Subject','history_file') and self.subjectInfo:
+                    history = open(self.app.log_basename + ".history", 'w')
+                    history.write('first_name\tlast_name\trin\tage\tgender\tmajor\n')
+                    history.write('%s\t%s\t%s\t%s\t%s\t%s\n' % self.subjectInfo)
+                    history.close()
+    
+            elif args[4] == 'header' and args[5] == 'ready':
+                self.app.gameevents.add("participant", "id", rin2id(self.subjectInfo[2]))

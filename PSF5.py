@@ -58,6 +58,7 @@ class Game(object):
     """Main game application"""
     def __init__(self):
         super(Game, self).__init__()
+        self.current_game = 0
 
         i = sys.argv[0].rfind('/')
         if i != -1:
@@ -65,7 +66,7 @@ class Game(object):
         else:
             self.approot = './'
 
-        self.gameevents = GameEventList()
+        self.gameevents = GameEventList(self)
         self.plugins = defaults.load_plugins(self, defaults.get_plugin_home())
         for name in self.plugins:
             try:
@@ -79,15 +80,36 @@ class Game(object):
         self.config.update_from_user_file()
         self.gameevents.add("config", "load", "user")
         
-        self.current_game = 0
-
         d = datetime.datetime.now().timetuple()
-        base = "%d_%d-%d-%d_%d-%d-%d"%(self.config.get_setting('General','id'), d[0], d[1], d[2], d[3], d[4], d[5])
+        base = "%s_%d-%d-%d_%d-%d-%d"%(self.config.get_setting('General','id'), d[0], d[1], d[2], d[3], d[4], d[5])
         logdir = self.config.get_setting('Logging','logdir')
         if len(logdir.strip()) == 0:
             logdir = get_default_logdir()
         self.log_basename = os.path.join(logdir, base)
-        self.gameevents.add("log", "ready")
+        self.gameevents.add("log", "basename", "ready")
+        
+        if self.config.get_setting('Logging','logging'):
+            log_filename = "%s.txt" % (self.log_basename)
+            self.log = open(log_filename, "w")
+            self.log.write("event_type\tsystem_clock\tgame_time\tcurrent_game\teid\te1\te2\te3\tfoes\tship_alive\tship_x\t"+
+                           "ship_y\tship_vel_x\tship_vel_y\tship_orientation\tdistance\tmine_alive\tmine_x\tmine_y\tfortress_alive\tfortress_orientation\t"+
+                           "missile\tshell\tbonus_prev\tbonus_cur\tbonus_cur_x\tbonus_cur_y\t")
+            if self.config.get_setting('General','bonus_system') == "AX-CPT":
+                self.log.write('bonus_isi\t')
+            self.log.write("score_pnts\tscore_cntrl\tscore_vlcty\tscore_vlner\t"+
+                           "score_iff\tscore_intrvl\tscore_speed\tscore_shots\tscore_flight\tscore_fortress\tscore_mine\tscore_bonus\tthrust_key\tleft_key\t"+
+                           "right_key\tfire_key\tiff_key\tshots_key\tpnts_key")
+            for name in self.plugins:
+                try:
+                    header = self.plugins[name].logHeader()
+                    if header:
+                        self.log.write(header)
+                except AttributeError:
+                    pass
+            self.log.write("\n")
+            self.gameevents.add("log", "header", "ready", log=False)
+        
+        self.gameevents.add("config","running",str(self.config))
         
         pygame.display.init()
         pygame.font.init()
@@ -114,6 +136,15 @@ class Game(object):
         self.f36 = pygame.font.Font(self.fp, int(36*self.aspect_ratio))
         
         self.frame = tokens.frame.Frame(self)
+        self.gameevents.add("score1",self.frame.p1_rect.centerx,self.frame.p1_rect.centery)
+        self.gameevents.add("score2",self.frame.p2_rect.centerx,self.frame.p2_rect.centery)
+        self.gameevents.add("score3",self.frame.p3_rect.centerx,self.frame.p3_rect.centery)
+        self.gameevents.add("score4",self.frame.p4_rect.centerx,self.frame.p4_rect.centery)
+        self.gameevents.add("score5",self.frame.p5_rect.centerx,self.frame.p5_rect.centery)
+        self.gameevents.add("score6",self.frame.p6_rect.centerx,self.frame.p6_rect.centery)
+        self.gameevents.add("score7",self.frame.p7_rect.centerx,self.frame.p7_rect.centery)
+        self.gameevents.add("score8",self.frame.p8_rect.centerx,self.frame.p8_rect.centery)
+
         self.score = tokens.score.Score(self)
         
         self.joystick = None
@@ -178,38 +209,6 @@ class Game(object):
         else:
             self.mine_exists = False
         self.mine_list = tokens.mine.MineList(self)
-        if self.config.get_setting('Logging','logging'):
-            log_filename = "%s.txt" % (self.log_basename)
-            self.log = open(log_filename, "w")
-            ncol = 46
-            self.log.write("event_type\tsystem_clock\tgame_time\tcurrent_game\teid\te1\te2\te3\tfoes\tship_alive\tship_x\t"+
-                           "ship_y\tship_vel_x\tship_vel_y\tship_orientation\tdistance\tmine_alive\tmine_x\tmine_y\tfortress_alive\tfortress_orientation\t"+
-                           "missile\tshell\tbonus_prev\tbonus_cur\tbonus_cur_x\tbonus_cur_y\t")
-            if self.config.get_setting('General','bonus_system') == "AX-CPT":
-                self.log.write('bonus_isi\t')
-                ncol += 1
-            self.log.write("score_pnts\tscore_cntrl\tscore_vlcty\tscore_vlner\t"+
-                           "score_iff\tscore_intrvl\tscore_speed\tscore_shots\tscore_flight\tscore_fortress\tscore_mine\tscore_bonus\tthrust_key\tleft_key\t"+
-                           "right_key\tfire_key\tiff_key\tshots_key\tpnts_key")
-            for name in self.plugins:
-                try:
-                    header, cols = self.plugins[name].logHeader()
-                    if header:
-                        self.log.write(header)
-                        ncol += cols
-                except AttributeError:
-                    pass
-            self.log.write("\tscore1x\tscore1y\tscore2x\tscore2y\tscore3x\tscore3y\tscore4x\tscore4y\tscore5x\tscore5y\tscore6x\tscore6y\tscore7x\tscore7y\tscore8x\tscore8y")
-            self.log.write("\tconfig")
-            self.log.write("\n")
-            self.log.write("CONFIG\t%f\t%d\t%d" % (time.time(), pygame.time.get_ticks(), self.current_game))
-            self.log.write("%s" % ("\t"* (ncol-4)))
-            self.log.write("\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d" %
-                           (self.frame.p1_rect.centerx, self.frame.p1_rect.centery, self.frame.p2_rect.centerx, self.frame.p2_rect.centery,
-                            self.frame.p3_rect.centerx, self.frame.p3_rect.centery, self.frame.p4_rect.centerx, self.frame.p4_rect.centery,
-                            self.frame.p5_rect.centerx, self.frame.p5_rect.centery, self.frame.p6_rect.centerx, self.frame.p6_rect.centery,
-                            self.frame.p7_rect.centerx, self.frame.p7_rect.centery, self.frame.p8_rect.centerx, self.frame.p8_rect.centery))
-            self.log.write("\t%s\n" % (self.config))
     
     def set_aspect_ratio(self):
         self.aspect_ratio = self.SCREEN_HEIGHT/768
@@ -397,11 +396,12 @@ class Game(object):
             time = currentevent.time
             ticks = currentevent.ticks
             eid = currentevent.eid
+            game = currentevent.game
             command = currentevent.command
             obj = currentevent.obj
             target = currentevent.target
             if self.config.get_setting('Logging','logging') and currentevent.log:
-                self.log.write("EVENT\t%f\t%d\t%d\t%d\t%s\t%s\t%s\n"%(time, ticks, self.current_game, eid, command, obj, target))
+                self.log.write("EVENT\t%f\t%d\t%d\t%d\t%s\t%s\t%s\n"%(time, ticks, game, eid, command, obj, target))
             if command == "press":
                 if obj == "pause":
                     self.pause_game()
@@ -1106,6 +1106,7 @@ class Game(object):
     
     def quit(self, ret=0):
         self.gameevents.add("game", "quit", ret)
+        self.process_events()
         if self.config.get_setting('Logging','logging'):
             self.log.close()
         pygame.quit()
