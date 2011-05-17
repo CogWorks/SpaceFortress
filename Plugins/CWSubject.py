@@ -133,7 +133,7 @@ class SF5Plugin(object):
                     history = open(self.app.log_basename + ".history", 'w')
                     history.write('first_name\tlast_name\trin\tage\tgender\tmajor\tcipher\n')
                     history.write('%s\t%s\t%s\t%s\t%s\t%s' % self.subjectInfo)
-                    history.write('\tBlowfish/CBC - 16Byte Key\n')
+                    history.write('\tAES/CBC - 16Byte Key\n')
                     history.close()
     
             elif args[4] == 'header' and args[5] == 'ready':
