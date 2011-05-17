@@ -122,7 +122,7 @@ class SF5Plugin(object):
 
                     self.subjectInfo = getSubjectInfo()
                     if self.subjectInfo:
-                        self.app.config.update_setting_value("General","id",rin2id(self.subjectInfo[2])[:16])
+                        self.app.config.update_setting_value("General","id",rin2id(self.subjectInfo[2])[:8])
             
                 self.expRoom = self.app.config.get_setting('CogWorks Exp','experiment_room').strip()
     
