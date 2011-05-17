@@ -127,8 +127,9 @@ class SF5Plugin(object):
             if args[4] == 'basename' and args[5] == 'ready':
                 if self.app.config.get_setting('CogWorks Subject','history_file') and self.subjectInfo:
                     history = open(self.app.log_basename + ".history", 'w')
-                    history.write('first_name\tlast_name\trin\tage\tgender\tmajor\n')
-                    history.write('%s\t%s\t%s\t%s\t%s\t%s\n' % self.subjectInfo)
+                    history.write('first_name\tlast_name\trin\tage\tgender\tmajor\tcipher\n')
+                    history.write('%s\t%s\t%s\t%s\t%s\t%s' % self.subjectInfo)
+                    history.write('\tBlowfish/CBC - 16Byte Key\n')
                     history.close()
     
             elif args[4] == 'header' and args[5] == 'ready':
