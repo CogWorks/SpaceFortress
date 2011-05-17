@@ -7,8 +7,8 @@
 * Implement example plugin which prints events to stdout
 * Move Eyegaze code into external plugin
 * Each event is logged with an increasing numeric id
-* Add CogWorks subject plugin, collects participant info, encrypts rin and 
-  writes history file
+* Add CogWorks subject plugin, collects participant info, experiment room, 
+  encrypts rin and writes history file
 * Add SF version / githash to log file
 
  v5.0.0_rc9

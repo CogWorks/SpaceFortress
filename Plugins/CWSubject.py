@@ -104,6 +104,7 @@ class SF5Plugin(object):
         super(SF5Plugin, self).__init__()
         self.app = app
         self.subjectInfo = None
+        self.expRoom = None
 
     def eventCallback(self, *args, **kwargs):
 
@@ -111,21 +112,24 @@ class SF5Plugin(object):
 
             if args[5] == 'defaults':
 
-                self.app.config.add_setting('CogWorks Subject', 'subject_window', False, type=2, about='Prompt for subject information')
-                self.app.config.add_setting('CogWorks Subject', 'history_file', False, type=2, about='Write history file')
+                self.app.config.add_setting('CogWorks Exp', 'subject_window', False, type=2, about='Prompt for subject information')
+                self.app.config.add_setting('CogWorks Exp', 'history_file', False, type=2, about='Write history file')
+                self.app.config.add_setting('CogWorks Exp', 'experiment_room', '', type=3, about='Write history file')
 
             elif args[5] == 'user':
 
-                if self.app.config.get_setting('CogWorks Subject','subject_window'):
+                if self.app.config.get_setting('CogWorks Exp','subject_window'):
 
                     self.subjectInfo = getSubjectInfo()
                     if self.subjectInfo:
                         self.app.config.update_setting_value("General","id",rin2id(self.subjectInfo[2])[:16])
+            
+                self.expRoom = self.app.config.get_setting('CogWorks Exp','experiment_room').strip()
     
         elif args[3] == 'log':
     
             if args[4] == 'basename' and args[5] == 'ready':
-                if self.app.config.get_setting('CogWorks Subject','history_file') and self.subjectInfo:
+                if self.app.config.get_setting('CogWorks Exp','history_file') and self.subjectInfo:
                     history = open(self.app.log_basename + ".history", 'w')
                     history.write('first_name\tlast_name\trin\tage\tgender\tmajor\tcipher\n')
                     history.write('%s\t%s\t%s\t%s\t%s\t%s' % self.subjectInfo)
@@ -134,3 +138,5 @@ class SF5Plugin(object):
     
             elif args[4] == 'header' and args[5] == 'ready':
                 self.app.gameevents.add("participant", "id", rin2id(self.subjectInfo[2]))
+                if self.expRoom and len(self.expRoom) > 0:
+                    self.app.gameevents.add("experiment", "room", self.expRoom)
