@@ -67,7 +67,9 @@ class Game(object):
             self.approot = './'
 
         self.gameevents = GameEventList(self)
-        self.plugins = defaults.load_plugins(self, defaults.get_plugin_home())
+        self.plugins = {}
+        self.plugins = defaults.load_plugins(self, os.path.join(self.approot, 'Plugins'), self.plugins)
+        self.plugins = defaults.load_plugins(self, defaults.get_plugin_home(), self.plugins)
         for name in self.plugins:
             try:
                 self.gameevents.addCallback(self.plugins[name].eventCallback)

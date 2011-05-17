@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import sys
+import sys, os
 from PySide.QtGui import *
 
 import defaults
@@ -11,7 +11,14 @@ if __name__ == '__main__':
     cfg = defaults.get_config()
     cfg.set_user_file(defaults.get_user_file())
     editor = ConfigEditor(app, cfg, 'Spacefortress Config Editor')
-    plugins = defaults.load_plugins(editor, defaults.get_plugin_home())
+    i = sys.argv[0].rfind('/')
+    if i != -1:
+        approot = sys.argv[0][:sys.argv[0].rfind('/')]
+    else:
+        approot = './'
+    plugins = {}
+    plugins = defaults.load_plugins(editor, os.path.join(approot, 'Plugins'), plugins)
+    plugins = defaults.load_plugins(editor, defaults.get_plugin_home(), plugins)
     for name in plugins:
         try:
             plugins[name].eventCallback(None, None, None, "config", "load", "defaults")

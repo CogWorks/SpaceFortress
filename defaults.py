@@ -31,19 +31,19 @@ def get_plugin_home():
 def get_user_file():
     return os.path.join(get_config_home(),'config')
 
-def load_plugins(app, dir):
+def load_plugins(app, dir, plugins):
     dir = os.path.abspath(dir)
     sys.path.append(dir)
-    plugins = {}
-    for f in os.listdir(dir):
-        module_name, ext = os.path.splitext(f)
-        if ext == '.py':
-            module = __import__(module_name)            
-            if not plugins.has_key(module_name):
-                try:
-                    plugins[module_name] = module.SF5Plugin(app)
-                except AttributeError:
-                    pass
+    if os.path.exists(dir):
+        for f in os.listdir(dir):
+            module_name, ext = os.path.splitext(f)
+            if ext == '.py':
+                module = __import__(module_name)            
+                if not plugins.has_key(module_name):
+                    try:
+                        plugins[module_name] = module.SF5Plugin(app)
+                    except AttributeError:
+                        pass
     return plugins
 
 def validate_string_len(info):
