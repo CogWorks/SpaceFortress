@@ -11,6 +11,8 @@
   encrypts rin and writes history file
 * Add SF version / githash to log file
 * Add plugin for collecting hardware info from Apple computers
+* Properly display new FOES each game
+* Add increasing counts each mine and bonus in log
 
  v5.0.0_rc9
 ---------------------

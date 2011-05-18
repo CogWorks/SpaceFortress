@@ -20,6 +20,10 @@ class Bonus(object):
         self.bonus_symbol = self.app.config.get_setting('Bonus','bonus_symbol')
         self.current_symbol = None
         self.prior_symbol = None
+        if self.app.config.get_setting('General','bonus_system') == "AX-CPT":
+            self.bonus_count = 1
+        else:
+            self.bonus_count = 0
         self.flag = False
         self.probability = self.app.config.get_setting('Bonus','bonus_probability')
         self.timer = Timer()
@@ -81,6 +85,7 @@ class Bonus(object):
             self.current_symbol = random.sample(self.symbols, 1)[0]
             self.flag = True
         self.set_bonus_location()
+        self.bonus_count += 1
             
     def pick_next_pair(self):
         """picks next cue and target for ax-cpt task"""
@@ -120,6 +125,7 @@ class Bonus(object):
             self.app.gameevents.add("bonus", "cue_disappears")
             self.prior_symbol = self.current_symbol
         elif self.state == "isi" and self.timer.elapsed() > self.isi_time: #make target appear
+            self.bonus_count += 1
             self.timer.reset()
             if self.isi_time == 800:
                 self.isi_time = 4000
