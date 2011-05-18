@@ -64,8 +64,7 @@ class MineList(list):
         self.iff_upper_bound = self.app.config.get_setting('Mine','intrvl_max')
         self.num_foes = self.app.config.get_setting('Mine','num_foes')
         self.letters = list(string.letters[26:]) #list of uppercase letters
-        self.letters.remove("T") #Screws up Lisp's read-from-string
-        self.generate_foes(self.num_foes)
+        self.generate_foes()
         self.timeout = self.app.config.get_setting('Mine','mine_timeout') #milliseconds after spawn when mine "gives up"
         self.spawn_time = self.app.config.get_setting('Mine','mine_spawn') #milliseconds after destruction when mine "respawns"
         self.timer = timer.Timer()
@@ -87,9 +86,11 @@ class MineList(list):
         self.MOT_timer = timer.Timer() #determines when MOT mines change state
         self.MOT_switch_timer = timer.Timer() #determine when moving MOT mine changes direction
         
-    def generate_foes(self, num):
+    def generate_foes(self):
         """determine which mine designations are 'foes'"""
-        self.foe_letters = random.sample(self.letters, num)
+        if len(self.letters) < self.num_foes:
+            self.letters = list(string.letters[26:])
+        self.foe_letters = random.sample(self.letters, self.num_foes)
         self.foe_letters.sort()
         for foe_letter in self.foe_letters:
             self.letters.remove(foe_letter)

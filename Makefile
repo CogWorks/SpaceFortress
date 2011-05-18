@@ -21,10 +21,20 @@ docs:
 
 macosx: docs ce-macosx sf-macosx
 	mkdir -p dist/macosx/Space\ Fortress\ 5/Documentation
+	mkdir -p dist/macosx/Space\ Fortress\ 5/Plugins
+	cp -r Plugins/*.py dist/macosx/Space\ Fortress\ 5/Plugins/
+	mkdir dist/macosx/Space\ Fortress\ 5/Plugins/pycogworks
+	cp Plugins/pycogworks/eyegaze.py dist/macosx/Space\ Fortress\ 5/Plugins/pycogworks/
+	cp Plugins/pycogworks/fixation.py dist/macosx/Space\ Fortress\ 5/Plugins/pycogworks/
+	cp Plugins/pycogworks/util.py dist/macosx/Space\ Fortress\ 5/Plugins/pycogworks/
 	mkdir dist/macosx/bundle
 	cp docs/experimenter_instructions.pdf dist/macosx/Space\ Fortress\ 5/Documentation/Experimenter\ Instructions\ for\ Subjects.pdf
 	cp Changelog dist/macosx/Space\ Fortress\ 5/Documentation/
 	mv dist/macosx/*.app dist/macosx/Space\ Fortress\ 5/
+	cd dist/macosx/Space\ Fortress\ 5/Space\ Fortress.app/Contents/MacOS; \
+	ln -s ../../../Plugins .
+	cd dist/macosx/Space\ Fortress\ 5/Config\ Editor.app/Contents/MacOS; \
+	ln -s ../../../Plugins .
 	python mac-tools/AssignIcon.py psf5.png dist/macosx/Space\ Fortress\ 5
 	mv dist/macosx/Space\ Fortress\ 5 dist/macosx/bundle
 	ver=`cat build-info`;\

@@ -108,7 +108,7 @@ def get_config():
     cfg.add_setting('Ship', 'ship_turn_speed', 6, "Ship's turning speed")
     cfg.add_setting('Ship', 'ship_vel_x', 0, 'Initial ship velocity in x direction')
     cfg.add_setting('Ship', 'ship_vel_y', 0, 'Initial ship velocity in y direction.')
-    cfg.add_setting('Ship', 'colored_damage', True)
+    cfg.add_setting('Ship', 'colored_damage', True, type=config.constants.CT_CHECKBOX)
     
     cfg.add_setting('Missile', 'missile_max', 100, 'Maximum number of missiles possible')
     cfg.add_setting('Missile', 'missile_num', 100, 'Number of missiles at start of game')

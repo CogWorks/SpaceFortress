@@ -223,6 +223,7 @@ class Game(object):
     
     def setup_world(self):
         """initializes gameplay"""
+        self.mine_list.generate_foes()
         self.gameevents.add("game", "setup")
         self.missile_list = []
         self.shell_list = []

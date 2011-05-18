@@ -17,6 +17,7 @@ if __name__ == '__main__':
     else:
         approot = './'
     plugins = {}
+    sys.path.append(os.path.join(approot, 'Plugins', 'pycogworks'))
     plugins = defaults.load_plugins(editor, os.path.join(approot, 'Plugins'), plugins)
     plugins = defaults.load_plugins(editor, defaults.get_plugin_home(), plugins)
     for name in plugins:
