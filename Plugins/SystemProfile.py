@@ -32,9 +32,9 @@ class SF5Plugin(object):
                 
                 if self.app.config.get_setting('SystemProfile','log_mac_hw'):
                     info = getHWInfo()
-                    self.app.gameevents.add("exp_hw", "model", info['Model Identifier'])
-                    self.app.gameevents.add("exp_hw", "processor", info['Processor Name'])
-                    self.app.gameevents.add("exp_hw", "processors", info['Number Of Processors'])
-                    self.app.gameevents.add("exp_hw", "cores", info['Total Number Of Cores'])
-                    self.app.gameevents.add("exp_hw", "cpu_speed", info['Processor Speed'])
-                    self.app.gameevents.add("exp_hw", "memory", info['Memory'])
+                    self.app.gameevents.add("exp_hw", "model", info['Model Identifier'], type='EVENT_SYSTEM')
+                    self.app.gameevents.add("exp_hw", "processor", info['Processor Name'], type='EVENT_SYSTEM')
+                    self.app.gameevents.add("exp_hw", "processors", info['Number Of Processors'], type='EVENT_SYSTEM')
+                    self.app.gameevents.add("exp_hw", "cores", info['Total Number Of Cores'], type='EVENT_SYSTEM')
+                    self.app.gameevents.add("exp_hw", "cpu_speed", info['Processor Speed'], type='EVENT_SYSTEM')
+                    self.app.gameevents.add("exp_hw", "memory", info['Memory'], type='EVENT_SYSTEM')

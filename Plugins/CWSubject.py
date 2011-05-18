@@ -137,6 +137,6 @@ class SF5Plugin(object):
     
             elif args[4] == 'header' and args[5] == 'ready':
                 if self.app.config.get_setting('CogWorks Exp','subject_window'):
-                    self.app.gameevents.add("participant", "id", rin2id(self.subjectInfo[2]))
+                    self.app.gameevents.add("participant", "id", rin2id(self.subjectInfo[2]), type='EVENT_SYSTEM')
                 if self.expRoom and len(self.expRoom) > 0:
-                    self.app.gameevents.add("experiment", "room", self.expRoom)
+                    self.app.gameevents.add("experiment", "room", self.expRoom, type='EVENT_SYSTEM')

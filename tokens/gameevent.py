@@ -9,7 +9,7 @@ import pygame, time
 
 class GameEvent(object):
     """an event that happens during gameplay"""
-    def __init__(self, time, ticks, eid, command, obj=None, target=None, log=True, game=0):
+    def __init__(self, time, ticks, eid, command, obj=None, target=None, log=True, game=0, type='EVENT_GAME'):
         super(GameEvent, self).__init__()
         self.time = time
         self.ticks = ticks
@@ -19,6 +19,7 @@ class GameEvent(object):
         self.target = target
         self.log = log
         self.game = game
+        self.type = type
                 
 class GameEventList(list):
     """a list that holds the game events"""
@@ -41,7 +42,7 @@ class GameEventList(list):
         for callback in self.callbacks:
             callback(*args, **kwargs)
         
-    def add(self, command, target=None, obj=None, log=True):
+    def add(self, command, target=None, obj=None, log=True, type='EVENT_GAME'):
         """adds an event to the list"""
         etime = time.time()
         eticks = pygame.time.get_ticks()
@@ -50,5 +51,5 @@ class GameEventList(list):
             eid = self.nevents
         else:
             eid = None
-        self.append(GameEvent(etime, eticks, eid, command, target, obj, log, self.app.current_game))
-        self.notify(etime, eticks, eid, command, target, obj, log=log, game=self.app.current_game)
+        self.append(GameEvent(etime, eticks, eid, command, target, obj, log, self.app.current_game*self.app.ingame, type))
+        self.notify(etime, eticks, eid, command, target, obj, log=log, game=self.app.current_game*self.app.ingame, type=type)

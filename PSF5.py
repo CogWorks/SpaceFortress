@@ -59,6 +59,7 @@ class Game(object):
     def __init__(self):
         super(Game, self).__init__()
         self.current_game = 0
+        self.ingame = -1
 
         i = sys.argv[0].rfind('/')
         if i != -1:
@@ -76,13 +77,13 @@ class Game(object):
             except AttributeError:
                 pass
                 
-        self.gameevents.add("game","version",githash)
+        self.gameevents.add("game","version",githash, type='EVENT_SYSTEM')
                 
         self.config = defaults.get_config()
         self.config.set_user_file(defaults.get_user_file())
-        self.gameevents.add("config", "load", "defaults")
+        self.gameevents.add("config", "load", "defaults", type='EVENT_SYSTEM')
         self.config.update_from_user_file()
-        self.gameevents.add("config", "load", "user")
+        self.gameevents.add("config", "load", "user", type='EVENT_SYSTEM')
         
         d = datetime.datetime.now().timetuple()
         base = "%s_%d-%d-%d_%d-%d-%d"%(self.config.get_setting('General','id'), d[0], d[1], d[2], d[3], d[4], d[5])
@@ -90,13 +91,13 @@ class Game(object):
         if len(logdir.strip()) == 0:
             logdir = get_default_logdir()
         self.log_basename = os.path.join(logdir, base)
-        self.gameevents.add("log", "basename", "ready")
+        self.gameevents.add("log", "basename", "ready", type='EVENT_SYSTEM')
         
         if self.config.get_setting('Logging','logging'):
             log_filename = "%s.txt" % (self.log_basename)
             self.log = open(log_filename, "w")
             self.log.write("event_type\tsystem_clock\tgame_time\tcurrent_game\teid\te1\te2\te3\tfoes\tship_alive\tship_x\t"+
-                           "ship_y\tship_vel_x\tship_vel_y\tship_orientation\tdistance\tmine_alive\tmine_x\tmine_y\tfortress_alive\tfortress_orientation\t"+
+                           "ship_y\tship_vel_x\tship_vel_y\tship_orientation\tdistance\tmine_id\tmine_x\tmine_y\tfortress_alive\tfortress_orientation\t"+
                            "missile\tshell\tbonus_prev\tbonus_cur\tbonus_cur_x\tbonus_cur_y\t")
             if self.config.get_setting('General','bonus_system') == "AX-CPT":
                 self.log.write('bonus_isi\t')
@@ -111,10 +112,10 @@ class Game(object):
                 except AttributeError:
                     pass
             self.log.write("\n")
-            self.gameevents.add("log", "header", "ready", log=False)
-            self.gameevents.add("log", "version", "1", log=False)
+            self.gameevents.add("log", "header", "ready", log=False, type='EVENT_SYSTEM')
+            self.gameevents.add("log", "version", "2", type='EVENT_SYSTEM')
         
-        self.gameevents.add("config","running",str(self.config))
+        self.gameevents.add("config","running",str(self.config), type='EVENT_SYSTEM')
         
         pygame.display.init()
         pygame.font.init()
@@ -141,14 +142,14 @@ class Game(object):
         self.f36 = pygame.font.Font(self.fp, int(36*self.aspect_ratio))
         
         self.frame = tokens.frame.Frame(self)
-        self.gameevents.add("score1",self.frame.p1_rect.centerx,self.frame.p1_rect.centery)
-        self.gameevents.add("score2",self.frame.p2_rect.centerx,self.frame.p2_rect.centery)
-        self.gameevents.add("score3",self.frame.p3_rect.centerx,self.frame.p3_rect.centery)
-        self.gameevents.add("score4",self.frame.p4_rect.centerx,self.frame.p4_rect.centery)
-        self.gameevents.add("score5",self.frame.p5_rect.centerx,self.frame.p5_rect.centery)
-        self.gameevents.add("score6",self.frame.p6_rect.centerx,self.frame.p6_rect.centery)
-        self.gameevents.add("score7",self.frame.p7_rect.centerx,self.frame.p7_rect.centery)
-        self.gameevents.add("score8",self.frame.p8_rect.centerx,self.frame.p8_rect.centery)
+        self.gameevents.add("score1",self.frame.p1_rect.centerx,self.frame.p1_rect.centery, type='EVENT_SYSTEM')
+        self.gameevents.add("score2",self.frame.p2_rect.centerx,self.frame.p2_rect.centery, type='EVENT_SYSTEM')
+        self.gameevents.add("score3",self.frame.p3_rect.centerx,self.frame.p3_rect.centery, type='EVENT_SYSTEM')
+        self.gameevents.add("score4",self.frame.p4_rect.centerx,self.frame.p4_rect.centery, type='EVENT_SYSTEM')
+        self.gameevents.add("score5",self.frame.p5_rect.centerx,self.frame.p5_rect.centery, type='EVENT_SYSTEM')
+        self.gameevents.add("score6",self.frame.p6_rect.centerx,self.frame.p6_rect.centery, type='EVENT_SYSTEM')
+        self.gameevents.add("score7",self.frame.p7_rect.centerx,self.frame.p7_rect.centery, type='EVENT_SYSTEM')
+        self.gameevents.add("score8",self.frame.p8_rect.centerx,self.frame.p8_rect.centery, type='EVENT_SYSTEM')
 
         self.score = tokens.score.Score(self)
         
@@ -183,7 +184,7 @@ class Game(object):
         else:
             self.screen = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
         
-        self.gameevents.add("display", 'setmode', (self.SCREEN_WIDTH, self.SCREEN_HEIGHT, self.aspect_ratio))
+        self.gameevents.add("display", 'setmode', (self.SCREEN_WIDTH, self.SCREEN_HEIGHT, self.aspect_ratio), type='EVENT_SYSTEM')
             
         self.clock = pygame.time.Clock()
         self.gametimer = tokens.timer.Timer()
@@ -223,8 +224,7 @@ class Game(object):
     
     def setup_world(self):
         """initializes gameplay"""
-        self.mine_list.generate_foes()
-        self.gameevents.add("game", "setup")
+        self.gameevents.add("game", "setup", type='EVENT_SYSTEM')
         self.missile_list = []
         self.shell_list = []
         self.ship = tokens.ship.Ship(self)
@@ -268,7 +268,7 @@ class Game(object):
         while True:
             event = pygame.event.wait()
             if event.type == pygame.KEYDOWN and event.key == self.pause_key:
-                self.gameevents.add("press", "unpause")
+                self.gameevents.add("press", "unpause", type='EVENT_USER')
                 if self.config.get_setting('Display','pause_overlay'):
                     self.screen.blit(backup,(0,0))
                 return
@@ -278,61 +278,61 @@ class Game(object):
         for event in pygame.event.get():
             if self.joystick:
                 if event.type == pygame.JOYAXISMOTION:
-                    self.gameevents.add("joyaxismotion", event.axis, event.value)
+                    self.gameevents.add("joyaxismotion", event.axis, event.value, type='EVENT_USER')
                 elif event.type == pygame.JOYBUTTONDOWN:
                     if event.button == self.fire_button:
-                        self.gameevents.add("press", "fire")
+                        self.gameevents.add("press", "fire", type='EVENT_USER')
                     elif event.button == self.IFF_button:
-                        self.gameevents.add("press", "iff")
+                        self.gameevents.add("press", "iff", type='EVENT_USER')
                     elif event.button == self.shots_button:
-                        self.gameevents.add("press", "shots")
+                        self.gameevents.add("press", "shots", type='EVENT_USER')
                     elif event.button == self.pnts_button:
-                        self.gameevents.add("press", "pnts")
+                        self.gameevents.add("press", "pnts", type='EVENT_USER')
                 elif event.type == pygame.JOYBUTTONUP:
                     if event.button == self.fire_button:
-                        self.gameevents.add("release", "fire")
+                        self.gameevents.add("release", "fire", type='EVENT_USER')
                     elif event.button == self.IFF_button:
-                        self.gameevents.add("release", "iff")
+                        self.gameevents.add("release", "iff", type='EVENT_USER')
                     elif event.button == self.shots_button:
-                        self.gameevents.add("release", "shots")
+                        self.gameevents.add("release", "shots", type='EVENT_USER')
                     elif event.button == self.pnts_button:
-                        self.gameevents.add("release", "pnts")
+                        self.gameevents.add("release", "pnts", type='EVENT_USER')
             else:
                 if event.type == pygame.KEYDOWN:
                     if event.key == self.thrust_key:
-                        self.gameevents.add("press", "thrust")
+                        self.gameevents.add("press", "thrust", type='EVENT_USER')
                     elif event.key == self.left_turn_key:
-                        self.gameevents.add("press", "left")
+                        self.gameevents.add("press", "left", type='EVENT_USER')
                     elif event.key == self.right_turn_key:
-                        self.gameevents.add("press", "right")
+                        self.gameevents.add("press", "right", type='EVENT_USER')
                     elif event.key == self.fire_key:
-                        self.gameevents.add("press", "fire")
+                        self.gameevents.add("press", "fire", type='EVENT_USER')
                     elif event.key == self.IFF_key:
-                        self.gameevents.add("press", "iff")
+                        self.gameevents.add("press", "iff", type='EVENT_USER')
                     elif event.key == self.shots_key:
-                        self.gameevents.add("press", "shots")
+                        self.gameevents.add("press", "shots", type='EVENT_USER')
                     elif event.key == self.pnts_key:
-                        self.gameevents.add("press", "pnts")
+                        self.gameevents.add("press", "pnts", type='EVENT_USER')
                 elif event.type == pygame.KEYUP:
                     if event.key == self.thrust_key:
-                        self.gameevents.add("release", "thrust")
+                        self.gameevents.add("release", "thrust", type='EVENT_USER')
                     elif event.key == self.left_turn_key:
-                        self.gameevents.add("release", "left")
+                        self.gameevents.add("release", "left", type='EVENT_USER')
                     elif event.key == self.right_turn_key:
-                        self.gameevents.add("release", "right")
+                        self.gameevents.add("release", "right", type='EVENT_USER')
                     elif event.key == self.fire_key:
-                        self.gameevents.add("release", "fire")
+                        self.gameevents.add("release", "fire", type='EVENT_USER')
                     elif event.key == self.IFF_key:
-                        self.gameevents.add("release", "iff")
+                        self.gameevents.add("release", "iff", type='EVENT_USER')
                     elif event.key == self.shots_key:
-                        self.gameevents.add("release", "shots")
+                        self.gameevents.add("release", "shots", type='EVENT_USER')
                     elif event.key == self.pnts_key:
-                        self.gameevents.add("release", "pnts")
+                        self.gameevents.add("release", "pnts", type='EVENT_USER')
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
-                    self.gameevents.add("press", "quit")
+                    self.gameevents.add("press", "quit", type='EVENT_USER')
                 elif event.key == self.pause_key and self.config.get_setting('General','allow_pause'):
-                    self.gameevents.add("press", "pause")
+                    self.gameevents.add("press", "pause", type='EVENT_USER')
     
     def process_game_logic(self):
         """processes game logic to produce game events"""
@@ -406,8 +406,9 @@ class Game(object):
             command = currentevent.command
             obj = currentevent.obj
             target = currentevent.target
+            type = currentevent.type
             if self.config.get_setting('Logging','logging') and currentevent.log:
-                self.log.write("EVENT\t%f\t%d\t%d\t%d\t%s\t%s\t%s\n"%(time, ticks, game, eid, command, obj, target))
+                self.log.write("%s\t%f\t%d\t%d\t%d\t%s\t%s\t%s\n"%(type, time, ticks, game, eid, command, obj, target))
             if command == "press":
                 if obj == "pause":
                     self.pause_game()
@@ -741,20 +742,11 @@ class Game(object):
                 self.bonus.draw(self.worldsurf)
         self.screen.blit(self.scoresurf, self.scorerect)
         self.screen.blit(self.worldsurf, self.worldrect)
-        self.gameevents.add("display", 'preflip', 'main', False)
+        self.gameevents.add("display", 'preflip', 'main', False, type='EVENT_SYSTEM')
         pygame.display.flip()
         
     def log_world(self):
         """logs current state of world to logfile"""
-        #Please use tabs between columns, and wrap cells with spaces in them in quotes, like the column with the
-        #list of shells
-        #self.log.write("%f %d\n"%(time.time(), pygame.time.get_ticks()))
-        #KEEP TRACK OF BOTH SCORES!
-        """log current frame's data to text file. Note that first line contains foe mine designations
-        format:
-        system_clock game_time ship_alive? ship_x ship_y ship_vel_x ship_vel_y ship_orientation mine_alive? mine_x mine_y 
-        fortress_alive? fortress_orientation [missile_x missile_y ...] [shell_x shell_y ...] bonus_symbol
-        pnts cntrl vlcty vlner iff intervl speed shots thrust_key left_key right_key fire_key iff_key shots_key pnts_key"""
         system_clock = time.time()
         game_time = pygame.time.get_ticks()
         if self.ship.alive:
@@ -767,26 +759,26 @@ class Game(object):
             distance = self.ship.get_distance_to_point(self.WORLD_WIDTH/2,self.WORLD_HEIGHT/2)
         else:
             ship_alive = "n"
-            ship_x = ""
-            ship_y = ""
-            ship_vel_x = ""
-            ship_vel_y = ""
-            ship_orientation = ""
+            ship_x = "NA"
+            ship_y = "NA"
+            ship_vel_x = "NA"
+            ship_vel_y = "NA"
+            ship_orientation = "NA"
             distance = 0
         if len(self.mine_list) > 0:
-            mine_alive = "y"
+            mine_id = self.mine_list[0].iff
             mine_x = "%.3f"%(self.mine_list[0].position.x)
             mine_y = "%.3f"%(self.mine_list[0].position.y)
         else:
-            mine_alive = "n"
-            mine_x = ""
-            mine_y = ""
+            mine_id = "NA"
+            mine_x = "NA"
+            mine_y = "NA"
         if self.fortress_exists and self.fortress.alive:
             fortress_alive = "y"
             fortress_orientation = str(self.fortress.orientation)
         else:
             fortress_alive = "n"
-            fortress_orientation = ""
+            fortress_orientation = "NA"
         missile = '"'
         for m in self.missile_list:
             missile += "%.3f %.3f "%(m.position.x, m.position.y)
@@ -800,23 +792,23 @@ class Game(object):
         if self.config.get_setting('General','bonus_system') == "AX-CPT":
             bonus_isi = str(self.bonus.isi_time)
         else:
-            bonus_isi = ''
+            bonus_isi = 'NA'
         if self.bonus.visible:
             bonus_cur_x = self.bonus.x
             bonus_cur_y = self.bonus.y
         else:
-            bonus_cur_x = ""
-            bonus_cur_y =  ""
+            bonus_cur_x = "NA"
+            bonus_cur_y =  "NA"
         if self.bonus.current_symbol == '':
-            bonus_cur = ""
+            bonus_cur = "NA"
         else:
             bonus_cur = self.bonus.current_symbol
         if self.bonus.prior_symbol == '':
-            bonus_prev = ""
+            bonus_prev = "NA"
         else:
             bonus_prev = self.bonus.prior_symbol
         if self.score.iff == '':
-            iff_score = ''
+            iff_score = 'NA'
         else:
             iff_score = self.score.iff
         keys = pygame.key.get_pressed()
@@ -849,9 +841,9 @@ class Game(object):
         else:
             pnts_key = "n"
         
-        self.log.write("STATE\t%f\t%d\t%d\t\t\t\t\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t" %
+        self.log.write("STATE\t%f\t%d\t%d\tNA\tNA\tNA\tNA\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t" %
                        (system_clock, game_time, self.current_game, " ".join(self.mine_list.foe_letters), ship_alive, ship_x, ship_y, ship_vel_x, ship_vel_y, ship_orientation,
-                        distance, mine_alive, mine_x, mine_y, fortress_alive, fortress_orientation, missile, shell))
+                        distance, mine_id, mine_x, mine_y, fortress_alive, fortress_orientation, missile, shell))
         if self.config.get_setting('General','bonus_system') == "AX-CPT":
             self.log.write("%s\t%s\t%s\t%s\t%s\t" %
                            (bonus_prev, bonus_cur, bonus_cur_x, bonus_cur_y, bonus_isi))
@@ -900,6 +892,7 @@ class Game(object):
         
     def display_foe_mines(self):
         """before game begins, present the list of IFF letters to target"""
+        self.mine_list.generate_foes()
         self.screen.fill((0,0,0))
         top = self.f24.render("The Type-2 mines for this session are:", True, (255,255,0))
         top_rect = top.get_rect()
@@ -1111,7 +1104,7 @@ class Game(object):
                         return
     
     def quit(self, ret=0):
-        self.gameevents.add("game", "quit", ret)
+        self.gameevents.add("game", "quit", ret, type='EVENT_USER')
         self.process_events()
         if self.config.get_setting('Logging','logging'):
             self.log.close()
@@ -1124,12 +1117,13 @@ def main():
     g.display_intro()
     while g.current_game < g.config.get_setting('General','games_per_session'):
         g.current_game += 1
-        g.gameevents.add("game", "ready")
+        g.gameevents.add("game", "ready", type='EVENT_SYSTEM')
         if g.mine_exists:
             g.display_foe_mines()
         g.setup_world()
         gameTimer = tokens.timer.Timer()
-        g.gameevents.add("game","start")
+        g.gameevents.add("game","start", type='EVENT_SYSTEM')
+        g.ingame = 1
         while True:
             g.clock.tick(30)
             g.process_input()
@@ -1141,16 +1135,17 @@ def main():
             if g.ship.alive == False:
                 g.reset_position()
             if gameTimer.elapsed() > g.config.get_setting('General','game_time'):
-                g.gameevents.add("game","end")
+                g.ingame = -1
+                g.gameevents.add("game","end", type='EVENT_SYSTEM')
                 g.fade()
-                g.gameevents.add("scores","show")
+                g.gameevents.add("scores","show", type='EVENT_SYSTEM')
                 if g.config.get_setting('Score','new_scoring'):
                     g.show_new_score()
                 else:
                     g.show_old_score()
-                g.gameevents.add("scores","hide")
+                g.gameevents.add("scores","hide", type='EVENT_SYSTEM')
                 break
-        g.gameevents.add("game", "over")
+        g.gameevents.add("game", "over", type='EVENT_SYSTEM')
     g.quit()
 
 if __name__ == '__main__':
