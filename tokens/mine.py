@@ -91,9 +91,6 @@ class MineList(list):
         if len(self.letters) < self.num_foes:
             self.letters = list(string.letters[26:])
         self.foe_letters = random.sample(self.letters, self.num_foes)
-        self.foe_letters.sort()
-        for foe_letter in self.foe_letters:
-            self.letters.remove(foe_letter)
             
     def add(self):
         """adds new mine to list"""
