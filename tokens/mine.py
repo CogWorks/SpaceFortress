@@ -88,8 +88,6 @@ class MineList(list):
         
     def generate_foes(self):
         """determine which mine designations are 'foes'"""
-        if len(self.letters) < self.num_foes:
-            self.letters = list(string.letters[26:])
         self.foe_letters = random.sample(self.letters, self.num_foes)
             
     def add(self):
