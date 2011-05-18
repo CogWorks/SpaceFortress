@@ -29,7 +29,7 @@ class SF5Plugin(object):
             
     def logCallback(self):
         if self.eg and self.eg.fix_data and self.eg.fix_data.eye_motion_state > 0:
-            return "\t%d\t%d\t%d" % (self.eg.fix_count + 1, self.eg.fix_data.eye_motion_state, self.eg.fix_data.fix_x, self.eg.fix_data.fix_y)
+            return "\t%d\t%d\t%d\t%d" % (self.eg.fix_count + 1, self.eg.fix_data.eye_motion_state, self.eg.fix_data.fix_x, self.eg.fix_data.fix_y)
         else:
             return None
     
