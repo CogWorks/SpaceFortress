@@ -908,17 +908,35 @@ class Game(object):
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
                     return
+                
+    def display_game_number(self):
+        """before game begins, present the game number"""
+        self.mine_list.generate_foes()
+        self.screen.fill((0,0,0))
+        gamesurf = self.f36.render("Game: %d of %d" % (self.current_game, self.config.get_setting('General','games_per_session')), True, (255,255,0))
+        gamerect = gamesurf.get_rect()
+        gamerect.centery = self.SCREEN_HEIGHT / 16 * 7
+        gamerect.centerx = self.SCREEN_WIDTH / 2
+        self.screen.blit(gamesurf, gamerect)
+        pygame.draw.line(self.screen, (255, 255, 255), (self.SCREEN_WIDTH / 4 , self.SCREEN_HEIGHT / 16 * 8.5), (self.SCREEN_WIDTH / 4 * 3, self.SCREEN_HEIGHT / 16 * 8.5))
+        pygame.draw.line(self.screen, (255, 255, 255), (self.SCREEN_WIDTH / 4 , self.SCREEN_HEIGHT / 16 * 5.5), (self.SCREEN_WIDTH / 4 * 3, self.SCREEN_HEIGHT / 16 * 5.5))
+        bottom = self.f24.render("Press any key to continue", True, (255,255,0))
+        bottom_rect = bottom.get_rect()
+        bottom_rect.centerx = self.SCREEN_WIDTH/2
+        bottom_rect.centery = 600*self.aspect_ratio
+        self.screen.blit(bottom, bottom_rect)
+        pygame.display.flip()
+        self.gameevents.add("display_game", self.current_game)
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
+                    return
+        
         
     def display_foe_mines(self):
         """before game begins, present the list of IFF letters to target"""
         self.mine_list.generate_foes()
         self.screen.fill((0,0,0))
-        gamesurf = self.f36.render("Game %d" % (self.current_game), True, (255,255,0))
-        gamerect = gamesurf.get_rect()
-        gamerect.centery = self.SCREEN_HEIGHT / 16 * 2
-        gamerect.centerx = self.SCREEN_WIDTH / 2
-        self.screen.blit(gamesurf, gamerect)
-        pygame.draw.line(self.screen, (255, 255, 255), (self.SCREEN_WIDTH / 4 , self.SCREEN_HEIGHT / 16 * 3), (self.SCREEN_WIDTH / 4 * 3, self.SCREEN_HEIGHT / 16 * 3))
         top = self.f24.render("The Type-2 mines for this session are:", True, (255,255,0))
         top_rect = top.get_rect()
         top_rect.centerx = self.SCREEN_WIDTH/2
@@ -1143,6 +1161,7 @@ def main():
     while g.current_game < g.config.get_setting('General','games_per_session'):
         g.current_game += 1
         g.gameevents.add("game", "ready", type='EVENT_SYSTEM')
+        g.display_game_number()
         if g.mine_exists:
             g.display_foe_mines()
         g.setup_world()

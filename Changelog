@@ -14,6 +14,7 @@
 * Properly display new FOES each game
 * Add increasing counts each mine and bonus in log
 * Fix indexerror for mine_list bug
+* Added a "game n of m" screen
 
  v5.0.0_rc9
 ---------------------
