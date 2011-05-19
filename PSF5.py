@@ -97,7 +97,7 @@ class Game(object):
             log_filename = "%s.txt" % (self.log_basename)
             self.log = open(log_filename, "w")
             self.log.write("event_type\tsystem_clock\tgame_time\tcurrent_game\teid\te1\te2\te3\tfoes\tship_alive\tship_x\t"+
-                           "ship_y\tship_vel_x\tship_vel_y\tship_orientation\tdistance\tmine_no\tmine_id\tmine_x\tmine_y\tfortress_alive\tfortress_orientation\t"+
+                           "ship_y\tsmod\tdmod\tship_vel_x\tship_vel_y\tship_orientation\tdistance\tmine_no\tmine_id\tmine_x\tmine_y\tfortress_alive\tfortress_orientation\t"+
                            "missile\tshell\tbonus_no\tbonus_prev\tbonus_cur\tbonus_cur_x\tbonus_cur_y\t")
             if self.config.get_setting('General','bonus_system') == "AX-CPT":
                 self.log.write('bonus_isi\t')
@@ -113,7 +113,7 @@ class Game(object):
                     pass
             self.log.write("\n")
             self.gameevents.add("log", "header", "ready", log=False, type='EVENT_SYSTEM')
-            self.gameevents.add("log", "version", "3", type='EVENT_SYSTEM')
+            self.gameevents.add("log", "version", "4", type='EVENT_SYSTEM')
         
         self.gameevents.add("config","running",str(self.config), type='EVENT_SYSTEM')
         
@@ -215,6 +215,9 @@ class Game(object):
         else:
             self.mine_exists = False
         self.mine_list = tokens.mine.MineList(self)
+        
+        self.dmod = -1
+        self.smod = -1
     
     def set_aspect_ratio(self):
         self.aspect_ratio = self.SCREEN_HEIGHT/768
@@ -337,6 +340,18 @@ class Game(object):
     def process_game_logic(self):
         """processes game logic to produce game events"""
         self.ship.compute()
+        if self.ingame:
+            distance = self.ship.get_distance_to_point(self.WORLD_WIDTH/2,self.WORLD_HEIGHT/2)
+            flight_max_inc = self.config.get_setting('Score', 'flight_max_increment')
+            dmod = 1 - (distance-self.smallhex.radius*1.125)/(self.WORLD_WIDTH/2)
+            if dmod > 1.0: dmod = 1.0
+            if dmod < 0.0: dmod = 0.0
+            smod = max([abs(self.ship.velocity.x),abs(self.ship.velocity.y)]) / self.ship.max_vel
+            self.dmod = dmod
+            self.smod = smod
+        else:
+            self.dmod = -1
+            self.smod = -1
         for missile in self.missile_list:
             missile.compute()
         if self.fortress_exists == True:
@@ -356,14 +371,8 @@ class Game(object):
         self.test_collisions()
         if self.flighttimer.elapsed() > self.config.get_setting('Score','update_timer'):
             self.flighttimer.reset()
-            distance = self.ship.get_distance_to_point(self.WORLD_WIDTH/2,self.WORLD_HEIGHT/2)
-            flight_max_inc = self.config.get_setting('Score', 'flight_max_increment')
-            dmod = 1 - (distance-self.smallhex.radius*1.125)/(self.WORLD_WIDTH/2)
-            if dmod > 1.0: dmod = 1.0
-            if dmod < 0.0: dmod = 0.0
-            smod = max([abs(self.ship.velocity.x),abs(self.ship.velocity.y)]) / self.ship.max_vel
             def pointspace (a0,a1,a2,b0,b1,b2): return math.exp(a1**(a0*a2)) * math.exp(b1**(b0*b2))
-            points = flight_max_inc * pointspace(dmod,2,1,smod,2,1.75) / pointspace(1,2,1,1,2,1.75)
+            points = flight_max_inc * pointspace(self.dmod,2,1,self.smod,2,1.75) / pointspace(1,2,1,1,2,1.75)
             self.gameevents.add("score+", "flight", points)
             if (self.ship.velocity.x **2 + self.ship.velocity.y **2)**0.5 < self.config.get_setting('Score','speed_threshold'):
                 self.gameevents.add("score+", "vlcty", self.config.get_setting('Score','VLCTY_increment'))
@@ -749,6 +758,12 @@ class Game(object):
         """logs current state of world to logfile"""
         system_clock = time.time()
         game_time = pygame.time.get_ticks()
+        if self.ingame:
+            smod = self.smod
+            dmod = self.dmod
+        else:
+            smod = "NA"
+            dmod = "NA"
         if self.ship.alive:
             ship_alive = "y"
             ship_x = "%.3f"%(self.ship.position.x)
@@ -845,8 +860,8 @@ class Game(object):
         else:
             pnts_key = "n"
         
-        self.log.write("STATE\t%f\t%d\t%d\tNA\tNA\tNA\tNA\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t" %
-                       (system_clock, game_time, self.current_game, " ".join(self.mine_list.foe_letters), ship_alive, ship_x, ship_y, ship_vel_x, ship_vel_y, ship_orientation,
+        self.log.write("STATE\t%f\t%d\t%d\tNA\tNA\tNA\tNA\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t" %
+                       (system_clock, game_time, self.current_game, " ".join(self.mine_list.foe_letters), ship_alive, ship_x, ship_y, smod, dmod, ship_vel_x, ship_vel_y, ship_orientation,
                         distance, mine_no, mine_id, mine_x, mine_y, fortress_alive, fortress_orientation, missile, shell))
         if self.config.get_setting('General','bonus_system') == "AX-CPT":
             self.log.write("%s\t%s\t%s\t%s\t%s\t%s\t" %
