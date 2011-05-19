@@ -60,6 +60,8 @@ class Game(object):
         super(Game, self).__init__()
         self.current_game = 0
         self.ingame = -1
+        self.flight2 = 0
+        self.mine2 = 0
 
         i = sys.argv[0].rfind('/')
         if i != -1:
@@ -102,7 +104,7 @@ class Game(object):
             if self.config.get_setting('General','bonus_system') == "AX-CPT":
                 self.log.write('bonus_isi\t')
             self.log.write("score_pnts\tscore_cntrl\tscore_vlcty\tscore_vlner\t"+
-                           "score_iff\tscore_intrvl\tscore_speed\tscore_shots\tscore_flight\tscore_flight2\tscore_fortress\tscore_mine\tscore_bonus\tthrust_key\tleft_key\t"+
+                           "score_iff\tscore_intrvl\tscore_speed\tscore_shots\tscore_flight\tscore_flight2\tscore_fortress\tscore_mine\tscore_mine2\tscore_bonus\tthrust_key\tleft_key\t"+
                            "right_key\tfire_key\tiff_key\tshots_key\tpnts_key")
             for name in self.plugins:
                 try:
@@ -228,7 +230,6 @@ class Game(object):
     def setup_world(self):
         """initializes gameplay"""
         self.gameevents.add("game", "setup", type='EVENT_SYSTEM')
-        self.flight2 = 0
         self.missile_list = []
         self.shell_list = []
         self.ship = tokens.ship.Ship(self)
@@ -248,6 +249,7 @@ class Game(object):
         self.score.speed = 0
         self.score.flight = 0
         self.flight2 = 0
+        self.mine2 = 0
         self.score.fortress = 0
         self.score.mines = 0
         self.score.bonus = 0
@@ -643,11 +645,13 @@ class Game(object):
             self.mine_list.timer.reset()
             self.gameevents.add("score-", "pnts", self.config.get_setting('Score','mine_hit_penalty'))
             self.gameevents.add("score-", "mines", self.config.get_setting('Score','mine_hit_penalty'))
+            self.mine2 -= self.config.get_setting('Score','mine_hit_penalty')
             self.ship.take_damage()
             if not self.ship.alive:
                 self.gameevents.add("destroyed", "ship", "shell")
                 self.gameevents.add("score-", "pnts", self.config.get_setting('Score','ship_death_penalty'))
                 self.gameevents.add("score-", "mines", self.config.get_setting('Score','ship_death_penalty'))
+                self.mine2 -= self.config.get_setting('Score','ship_death_penalty')
                 self.ship.color = (255,255,0)
             elif self.config.get_setting('Ship','colored_damage'):
                 g = 255 / self.ship.start_health * (self.ship.health-1)
@@ -658,6 +662,7 @@ class Game(object):
             self.mine_list.iff_flag = False
             self.mine_list.timer.reset()
             self.gameevents.add("score+", "mines", self.config.get_setting('Score','energize_friend'))
+            self.mine2 += 50
             #amazingly, missile can hit the mine in the same frame as the mine hits the ship
             if len(self.mine_list) > 0:
                 del self.mine_list[0]
@@ -669,6 +674,7 @@ class Game(object):
             self.mine_list.iff_flag = False
             self.mine_list.timer.reset()
             self.gameevents.add("score+", "mines", self.config.get_setting('Score','destroy_foe'))
+            self.mine2 += 75
             if len(self.mine_list) > 0:
                 del self.mine_list[0]
             self.score.iff = ''
@@ -872,9 +878,9 @@ class Game(object):
         else:
             self.log.write("%s\t%s\t%s\t%s\t%s\t" %
                            (bonus_no, bonus_prev, bonus_cur, bonus_cur_x, bonus_cur_y))
-        self.log.write("%d\t%d\t%d\t%d\t%s\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s" %
+        self.log.write("%d\t%d\t%d\t%d\t%s\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s" %
                        (self.score.pnts, self.score.cntrl, self.score.vlcty, self.score.vlner, iff_score, self.score.intrvl, self.score.speed, self.score.shots, self.score.flight, self.flight2, self.score.fortress, 
-                        self.score.mines, self.score.bonus, thrust_key, left_key, right_key, fire_key, iff_key, shots_key, pnts_key))
+                        self.score.mines, self.mine2, self.score.bonus, thrust_key, left_key, right_key, fire_key, iff_key, shots_key, pnts_key))
         for name in self.plugins:
             try:
                 data = self.plugins[name].logCallback()
