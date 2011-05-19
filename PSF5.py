@@ -913,6 +913,12 @@ class Game(object):
         """before game begins, present the list of IFF letters to target"""
         self.mine_list.generate_foes()
         self.screen.fill((0,0,0))
+        gamesurf = self.f36.render("Game %d" % (self.current_game), True, (255,255,0))
+        gamerect = gamesurf.get_rect()
+        gamerect.centery = self.SCREEN_HEIGHT / 16 * 2
+        gamerect.centerx = self.SCREEN_WIDTH / 2
+        self.screen.blit(gamesurf, gamerect)
+        pygame.draw.line(self.screen, (255, 255, 255), (self.SCREEN_WIDTH / 4 , self.SCREEN_HEIGHT / 16 * 3), (self.SCREEN_WIDTH / 4 * 3, self.SCREEN_HEIGHT / 16 * 3))
         top = self.f24.render("The Type-2 mines for this session are:", True, (255,255,0))
         top_rect = top.get_rect()
         top_rect.centerx = self.SCREEN_WIDTH/2
