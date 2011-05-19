@@ -122,7 +122,7 @@ def get_config():
     cfg.add_setting('Hexagon', 'small_hex', 40, '"Radius" of small hexagon')
     cfg.add_setting('Hexagon', 'hex_shrink', False, type=config.constants.CT_CHECKBOX, about='Does the outer hex shrink over time?')
     cfg.add_setting('Hexagon', 'hex_shrink_radius', 150, 'If hex shrinks, to what minimum radius?')
-    cfg.add_setting('Hexagon', 'hide_big_hex', False, type=config.constants.CT_CHECKBOX)
+    cfg.add_setting('Hexagon', 'hide_big_hex', True, type=config.constants.CT_CHECKBOX)
     cfg.add_setting('Hexagon', 'hide_small_hex', False, type=config.constants.CT_CHECKBOX)
     
     cfg.add_setting('Fortress', 'fortress_exists', True, type=config.constants.CT_CHECKBOX, about='Does the fortress exist?')
