@@ -13,6 +13,7 @@
 * Add plugin for collecting hardware info from Apple computers
 * Properly display new FOES each game
 * Add increasing counts each mine and bonus in log
+* Fix indexerror for mine_list bug
 
  v5.0.0_rc9
 ---------------------
