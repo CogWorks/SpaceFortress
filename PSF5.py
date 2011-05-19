@@ -102,7 +102,7 @@ class Game(object):
             if self.config.get_setting('General','bonus_system') == "AX-CPT":
                 self.log.write('bonus_isi\t')
             self.log.write("score_pnts\tscore_cntrl\tscore_vlcty\tscore_vlner\t"+
-                           "score_iff\tscore_intrvl\tscore_speed\tscore_shots\tscore_flight\tscore_fortress\tscore_mine\tscore_bonus\tthrust_key\tleft_key\t"+
+                           "score_iff\tscore_intrvl\tscore_speed\tscore_shots\tscore_flight\tscore_flight2\tscore_fortress\tscore_mine\tscore_bonus\tthrust_key\tleft_key\t"+
                            "right_key\tfire_key\tiff_key\tshots_key\tpnts_key")
             for name in self.plugins:
                 try:
@@ -228,6 +228,7 @@ class Game(object):
     def setup_world(self):
         """initializes gameplay"""
         self.gameevents.add("game", "setup", type='EVENT_SYSTEM')
+        self.flight2 = 0
         self.missile_list = []
         self.shell_list = []
         self.ship = tokens.ship.Ship(self)
@@ -246,6 +247,7 @@ class Game(object):
         self.score.vlcty = 0
         self.score.speed = 0
         self.score.flight = 0
+        self.flight2 = 0
         self.score.fortress = 0
         self.score.mines = 0
         self.score.bonus = 0
@@ -374,6 +376,7 @@ class Game(object):
             def pointspace (a0,a1,a2,b0,b1,b2): return math.exp(a1**(a0*a2)) * math.exp(b1**(b0*b2))
             points = flight_max_inc * pointspace(self.dmod,2,1,self.smod,2,1.75) / pointspace(1,2,1,1,2,1.75)
             self.gameevents.add("score+", "flight", points)
+            self.flight2 += flight_max_inc * pointspace(self.dmod,2,.45,self.smod,2,1) / pointspace(1,2,.45,1,2,1)
             if (self.ship.velocity.x **2 + self.ship.velocity.y **2)**0.5 < self.config.get_setting('Score','speed_threshold'):
                 self.gameevents.add("score+", "vlcty", self.config.get_setting('Score','VLCTY_increment'))
                 #self.gameevents.add("score+", "flight", self.config.get_setting('Score','VLCTY_increment'))
@@ -869,8 +872,8 @@ class Game(object):
         else:
             self.log.write("%s\t%s\t%s\t%s\t%s\t" %
                            (bonus_no, bonus_prev, bonus_cur, bonus_cur_x, bonus_cur_y))
-        self.log.write("%d\t%d\t%d\t%d\t%s\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s" %
-                       (self.score.pnts, self.score.cntrl, self.score.vlcty, self.score.vlner, iff_score, self.score.intrvl, self.score.speed, self.score.shots, self.score.flight, self.score.fortress, 
+        self.log.write("%d\t%d\t%d\t%d\t%s\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s" %
+                       (self.score.pnts, self.score.cntrl, self.score.vlcty, self.score.vlner, iff_score, self.score.intrvl, self.score.speed, self.score.shots, self.score.flight, self.flight2, self.score.fortress, 
                         self.score.mines, self.score.bonus, thrust_key, left_key, right_key, fire_key, iff_key, shots_key, pnts_key))
         for name in self.plugins:
             try:
