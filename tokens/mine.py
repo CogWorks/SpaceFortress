@@ -57,6 +57,7 @@ class MineList(list):
     def __init__(self, app):
         super(MineList, self).__init__()
         self.app = app
+        self.mine_count = 0
         self.mine_mode = self.app.config.get_setting('Mine','mine_mode')
         self.minimum_spawn_distance = self.app.config.get_setting('Mine','minimum_spawn_distance')
         self.maximum_spawn_distance = self.app.config.get_setting('Mine','maximum_spawn_distance')
@@ -105,6 +106,7 @@ class MineList(list):
             mine.iff = random.sample(self.letters, 1)[0]
         if self.mine_mode == "standard":
             self.app.score.iff = mine.iff
+        self.mine_count += 1
         self.append(mine)
         
     def compute(self):

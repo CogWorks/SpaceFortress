@@ -97,8 +97,8 @@ class Game(object):
             log_filename = "%s.txt" % (self.log_basename)
             self.log = open(log_filename, "w")
             self.log.write("event_type\tsystem_clock\tgame_time\tcurrent_game\teid\te1\te2\te3\tfoes\tship_alive\tship_x\t"+
-                           "ship_y\tship_vel_x\tship_vel_y\tship_orientation\tdistance\tmine_id\tmine_x\tmine_y\tfortress_alive\tfortress_orientation\t"+
-                           "missile\tshell\tbonus_prev\tbonus_cur\tbonus_cur_x\tbonus_cur_y\t")
+                           "ship_y\tship_vel_x\tship_vel_y\tship_orientation\tdistance\tmine_no\tmine_id\tmine_x\tmine_y\tfortress_alive\tfortress_orientation\t"+
+                           "missile\tshell\tbonus_no\tbonus_prev\tbonus_cur\tbonus_cur_x\tbonus_cur_y\t")
             if self.config.get_setting('General','bonus_system') == "AX-CPT":
                 self.log.write('bonus_isi\t')
             self.log.write("score_pnts\tscore_cntrl\tscore_vlcty\tscore_vlner\t"+
@@ -113,7 +113,7 @@ class Game(object):
                     pass
             self.log.write("\n")
             self.gameevents.add("log", "header", "ready", log=False, type='EVENT_SYSTEM')
-            self.gameevents.add("log", "version", "2", type='EVENT_SYSTEM')
+            self.gameevents.add("log", "version", "3", type='EVENT_SYSTEM')
         
         self.gameevents.add("config","running",str(self.config), type='EVENT_SYSTEM')
         
@@ -766,10 +766,12 @@ class Game(object):
             ship_orientation = "NA"
             distance = 0
         if len(self.mine_list) > 0:
+            mine_no = self.mine_list.mine_count
             mine_id = self.mine_list[0].iff
             mine_x = "%.3f"%(self.mine_list[0].position.x)
             mine_y = "%.3f"%(self.mine_list[0].position.y)
         else:
+            mine_no = "NA"
             mine_id = "NA"
             mine_x = "NA"
             mine_y = "NA"
@@ -794,9 +796,11 @@ class Game(object):
         else:
             bonus_isi = 'NA'
         if self.bonus.visible:
+            bonus_no = self.bonus.bonus_count
             bonus_cur_x = self.bonus.x
             bonus_cur_y = self.bonus.y
         else:
+            bonus_no = "NA"
             bonus_cur_x = "NA"
             bonus_cur_y =  "NA"
         if self.bonus.current_symbol == '':
@@ -841,15 +845,15 @@ class Game(object):
         else:
             pnts_key = "n"
         
-        self.log.write("STATE\t%f\t%d\t%d\tNA\tNA\tNA\tNA\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t" %
+        self.log.write("STATE\t%f\t%d\t%d\tNA\tNA\tNA\tNA\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t" %
                        (system_clock, game_time, self.current_game, " ".join(self.mine_list.foe_letters), ship_alive, ship_x, ship_y, ship_vel_x, ship_vel_y, ship_orientation,
-                        distance, mine_id, mine_x, mine_y, fortress_alive, fortress_orientation, missile, shell))
+                        distance, mine_no, mine_id, mine_x, mine_y, fortress_alive, fortress_orientation, missile, shell))
         if self.config.get_setting('General','bonus_system') == "AX-CPT":
-            self.log.write("%s\t%s\t%s\t%s\t%s\t" %
-                           (bonus_prev, bonus_cur, bonus_cur_x, bonus_cur_y, bonus_isi))
+            self.log.write("%s\t%s\t%s\t%s\t%s\t%s\t" %
+                           (bonus_no, bonus_prev, bonus_cur, bonus_cur_x, bonus_cur_y, bonus_isi))
         else:
-            self.log.write("%s\t%s\t%s\t%s\t" %
-                           (bonus_prev, bonus_cur, bonus_cur_x, bonus_cur_y))
+            self.log.write("%s\t%s\t%s\t%s\t%s\t" %
+                           (bonus_no, bonus_prev, bonus_cur, bonus_cur_x, bonus_cur_y))
         self.log.write("%d\t%d\t%d\t%d\t%s\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s" %
                        (self.score.pnts, self.score.cntrl, self.score.vlcty, self.score.vlner, iff_score, self.score.intrvl, self.score.speed, self.score.shots, self.score.flight, self.score.fortress, 
                         self.score.mines, self.score.bonus, thrust_key, left_key, right_key, fire_key, iff_key, shots_key, pnts_key))
