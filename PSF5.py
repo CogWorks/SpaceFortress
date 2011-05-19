@@ -500,11 +500,11 @@ class Game(object):
                 if obj == "foe":
                     self.mine_list.iff_flag = True
                     self.mine_list.iff_timer.reset()
-                else:
+                elif len(self.mine_list) > 0:
                     self.mine_list[0].tagged = "fail"
             elif command == "second_tag":
                 self.mine_list.iff_flag = False
-                if obj == "foe":
+                if obj == "foe" and len(self.mine_list) > 0:
                     self.mine_list[0].tagged = "tagged"                    
             elif command == "release":
                 if obj == "left":
