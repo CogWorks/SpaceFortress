@@ -62,6 +62,15 @@ class Game(object):
         self.ingame = -1
         self.flight2 = 0
         self.mine2 = 0
+        self.fps = 30
+        self.playback = False
+        self.playback_data = []
+        self.playback_available_games = 0
+        self.playback_game = 0
+        self.playback_aspect_ratio = 0
+        self.playback_index = 0
+        self.playback_keyheld = [0,0]
+        self.header = {}
 
         i = sys.argv[0].rfind('/')
         if i != -1:
@@ -87,6 +96,35 @@ class Game(object):
         self.config.update_from_user_file()
         self.gameevents.add("config", "load", "user", type='EVENT_SYSTEM')
         
+        if self.config.get_setting('Playback','playback'):
+            import playback
+            #logfile = playback.pickLog()
+            logfile = '/Users/ryan/SFData/c83e3d50/c83e3d50_2011-5-19_12-35-52.txt'
+            if logfile and os.path.exists(logfile):
+                self.logfile = open(logfile,'r')
+                header = self.logfile.readline()[:-1].split('\t')
+                for i in range(0,len(header)):
+                    self.header[header[i]] = i
+                line = self.logfile.readline()
+                while (line):
+                    line = line[:-1].split('\t')
+                    if line[5] == 'display' and line[6] == 'setmode':
+                        info = eval(line[7])
+                        self.playback_aspect_ratio = info[2]
+                    if abs(int(line[3])) > self.playback_available_games:
+                        self.playback_available_games = abs(int(line[3]))
+                    self.playback_data.append(line)
+                    line = self.logfile.readline()
+                if self.playback_available_games:
+                    self.playback_game = playback.pickGame(self.playback_available_games)
+                    if self.playback_game:
+                        data = []
+                        for d in self.playback_data:
+                            if int(d[3]) == self.playback_game:
+                                data.append(d)
+                        self.playback_data = data
+                        self.playback = True
+        
         d = datetime.datetime.now().timetuple()
         base = "%s_%d-%d-%d_%d-%d-%d"%(self.config.get_setting('General','id'), d[0], d[1], d[2], d[3], d[4], d[5])
         logdir = self.config.get_setting('Logging','logdir')
@@ -95,7 +133,7 @@ class Game(object):
         self.log_basename = os.path.join(logdir, base)
         self.gameevents.add("log", "basename", "ready", type='EVENT_SYSTEM')
         
-        if self.config.get_setting('Logging','logging'):
+        if not self.playback and self.config.get_setting('Logging','logging'):
             log_filename = "%s.txt" % (self.log_basename)
             self.log = open(log_filename, "w")
             self.log.write("event_type\tsystem_clock\tgame_time\tcurrent_game\teid\te1\te2\te3\tfoes\tship_alive\tship_x\t"+
@@ -117,7 +155,8 @@ class Game(object):
             self.gameevents.add("log", "header", "ready", log=False, type='EVENT_SYSTEM')
             self.gameevents.add("log", "version", "4", type='EVENT_SYSTEM')
         
-        self.gameevents.add("config","running",str(self.config), type='EVENT_SYSTEM')
+        if not self.playback:
+            self.gameevents.add("config","running",str(self.config), type='EVENT_SYSTEM')
         
         pygame.display.init()
         pygame.font.init()
@@ -125,7 +164,7 @@ class Game(object):
         display_info = pygame.display.Info()
         mode_list = pygame.display.list_modes()
         if self.config.get_setting('Display','display_mode') == 'Windowed':
-            best_mode = mode_list[1]
+            best_mode = mode_list[4]
         else:
             best_mode = mode_list[0]
         self.SCREEN_WIDTH = best_mode[0]
@@ -137,6 +176,7 @@ class Game(object):
         self.linewidth = self.config.get_setting('Display','linewidth')
         
         self.fp = os.path.join(self.approot, "fonts/freesansbold.ttf")
+        self.f6 = pygame.font.Font(self.fp, int(12*self.aspect_ratio))
         self.f = pygame.font.Font(self.fp, int(14*self.aspect_ratio))
         self.f24 = pygame.font.Font(self.fp, int(20*self.aspect_ratio))
         self.f28 = pygame.font.Font(self.fp, int(28*self.aspect_ratio))
@@ -341,6 +381,18 @@ class Game(object):
                 elif event.key == self.pause_key and self.config.get_setting('General','allow_pause'):
                     self.gameevents.add("press", "pause", type='EVENT_USER')
     
+    def process_playback_logic(self):
+        self.ship.compute()
+        for missile in self.missile_list:
+            missile.compute()
+        if self.fortress_exists == True:
+            self.fortress.compute()
+        for shell in self.shell_list:
+            shell.compute()
+        self.mine_list.compute()
+        self.check_bounds()
+        self.test_collisions()
+        
     def process_game_logic(self):
         """processes game logic to produce game events"""
         self.ship.compute()
@@ -421,7 +473,7 @@ class Game(object):
             obj = currentevent.obj
             target = currentevent.target
             type = currentevent.type
-            if self.config.get_setting('Logging','logging') and currentevent.log:
+            if not self.playback  and self.config.get_setting('Logging','logging') and currentevent.log:
                 self.log.write("%s\t%f\t%d\t%d\t%d\t%s\t%s\t%s\n"%(type, time, ticks, game, eid, command, obj, target))
             if command == "press":
                 if obj == "pause":
@@ -563,11 +615,11 @@ class Game(object):
                 self.score.intrvl = 0
                 self.gameevents.add("score-", "mines", self.config.get_setting('Score','mine_timeout_penalty'))
             elif command == "score+":
-                self.score.__setattr__(obj, self.score.__getattribute__(obj) + target)
+                self.score.__setattr__(obj, self.score.__getattribute__(obj) + float(target))
                 if self.score.shots > self.config.get_setting('Missile','missile_max'):
                     self.score.shots = self.config.get_setting('Missile','missile_max')
             elif command == "score-":
-                self.score.__setattr__(obj, self.score.__getattribute__(obj) - target)
+                self.score.__setattr__(obj, self.score.__getattribute__(obj) - float(target))
             elif command == "collide":
                 self.process_collision(obj, target)
             elif command == "joyaxismotion":
@@ -760,6 +812,8 @@ class Game(object):
                 self.bonus.draw(self.worldsurf)
         self.screen.blit(self.scoresurf, self.scorerect)
         self.screen.blit(self.worldsurf, self.worldrect)
+        if self.config.get_setting('General','show_fps'):
+            self.draw_fps()
         self.gameevents.add("display", 'preflip', 'main', False, type='EVENT_SYSTEM')
         pygame.display.flip()
         
@@ -920,9 +974,14 @@ class Game(object):
                 
     def display_game_number(self):
         """before game begins, present the game number"""
+        self.gameevents.add("display_game", self.current_game)
         self.mine_list.generate_foes()
         self.screen.fill((0,0,0))
-        gamesurf = self.f36.render("Game: %d of %d" % (self.current_game, self.config.get_setting('General','games_per_session')), True, (255,255,0))
+        if self.playback:
+            title = '~~~ Playback Mode ~~~'
+        else:
+            title = "Game: %d of %d" % (self.current_game, self.config.get_setting('General','games_per_session'))
+        gamesurf = self.f36.render(title, True, (255,255,0))
         gamerect = gamesurf.get_rect()
         gamerect.centery = self.SCREEN_HEIGHT / 16 * 7
         gamerect.centerx = self.SCREEN_WIDTH / 2
@@ -935,12 +994,10 @@ class Game(object):
         bottom_rect.centery = 600*self.aspect_ratio
         self.screen.blit(bottom, bottom_rect)
         pygame.display.flip()
-        self.gameevents.add("display_game", self.current_game)
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
                     return
-        
         
     def display_foe_mines(self):
         """before game begins, present the list of IFF letters to target"""
@@ -1154,12 +1211,102 @@ class Game(object):
                         self.quit(1)
                     else:
                         return
+                    
+    def process_state(self, state):
+        
+        ship_x = state[self.header['ship_x']]
+        ship_y = state[self.header['ship_y']]
+        ship_orientation = state[self.header['ship_orientation']]
+        if ship_x != 'NA' and ship_y != 'NA' and ship_orientation != 'NA':
+            self.ship.position.x = float(ship_x) / self.playback_aspect_ratio * self.aspect_ratio
+            self.ship.position.y = float(ship_y) / self.playback_aspect_ratio * self.aspect_ratio
+            self.ship.orientation = float(ship_orientation)
+        
+        fortress_orientation = state[self.header['fortress_orientation']]
+        if fortress_orientation != 'NA':
+            self.fortress.orientation = float(fortress_orientation)
+        
+        self.missile_list = []
+        missiles = state[self.header['missile']][1:-1].strip()
+        if missiles != "":
+            missiles = map(float,missiles.split(' ')[::-1])
+            n_missiles = int(len(missiles)/2)
+            for i in range(0,n_missiles):
+                self.missile_list.append(tokens.missile.Missile(self))
+                self.missile_list[i].position.x = missiles.pop() / self.playback_aspect_ratio * self.aspect_ratio
+                self.missile_list[i].position.y = missiles.pop() / self.playback_aspect_ratio * self.aspect_ratio
+                
+        self.shell_list = []
+        shells = state[self.header['shell']][1:-1].strip()
+        if shells != "":
+            shells = map(float,shells.split(' ')[::-1])
+            n_shells = int(len(shells)/2)
+            for i in range(0,n_shells):
+                self.shell_list.append(tokens.shell.Shell(self, self.fortress.orientation))
+                self.shell_list[i].position.x = shells.pop() / self.playback_aspect_ratio * self.aspect_ratio
+                self.shell_list[i].position.y = shells.pop() / self.playback_aspect_ratio * self.aspect_ratio
+            
+        self.mine_list = tokens.mine.MineList(self)
+        mine_x = state[self.header['mine_x']]
+        mine_y = state[self.header['mine_y']]
+        if mine_x != 'NA' and mine_y != 'NA':
+            mine_x = float(mine_x) / self.playback_aspect_ratio * self.aspect_ratio
+            mine_y = float(mine_y) / self.playback_aspect_ratio * self.aspect_ratio
+            self.mine_list.append(tokens.mine.Mine(self))
+            self.mine_list[0].position.x = mine_x
+            self.mine_list[0].position.y = mine_y
+            
+        self.score.pnts = int(state[self.header['score_pnts']])
+        self.score.cntrl = int(state[self.header['score_cntrl']])
+        self.score.vlcty = int(state[self.header['score_vlcty']])
+        self.score.speed = int(state[self.header['score_speed']])
+        self.score.flight = int(state[self.header['score_flight']])
+        self.score.fortress = int(state[self.header['score_fortress']])
+        self.score.mines = int(state[self.header['score_mine']])
+        self.score.bonus = int(state[self.header['score_bonus']])
+        self.score.vlner = int(state[self.header['score_vlner']])
+        self.score.shots = int(state[self.header['score_shots']])
+                    
+    def process_playback_input(self):
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    self.quit(1)
+                elif event.key == pygame.K_UP:
+                    self.fps += 1
+                elif event.key == pygame.K_DOWN:
+                    self.fps -= 1
+                    if self.fps < 1:
+                        self.fps = 1
+                elif event.key == pygame.K_LEFT:
+                    self.playback_keyheld[0] = 1
+                    self.playback_index -= 10
+                    if self.playback_index < 0:
+                        self.playback_index = 0
+                elif event.key == pygame.K_RIGHT:
+                    self.playback_keyheld[1] = 1
+                    self.playback_index += 10
+                    if self.playback_index > len(self.playback_data) - 1:
+                        self.playback_index = len(self.playback_data) - 1
+            elif event.type == pygame.KEYUP:
+                if event.key == pygame.K_LEFT:
+                    self.playback_keyheld[0] = 0
+                elif event.key == pygame.K_RIGHT:
+                    self.playback_keyheld[1] = 0
+    
+    def draw_fps(self):
+        fpssurf = self.f6.render("%.2f" % (self.clock.get_fps()), True, (255,0,0))
+        fpsrect = fpssurf.get_rect()
+        fpsrect.bottom = self.SCREEN_HEIGHT -8
+        fpsrect.right = self.SCREEN_WIDTH - 8
+        self.screen.blit(fpssurf, fpsrect)
     
     def quit(self, ret=0):
-        self.gameevents.add("game", "quit", ret, type='EVENT_USER')
-        self.process_events()
-        if self.config.get_setting('Logging','logging'):
-            self.log.close()
+        if not self.playback:
+            self.gameevents.add("game", "quit", ret, type='EVENT_USER')
+            self.process_events()
+            if self.config.get_setting('Logging','logging'):
+                self.log.close()
         pygame.quit()
         sys.exit(ret)
 
@@ -1167,38 +1314,57 @@ def main():
     
     g = Game()
     g.display_intro()
-    while g.current_game < g.config.get_setting('General','games_per_session'):
-        g.current_game += 1
-        g.gameevents.add("game", "ready", type='EVENT_SYSTEM')
+    if not g.playback:
+        while g.current_game < g.config.get_setting('General','games_per_session'):
+            g.current_game += 1
+            g.gameevents.add("game", "ready", type='EVENT_SYSTEM')
+            g.display_game_number()
+            if g.mine_exists:
+                g.display_foe_mines()
+            g.setup_world()
+            gameTimer = tokens.timer.Timer()
+            g.gameevents.add("game","start", type='EVENT_SYSTEM')
+            g.ingame = 1
+            while True:
+                g.clock.tick(g.fps)
+                g.process_input()
+                g.process_game_logic()
+                g.process_events()              
+                g.draw()
+                if g.config.get_setting('Logging','logging'):
+                    g.log_world()
+                if g.ship.alive == False:
+                    g.reset_position()
+                if gameTimer.elapsed() > g.config.get_setting('General','game_time'):
+                    g.ingame = -1
+                    g.gameevents.add("game","end", type='EVENT_SYSTEM')
+                    g.fade()
+                    g.gameevents.add("scores","show", type='EVENT_SYSTEM')
+                    if g.config.get_setting('Score','new_scoring'):
+                        g.show_new_score()
+                    else:
+                        g.show_old_score()
+                    g.gameevents.add("scores","hide", type='EVENT_SYSTEM')
+                    break
+            g.gameevents.add("game", "over", type='EVENT_SYSTEM')
+    else:
+        pygame.key.set_repeat(1,10)
         g.display_game_number()
-        if g.mine_exists:
-            g.display_foe_mines()
         g.setup_world()
-        gameTimer = tokens.timer.Timer()
-        g.gameevents.add("game","start", type='EVENT_SYSTEM')
-        g.ingame = 1
         while True:
-            g.clock.tick(30)
-            g.process_input()
-            g.process_game_logic()
-            g.process_events()              
+            g.clock.tick(g.fps)
+            while g.playback_data[g.playback_index][0][:5] == 'EVENT':
+                if g.playback_index < len(g.playback_data) - 1:
+                    if g.playback_keyheld[1]:
+                        g.playback_index -= 1
+                    else:
+                        g.playback_index += 1
+            g.process_state(g.playback_data[g.playback_index])
             g.draw()
-            if g.config.get_setting('Logging','logging'):
-                g.log_world()
-            if g.ship.alive == False:
-                g.reset_position()
-            if gameTimer.elapsed() > g.config.get_setting('General','game_time'):
-                g.ingame = -1
-                g.gameevents.add("game","end", type='EVENT_SYSTEM')
-                g.fade()
-                g.gameevents.add("scores","show", type='EVENT_SYSTEM')
-                if g.config.get_setting('Score','new_scoring'):
-                    g.show_new_score()
-                else:
-                    g.show_old_score()
-                g.gameevents.add("scores","hide", type='EVENT_SYSTEM')
-                break
-        g.gameevents.add("game", "over", type='EVENT_SYSTEM')
+            g.process_playback_input()
+            if sum(g.playback_keyheld) == 0:
+                if g.playback_index < len(g.playback_data) - 1:
+                    g.playback_index += 1
     g.quit()
 
 if __name__ == '__main__':

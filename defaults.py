@@ -81,6 +81,7 @@ def get_config():
     cfg.add_setting('General', 'game_time', 300000, alias='Game Duration (ms)', about='Time in milliseconds for a game. NOTE! If you escape in the middle of a game, the log will have "short" prepended to the name')
     cfg.add_setting('General', 'sound', True, alias='Sound', type=config.constants.CT_CHECKBOX, about='Enable/disable sound')
     cfg.add_setting('General', 'allow_pause', True, alias='Allow Pausing', type=config.constants.CT_CHECKBOX, about='Enable/disable whether or not pausing is allowed.')
+    cfg.add_setting('General', 'show_fps', False, type=config.constants.CT_CHECKBOX)
     
     cfg.add_setting('Display', 'display_mode', 'Fullscreen', alias='Display Mode', options=['Fullscreen','Windowed','Fake Fullscreen'], type=config.constants.CT_COMBO, about='Run at full screen? Set to f to run in a window')
     cfg.add_setting('Display', 'linewidth', 1, alias='Linewidth', about='Width of lines drawn on screen. Increase for a more "projector-friendly" game')
@@ -223,5 +224,8 @@ def get_config():
     cfg.add_setting('Joystick', 'iff_button', 3)
     cfg.add_setting('Joystick', 'shots_button', 1)
     cfg.add_setting('Joystick', 'pnts_button', 2)
+    
+    cfg.add_setting('Playback', 'playback', False, type=2)
+    cfg.add_setting('Playback', 'logfile', '/Users/ryan/SFData/c83e3d50/c83e3d50_2011-5-19_14-12-44.txt', type=3)
     
     return cfg
