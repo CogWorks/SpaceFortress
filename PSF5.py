@@ -1243,6 +1243,16 @@ class Game(object):
         if fortress_orientation != 'NA':
             self.fortress.orientation = float(fortress_orientation)
         
+        if state[self.header['fortress_alive']] == 'y':
+            self.fortress.alive = True
+        else:
+            self.fortress.alive = False
+        
+        if state[self.header['ship_alive']] == 'y':
+            self.ship.alive = True
+        else:
+            self.ship.alive = False
+        
         self.missile_list = []
         missiles = state[self.header['missile']][1:-1].strip()
         if missiles != "":
