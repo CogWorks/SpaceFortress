@@ -99,8 +99,8 @@ class Game(object):
         
         if self.config.get_setting('Playback','playback'):
             import playback
-            #logfile = playback.pickLog()
-            logfile = '/Users/ryan/SFData/c83e3d50/c83e3d50_2011-5-19_12-35-52.txt'
+            logfile = playback.pickLog()
+            #logfile = '/Users/ryan/SFData/c83e3d50/c83e3d50_2011-5-19_12-35-52.txt'
             if logfile and os.path.exists(logfile):
                 self.logfile = open(logfile,'r')
                 header = self.logfile.readline()[:-1].split('\t')
