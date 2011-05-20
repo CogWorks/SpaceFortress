@@ -176,6 +176,14 @@ class Game(object):
         self.WORLD_HEIGHT = int(626 * self.aspect_ratio)
         self.linewidth = self.config.get_setting('Display','linewidth')
         
+        self.kp_space = self.linewidth
+        self.kp_right = self.linewidth
+        self.kp_left = self.linewidth
+        self.kp_thrust = self.linewidth
+        self.kp_iff = self.linewidth
+        self.kp_shots = self.linewidth
+        self.kp_points = self.linewidth
+        
         self.fp = os.path.join(self.approot, "fonts/freesansbold.ttf")
         self.f6 = pygame.font.Font(self.fp, int(12*self.aspect_ratio))
         self.f = pygame.font.Font(self.fp, int(14*self.aspect_ratio))
@@ -792,6 +800,8 @@ class Game(object):
         self.score.draw(self.scoresurf)
         self.bighex.draw(self.worldsurf)
         self.smallhex.draw(self.worldsurf)
+        if self.config.get_setting('Display','show_kp'):
+            self.draw_kp()
         for shell in self.shell_list:
             shell.draw(self.worldsurf)
         if self.fortress_exists:
@@ -1329,6 +1339,38 @@ class Game(object):
                 elif event.key == pygame.K_RIGHT:
                     self.playback_keyheld[1] = 0
     
+    def draw_kp(self):
+        
+        color = (48,48,48)
+        
+        left = self.WORLD_WIDTH/2 - self.WORLD_WIDTH/12
+        top = self.WORLD_HEIGHT - self.WORLD_HEIGHT/18 * 2
+        width = self.WORLD_WIDTH/12 * 2
+        height = self.WORLD_HEIGHT/18 * .75
+        pygame.draw.rect(self.worldsurf, color, (left,top,width,height), self.kp_space)
+        
+        top = top - height * 1.5
+        left = left + width + height/2
+        width = height
+        pygame.draw.rect(self.worldsurf, color, (left,top,width,height), self.kp_iff)
+        
+        left = left + width + height/2
+        pygame.draw.rect(self.worldsurf, color, (left,top,width,height), self.kp_shots)
+        
+        left = left + width + height/2
+        pygame.draw.rect(self.worldsurf, color, (left,top,width,height), self.kp_points)
+        
+        left = self.WORLD_WIDTH/2 - self.WORLD_WIDTH/12 - width - height/2
+        pygame.draw.rect(self.worldsurf, color, (left,top,width,height), self.kp_right)
+        
+        left = left - width - height/2
+        top = top - height * 1.5
+        pygame.draw.rect(self.worldsurf, color, (left,top,width,height), self.kp_thrust)
+        
+        left = left - width - height/2
+        top = top + height * 1.5
+        pygame.draw.rect(self.worldsurf, color, (left,top,width,height), self.kp_left)
+    
     def draw_fps(self):
         fpssurf = self.f6.render("%.2f" % (self.clock.get_fps()), True, (255,0,0))
         fpsrect = fpssurf.get_rect()
@@ -1344,7 +1386,40 @@ class Game(object):
             etrect.bottom = self.SCREEN_HEIGHT -8
             etrect.left = 8
             self.screen.blit(etsurf, etrect)
-        
+            
+    def process_playback_event(self, event):
+        if event[0] == 'EVENT_USER':
+            if event[5] == 'press':
+                if event[6] == 'fire':
+                    self.kp_space = 0
+                elif event[6] == 'right':
+                    self.kp_right = 0
+                elif event[6] == 'left':
+                    self.kp_left = 0
+                elif event[6] == 'thrust':
+                    self.kp_thrust = 0
+                elif event[6] == 'iff':
+                    self.kp_iff = 0
+                elif event[6] == 'shots':
+                    self.kp_shots = 0
+                elif event[6] == 'points':
+                    self.kp_points = 0
+            elif event[5] == 'release':
+                if event[6] == 'fire':
+                    self.kp_space = self.linewidth
+                elif event[6] == 'right':
+                    self.kp_right = self.linewidth
+                elif event[6] == 'left':
+                    self.kp_left = self.linewidth
+                elif event[6] == 'thrust':
+                    self.kp_thrust = self.linewidth
+                elif event[6] == 'iff':
+                    self.kp_iff = self.linewidth
+                elif event[6] == 'shots':
+                    self.kp_shots = self.linewidth
+                elif event[6] == 'points':
+                    self.kp_points = self.linewidth
+                        
     def quit(self, ret=0):
         if not self.playback:
             self.gameevents.add("game", "quit", ret, type='EVENT_USER')
@@ -1397,7 +1472,8 @@ def main():
         g.setup_world()
         while True:
             g.clock.tick(g.fps)
-            while g.playback_data[g.playback_index][0][:5] == 'EVENT':                    
+            while g.playback_data[g.playback_index][0][:5] == 'EVENT':
+                g.process_playback_event(g.playback_data[g.playback_index])
                 if g.playback_index < len(g.playback_data) - 1:
                     if g.playback_keyheld[1]:
                         g.playback_index -= 1

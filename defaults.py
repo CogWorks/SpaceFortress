@@ -87,6 +87,7 @@ def get_config():
     cfg.add_setting('Display', 'pause_overlay', True, alias='Pause Overlay', type=config.constants.CT_CHECKBOX, about='Blank screen and show "Paused!" when game is paused.')
     cfg.add_setting('Display', 'show_fps', False, type=config.constants.CT_CHECKBOX)
     cfg.add_setting('Display', 'show_et', False, type=config.constants.CT_CHECKBOX)
+    cfg.add_setting('Display', 'show_kp', False, type=config.constants.CT_CHECKBOX)
     
     cfg.add_setting('Logging', 'logging', True, alias='Logging', type=config.constants.CT_CHECKBOX, about='Enable/disable logging')
     cfg.add_setting('Logging', 'logdir', '', alias='Log Directory', type=config.constants.CT_LINEEDIT, about='Directory for log files, leave blank for default.')
