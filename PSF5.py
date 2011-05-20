@@ -1272,6 +1272,9 @@ class Game(object):
             self.mine_list.append(tokens.mine.Mine(self))
             self.mine_list[0].position.x = mine_x
             self.mine_list[0].position.y = mine_y
+            self.score.iff = state[self.header['mine_id']]
+        else:
+            self.score.iff = ''
             
         self.score.pnts = int(state[self.header['score_pnts']])
         self.score.cntrl = int(state[self.header['score_cntrl']])
@@ -1283,6 +1286,11 @@ class Game(object):
         self.score.bonus = int(state[self.header['score_bonus']])
         self.score.vlner = int(state[self.header['score_vlner']])
         self.score.shots = int(state[self.header['score_shots']])
+        
+        if state[self.header['score_intrvl']] == '0':
+            self.score.intrvl = ''
+        else:
+            self.score.intrvl = state[self.header['score_intrvl']]
                     
     def process_playback_input(self):
         for event in pygame.event.get():
