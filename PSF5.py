@@ -1228,6 +1228,17 @@ class Game(object):
             self.ship.position.y = float(ship_y) / self.playback_aspect_ratio * self.aspect_ratio
             self.ship.orientation = float(ship_orientation)
         
+        bonus_cur_x = state[self.header['bonus_cur_x']]
+        bonus_cur_y = state[self.header['bonus_cur_y']]
+        bonus_cur = state[self.header['bonus_cur']]
+        if bonus_cur_x != 'NA' and bonus_cur_y != 'NA' and bonus_cur != 'NA':
+            self.bonus.x = float(bonus_cur_x) / self.playback_aspect_ratio * self.aspect_ratio
+            self.bonus.y = float(bonus_cur_y) / self.playback_aspect_ratio * self.aspect_ratio
+            self.bonus.visible = True
+            self.bonus.current_symbol = bonus_cur
+        else:
+            self.bonus.visible = False
+        
         fortress_orientation = state[self.header['fortress_orientation']]
         if fortress_orientation != 'NA':
             self.fortress.orientation = float(fortress_orientation)
