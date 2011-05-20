@@ -70,6 +70,7 @@ class Game(object):
         self.playback_aspect_ratio = 0
         self.playback_index = 0
         self.playback_keyheld = [0,0]
+        self.playback_start = 0
         self.header = {}
 
         i = sys.argv[0].rfind('/')
@@ -812,8 +813,10 @@ class Game(object):
                 self.bonus.draw(self.worldsurf)
         self.screen.blit(self.scoresurf, self.scorerect)
         self.screen.blit(self.worldsurf, self.worldrect)
-        if self.config.get_setting('General','show_fps'):
+        if self.config.get_setting('Display','show_fps'):
             self.draw_fps()
+        if self.config.get_setting('Display','show_et'):
+            self.draw_et()
         self.gameevents.add("display", 'preflip', 'main', False, type='EVENT_SYSTEM')
         pygame.display.flip()
         
@@ -1214,6 +1217,9 @@ class Game(object):
                     
     def process_state(self, state):
         
+        if self.playback_start == 0:
+            self.playback_start = int(state[2])
+        
         ship_x = state[self.header['ship_x']]
         ship_y = state[self.header['ship_y']]
         ship_orientation = state[self.header['ship_orientation']]
@@ -1301,6 +1307,15 @@ class Game(object):
         fpsrect.right = self.SCREEN_WIDTH - 8
         self.screen.blit(fpssurf, fpsrect)
     
+    def draw_et(self):
+        if self.playback:
+            et = int(self.playback_data[self.playback_index][2]) - self.playback_start
+            etsurf = self.f6.render("%.2f" % (et / 1000), True, (255,0,0))
+            etrect = etsurf.get_rect()
+            etrect.bottom = self.SCREEN_HEIGHT -8
+            etrect.left = 8
+            self.screen.blit(etsurf, etrect)
+        
     def quit(self, ret=0):
         if not self.playback:
             self.gameevents.add("game", "quit", ret, type='EVENT_USER')
@@ -1353,7 +1368,7 @@ def main():
         g.setup_world()
         while True:
             g.clock.tick(g.fps)
-            while g.playback_data[g.playback_index][0][:5] == 'EVENT':
+            while g.playback_data[g.playback_index][0][:5] == 'EVENT':                    
                 if g.playback_index < len(g.playback_data) - 1:
                     if g.playback_keyheld[1]:
                         g.playback_index -= 1
