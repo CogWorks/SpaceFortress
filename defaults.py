@@ -228,6 +228,5 @@ def get_config():
     cfg.add_setting('Joystick', 'pnts_button', 2)
     
     cfg.add_setting('Playback', 'playback', False, type=2)
-    cfg.add_setting('Playback', 'logfile', '/Users/ryan/SFData/c83e3d50/c83e3d50_2011-5-19_14-12-44.txt', type=3)
     
     return cfg
