@@ -2,6 +2,7 @@
 
 from __future__ import division
 import subprocess, os, sys, platform, math
+from random import randrange
 
 githash = None
 env = os.environ
@@ -72,6 +73,8 @@ class Game(object):
         self.playback_keyheld = [0,0]
         self.playback_start = 0
         self.header = {}
+        
+        self.stars = []
 
         i = sys.argv[0].rfind('/')
         if i != -1:
@@ -272,6 +275,10 @@ class Game(object):
         
         self.dmod = -1
         self.smod = -1
+        
+        if self.config.get_setting('Starfield','show_starfield'):
+            self.init_stars()
+              
     
     def set_aspect_ratio(self):
         self.aspect_ratio = self.SCREEN_HEIGHT/768
@@ -801,9 +808,12 @@ class Game(object):
         self.screen.fill((0,0,0))
         self.frame.draw(self.worldsurf, self.scoresurf)
         self.score.draw(self.scoresurf)
+        if self.stars:
+            for star in self.stars:
+                self.worldsurf.set_at(star,(255,255,255))
         self.bighex.draw(self.worldsurf)
         self.smallhex.draw(self.worldsurf)
-        if self.config.get_setting('Display','show_kp'):
+        if self.playback and self.config.get_setting('Display','show_kp'):
             self.draw_kp()
         for shell in self.shell_list:
             shell.draw(self.worldsurf)
@@ -1331,6 +1341,14 @@ class Game(object):
                     self.playback_keyheld[0] = 0
                 elif event.key == pygame.K_RIGHT:
                     self.playback_keyheld[1] = 0
+
+    def init_stars(self):
+        """ Create the starfield """
+        self.stars = []
+        for i in range(self.config.get_setting('Starfield','max_stars')):
+            star = [randrange(0,self.WORLD_WIDTH - self.linewidth),
+                    randrange(0,self.WORLD_HEIGHT - self.linewidth)]
+            self.stars.append(star)
     
     def draw_kp(self):
         

@@ -229,4 +229,7 @@ def get_config():
     
     cfg.add_setting('Playback', 'playback', False, type=2)
     
+    cfg.add_setting('Starfield', 'show_starfield', True, type=2)
+    cfg.add_setting('Starfield', 'max_stars', 250)
+    
     return cfg
