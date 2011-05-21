@@ -100,7 +100,6 @@ class Game(object):
         if self.config.get_setting('Playback','playback'):
             import playback
             logfile = playback.pickLog()
-            #logfile = '/Users/ryan/SFData/c83e3d50/c83e3d50_2011-5-19_12-35-52.txt'
             if logfile and os.path.exists(logfile):
                 self.logfile = open(logfile,'r')
                 header = self.logfile.readline()[:-1].split('\t')
@@ -125,6 +124,10 @@ class Game(object):
                                 data.append(d)
                         self.playback_data = data
                         self.playback = True
+                    else:
+                        sys.exit()
+            else:
+                sys.exit()
         
         d = datetime.datetime.now().timetuple()
         base = "%s_%d-%d-%d_%d-%d-%d"%(self.config.get_setting('General','id'), d[0], d[1], d[2], d[3], d[4], d[5])
@@ -165,7 +168,7 @@ class Game(object):
         display_info = pygame.display.Info()
         mode_list = pygame.display.list_modes()
         if self.config.get_setting('Display','display_mode') == 'Windowed':
-            best_mode = mode_list[4]
+            best_mode = mode_list[1]
         else:
             best_mode = mode_list[0]
         self.SCREEN_WIDTH = best_mode[0]
