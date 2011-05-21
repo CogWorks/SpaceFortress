@@ -52,15 +52,17 @@ class Missile(token.Token):
         pygame.draw.line(worldsurf, (255,0,0), (self.x1, self.y1), (self.x3, self.y3), self.app.linewidth)
         pygame.draw.line(worldsurf, (255,0,0), (self.x1, self.y1), (self.x4, self.y4), self.app.linewidth)
         
-    # def collides_with(self, sf_object):
-    #     """determines if missile is colliding with a particular object"""
-    #     incx = math.cos(math.radians((self.orientation) % 360)) # "incremental x" - how much it moves with speed = 1
-    #     incy = -math.sin(math.radians((self.orientation) % 360)) # "incremental y" - how much it moves with speed = 1
-    #     for i in range(1, self.speed + 1):
-    #         tempx = self.position.x + incx * i #test position
-    #         tempy = self.position.y + incy * i
-    #         tempdist = math.sqrt(((tempx - sf_object.position.x) ** 2) + ((tempy - sf_object.position.y) ** 2))
-    #         if tempdist <= self.collision_radius + sf_object.collision_radius:
-    #             return 1
-    #     return 0
-
+    def __str__(self):
+        return '(%.2f,%.2f,%.2f)' % (self.position.x,self.position.y,self.orientation)
+        
+class MissileList(list):
+    
+    def __init__(self, app):
+        super(MissileList, self).__init__()
+        self.app = app
+        
+    def __str__(self):
+        s = ''
+        for i in range(0,len(self)):
+            s = '%s,%s' % (s,self[i])
+        return '[%s]' % (s[1:])

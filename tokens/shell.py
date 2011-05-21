@@ -51,3 +51,18 @@ class Shell(token.Token):
         pygame.draw.line(worldsurf, (255,0,0), (x2, y2), (x3, y3), self.app.linewidth)
         pygame.draw.line(worldsurf, (255,0,0), (x3, y3), (x4, y4), self.app.linewidth)
         pygame.draw.line(worldsurf, (255,0,0), (x4, y4), (x1, y1), self.app.linewidth)
+        
+    def __str__(self):
+        return '(%.2f,%.2f,%.2f)' % (self.position.x,self.position.y,self.orientation)
+    
+class ShellList(list):
+    
+    def __init__(self, app):
+        super(ShellList, self).__init__()
+        self.app = app
+        
+    def __str__(self):
+        s = ''
+        for i in range(0,len(self)):
+            s = '%s,%s' % (s,self[i])
+        return '[%s]' % (s[1:])

@@ -282,8 +282,8 @@ class Game(object):
     def setup_world(self):
         """initializes gameplay"""
         self.gameevents.add("game", "setup", type='EVENT_SYSTEM')
-        self.missile_list = []
-        self.shell_list = []
+        self.missile_list = tokens.missile.MissileList(self)
+        self.shell_list = tokens.shell.ShellList(self)
         self.ship = tokens.ship.Ship(self)
         if self.config.get_setting('Bonus','bonus_exists'):
             self.bonus = tokens.bonus.Bonus(self)
@@ -875,16 +875,6 @@ class Game(object):
         else:
             fortress_alive = "n"
             fortress_orientation = "NA"
-        missile = '"'
-        for m in self.missile_list:
-            missile += "%.3f %.3f "%(m.position.x, m.position.y)
-        missile.rstrip()
-        missile += '"'
-        shell = '"'
-        for s in self.shell_list:
-            shell += "%.3f %.3f "%(s.position.x, s.position.y)
-        shell.rstrip()
-        shell += '"'
         if self.config.get_setting('General','bonus_system') == "AX-CPT":
             bonus_isi = str(self.bonus.isi_time)
         else:
@@ -941,7 +931,7 @@ class Game(object):
         
         self.log.write("STATE\t%f\t%d\t%d\tNA\tNA\tNA\tNA\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t" %
                        (system_clock, game_time, self.current_game, " ".join(self.mine_list.foe_letters), ship_alive, ship_x, ship_y, smod, dmod, ship_vel_x, ship_vel_y, ship_orientation,
-                        distance, mine_no, mine_id, mine_x, mine_y, fortress_alive, fortress_orientation, missile, shell))
+                        distance, mine_no, mine_id, mine_x, mine_y, fortress_alive, fortress_orientation, self.missile_list, self.shell_list))
         if self.config.get_setting('General','bonus_system') == "AX-CPT":
             self.log.write("%s\t%s\t%s\t%s\t%s\t%s\t" %
                            (bonus_no, bonus_prev, bonus_cur, bonus_cur_x, bonus_cur_y, bonus_isi))
