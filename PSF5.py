@@ -2,7 +2,7 @@
 
 from __future__ import division
 import subprocess, os, sys, platform, math
-from random import randrange
+from random import randrange, choice
 
 githash = None
 env = os.environ
@@ -811,9 +811,22 @@ class Game(object):
         self.screen.fill((0,0,0))
         self.frame.draw(self.worldsurf, self.scoresurf)
         self.score.draw(self.scoresurf)
+        
         if self.stars:
             for star in self.stars:
-                self.worldsurf.set_at(star,(255,255,255))
+                star[1] += star[2] * self.config.get_setting('Graphics','star_speed')
+                if star[1] >= self.WORLD_HEIGHT:
+                    star[1] = 0
+                    star[0] = randrange(0,self.WORLD_WIDTH-self.linewidth)
+                    star[2] = choice([1,2,3])
+                if star[2] == 1:
+                    color = (100,100,100)
+                elif star[2] == 2:
+                    color = (190,190,190)
+                elif star[2] == 3:
+                    color = (255,255,255)
+                self.worldsurf.fill(color,(star[0],star[1],star[2],star[2]))
+                
         self.bighex.draw(self.worldsurf)
         self.smallhex.draw(self.worldsurf)
         if self.playback and self.config.get_setting('Display','show_kp'):
@@ -1350,7 +1363,8 @@ class Game(object):
         self.stars = []
         for i in range(self.config.get_setting('Graphics','max_stars')):
             star = [randrange(0,self.WORLD_WIDTH - self.linewidth),
-                    randrange(0,self.WORLD_HEIGHT - self.linewidth)]
+                    randrange(0,self.WORLD_HEIGHT - self.linewidth),
+                    choice([1,2,3])]
             self.stars.append(star)
     
     def draw_kp(self):

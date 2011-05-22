@@ -91,6 +91,7 @@ def get_config():
     
     cfg.add_setting('Graphics', 'show_starfield', True, type=2)
     cfg.add_setting('Graphics', 'max_stars', 250)
+    cfg.add_setting('Graphics', 'star_speed', .5, type=config.constants.CT_DBLSPINBOX)
     cfg.add_setting('Graphics', 'fancy', False, type=config.constants.CT_CHECKBOX)
     
     cfg.add_setting('Logging', 'logging', True, alias='Logging', type=config.constants.CT_CHECKBOX, about='Enable/disable logging')

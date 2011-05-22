@@ -44,6 +44,7 @@ class DoubleSpinBox(QDoubleSpinBox):
         self.category = category
         self.setting = setting
         self.info = info
+        self.setSingleStep(.01)
         self.setMaximum(1000000)
         self.setValue(info['value'])
         QObject.connect(self, SIGNAL('valueChanged(double)'), self.stateChangeHandler)

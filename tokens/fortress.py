@@ -33,7 +33,7 @@ class Fortress(token.Token):
         self.reset_timer = clock_timer()
         self.alive = True
         if self.app.config.get_setting('Graphics','fancy'):
-            self.fortress = picture.Picture(os.path.join(self.app.approot, 'psf5.png'), (64*self.app.aspect_ratio)/128)
+            self.fortress = picture.Picture(os.path.join(self.app.approot, 'psf5.png'), (72*self.app.aspect_ratio)/128)
         
   
     def compute(self):
