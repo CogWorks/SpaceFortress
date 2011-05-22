@@ -672,6 +672,7 @@ class Game(object):
                 self.ship.color = (255,255,0)
             elif self.config.get_setting('Ship','colored_damage'):
                 g = 255 / self.ship.start_health * (self.ship.health-1)
+                self.ship.shield_alpha = (self.ship.health-1)/self.ship.start_health * 255
                 self.ship.color = (255,g,0)
                 
         elif obj.startswith("missile_"):
@@ -799,6 +800,7 @@ class Game(object):
         self.sounds.explosion.play()
         pygame.time.delay(1000)
         self.score.iff = ""
+        self.ship.shield.image.set_alpha(255)
         self.ship.alive = True
         self.ship.position.x = self.config.get_setting('Ship','ship_pos_x')*self.aspect_ratio
         self.ship.position.y = self.config.get_setting('Ship','ship_pos_y')*self.aspect_ratio

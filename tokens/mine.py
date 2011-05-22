@@ -33,7 +33,8 @@ class Mine(token.Token):
         self.tagged = "untagged"
         self.color = (0, 255, 255)
         if self.app.config.get_setting('Graphics','fancy'):
-            self.mine = picture.Picture(os.path.join(self.app.approot, 'gfx/mine.png'), 48*self.app.aspect_ratio/128, random.randint(0,359))
+            img = random.choice(['gfx/clust1.png','gfx/clust2.png','gfx/clust3.png','gfx/clust4.png'])
+            self.mine = picture.Picture(os.path.join(self.app.approot, img), 64*self.app.aspect_ratio/128, random.randint(0,359))
                 
     def generate_new_position(self):
         """chooses random location to place mine"""
