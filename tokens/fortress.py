@@ -6,10 +6,11 @@
 #Fall 2010
 from __future__ import division
 from vector2D import Vector2D
-import math
+import math, os
 import token
 import shell
 import pygame
+import picture
 from gameevent import GameEvent
 from timer import Timer as clock_timer
 from timer import FrameTimer as frame_timer
@@ -31,6 +32,8 @@ class Fortress(token.Token):
         self.lock_time = self.app.config.get_setting('Fortress','fortress_lock_time')
         self.reset_timer = clock_timer()
         self.alive = True
+        if self.app.config.get_setting('Graphics','fancy'):
+            self.fortress = picture.Picture(os.path.join(self.app.approot, 'psf5.png'), (64*self.app.aspect_ratio)/128)
         
   
     def compute(self):
@@ -78,8 +81,15 @@ class Fortress(token.Token):
         x6 = - (18 * self.sinphi)*self.app.aspect_ratio + self.position.x
         y6 = -(18 * self.cosphi)*self.app.aspect_ratio + self.position.y
         
-        pygame.draw.line(worldsurf, (255,255,0), (x1,y1), (x2, y2), self.app.linewidth)
-        pygame.draw.line(worldsurf, (255,255,0), (x3,y3), (x5, y5), self.app.linewidth)
-        pygame.draw.line(worldsurf, (255,255,0), (x3,y3), (x4, y4), self.app.linewidth)
-        pygame.draw.line(worldsurf, (255,255,0), (x5,y5), (x6, y6), self.app.linewidth)
+        if self.app.config.get_setting('Graphics','fancy'):
+            fortress = pygame.transform.rotate(self.fortress.image, self.orientation-90)
+            fortressrect = fortress.get_rect()
+            fortressrect.centerx = self.position.x
+            fortressrect.centery = self.position.y
+            worldsurf.blit(fortress, fortressrect)
+        else:
+            pygame.draw.line(worldsurf, (255,255,0), (x1,y1), (x2, y2), self.app.linewidth)
+            pygame.draw.line(worldsurf, (255,255,0), (x3,y3), (x5, y5), self.app.linewidth)
+            pygame.draw.line(worldsurf, (255,255,0), (x3,y3), (x4, y4), self.app.linewidth)
+            pygame.draw.line(worldsurf, (255,255,0), (x5,y5), (x6, y6), self.app.linewidth)
         

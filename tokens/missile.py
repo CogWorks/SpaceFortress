@@ -6,9 +6,10 @@
 #Fall 2010
 from __future__ import division
 from vector2D import Vector2D
-import math
+import math, os
 import token
 import pygame
+import picture
 #from frame import Frame
 
 class Missile(token.Token):
@@ -23,6 +24,8 @@ class Missile(token.Token):
         self.speed = self.app.config.get_setting('Missile','missile_speed')
         self.velocity.x = math.cos(math.radians((self.orientation) % 360)) * self.speed
         self.velocity.y = -math.sin(math.radians((self.orientation) % 360)) * self.speed
+        if self.app.config.get_setting('Graphics','fancy'):
+            self.missile = picture.Picture(os.path.join(self.app.approot, 'gfx/plasma-blue-small.png'), 25*self.app.aspect_ratio/29, self.orientation-90)
         
     def compute(self):
         """calculates new position of ship's missile"""
@@ -48,9 +51,14 @@ class Missile(token.Token):
         self.x4 = ((-5 * self.cosphi) - (-5 * self.sinphi))*self.app.aspect_ratio + self.position.x
         self.y4 = (-((-5 * self.cosphi) + (-5 * self.sinphi)))*self.app.aspect_ratio + self.position.y
         
-        pygame.draw.line(worldsurf, (255,0,0), (self.x1, self.y1), (self.x2, self.y2), self.app.linewidth)
-        pygame.draw.line(worldsurf, (255,0,0), (self.x1, self.y1), (self.x3, self.y3), self.app.linewidth)
-        pygame.draw.line(worldsurf, (255,0,0), (self.x1, self.y1), (self.x4, self.y4), self.app.linewidth)
+        if self.app.config.get_setting('Graphics','fancy'):
+            self.missile.rect.centerx = self.position.x
+            self.missile.rect.centery = self.position.y
+            worldsurf.blit(self.missile.image, self.missile.rect)
+        else:
+            pygame.draw.line(worldsurf, (255,0,0), (self.x1, self.y1), (self.x2, self.y2), self.app.linewidth)
+            pygame.draw.line(worldsurf, (255,0,0), (self.x1, self.y1), (self.x3, self.y3), self.app.linewidth)
+            pygame.draw.line(worldsurf, (255,0,0), (self.x1, self.y1), (self.x4, self.y4), self.app.linewidth)
         
     def __str__(self):
         return '(%.2f,%.2f,%.2f)' % (self.position.x,self.position.y,self.orientation)

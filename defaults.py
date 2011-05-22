@@ -89,6 +89,10 @@ def get_config():
     cfg.add_setting('Display', 'show_et', False, type=config.constants.CT_CHECKBOX)
     cfg.add_setting('Display', 'show_kp', False, type=config.constants.CT_CHECKBOX)
     
+    cfg.add_setting('Graphics', 'show_starfield', True, type=2)
+    cfg.add_setting('Graphics', 'max_stars', 250)
+    cfg.add_setting('Graphics', 'fancy', False, type=config.constants.CT_CHECKBOX)
+    
     cfg.add_setting('Logging', 'logging', True, alias='Logging', type=config.constants.CT_CHECKBOX, about='Enable/disable logging')
     cfg.add_setting('Logging', 'logdir', '', alias='Log Directory', type=config.constants.CT_LINEEDIT, about='Directory for log files, leave blank for default.')
         
@@ -228,8 +232,5 @@ def get_config():
     cfg.add_setting('Joystick', 'pnts_button', 2)
     
     cfg.add_setting('Playback', 'playback', False, type=2)
-    
-    cfg.add_setting('Starfield', 'show_starfield', True, type=2)
-    cfg.add_setting('Starfield', 'max_stars', 250)
     
     return cfg

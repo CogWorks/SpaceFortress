@@ -6,12 +6,13 @@
 #Fall 2010
 from __future__ import division
 from vector2D import Vector2D
-import math
+import math, os
 import token
 import string
 import random
 import pygame
 import timer
+import picture
 
 #from frame import Frame
 
@@ -31,6 +32,8 @@ class Mine(token.Token):
         self.iff = None
         self.tagged = "untagged"
         self.color = (0, 255, 255)
+        if self.app.config.get_setting('Graphics','fancy'):
+            self.mine = picture.Picture(os.path.join(self.app.approot, 'gfx/mine.png'), 48*self.app.aspect_ratio/128, random.randint(0,359))
                 
     def generate_new_position(self):
         """chooses random location to place mine"""
@@ -46,11 +49,15 @@ class Mine(token.Token):
         
     def draw(self, worldsurf):
         """draws mine to worldsurf"""
-        pygame.draw.line(worldsurf, self.color, (self.position.x - 16*self.app.aspect_ratio, self.position.y), (self.position.x, self.position.y - 24*self.app.aspect_ratio), self.app.linewidth)
-        pygame.draw.line(worldsurf, self.color, (self.position.x, self.position.y - 24*self.app.aspect_ratio), (self.position.x + 16*self.app.aspect_ratio, self.position.y), self.app.linewidth)
-        pygame.draw.line(worldsurf, self.color, (self.position.x + 16*self.app.aspect_ratio, self.position.y), (self.position.x, self.position.y + 24*self.app.aspect_ratio), self.app.linewidth)
-        pygame.draw.line(worldsurf, self.color, (self.position.x, self.position.y + 24*self.app.aspect_ratio), (self.position.x - 16*self.app.aspect_ratio, self.position.y), self.app.linewidth)
-        
+        if self.app.config.get_setting('Graphics','fancy'):
+            self.mine.rect.centerx = self.position.x
+            self.mine.rect.centery = self.position.y
+            worldsurf.blit(self.mine.image, self.mine.rect)
+        else:
+            pygame.draw.line(worldsurf, self.color, (self.position.x - 16*self.app.aspect_ratio, self.position.y), (self.position.x, self.position.y - 24*self.app.aspect_ratio), self.app.linewidth)
+            pygame.draw.line(worldsurf, self.color, (self.position.x, self.position.y - 24*self.app.aspect_ratio), (self.position.x + 16*self.app.aspect_ratio, self.position.y), self.app.linewidth)
+            pygame.draw.line(worldsurf, self.color, (self.position.x + 16*self.app.aspect_ratio, self.position.y), (self.position.x, self.position.y + 24*self.app.aspect_ratio), self.app.linewidth)
+            pygame.draw.line(worldsurf, self.color, (self.position.x, self.position.y + 24*self.app.aspect_ratio), (self.position.x - 16*self.app.aspect_ratio, self.position.y), self.app.linewidth)
         
 class MineList(list):
     """extension of list to contain properties for mine subsystem"""

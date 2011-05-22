@@ -276,7 +276,7 @@ class Game(object):
         self.dmod = -1
         self.smod = -1
         
-        if self.config.get_setting('Starfield','show_starfield'):
+        if self.config.get_setting('Graphics','show_starfield'):
             self.init_stars()
               
     
@@ -1345,7 +1345,7 @@ class Game(object):
     def init_stars(self):
         """ Create the starfield """
         self.stars = []
-        for i in range(self.config.get_setting('Starfield','max_stars')):
+        for i in range(self.config.get_setting('Graphics','max_stars')):
             star = [randrange(0,self.WORLD_WIDTH - self.linewidth),
                     randrange(0,self.WORLD_HEIGHT - self.linewidth)]
             self.stars.append(star)

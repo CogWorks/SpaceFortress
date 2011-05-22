@@ -4,10 +4,11 @@
 #Marc Destefano
 #Rensselaer Polytechnic Institute
 #Fall 2010
-import math
+import math, os
 import token
 import missile
 import pygame
+import picture
 from timer import Timer
 from gameevent import GameEvent
 
@@ -48,6 +49,9 @@ class Ship(token.Token):
         if self.app.config.get_setting('Joystick','invert_y'):
             self.invert_y = -1.0
         self.color = (255,255,0)
+        if self.app.config.get_setting('Graphics','fancy'):
+            self.ship = picture.Picture(os.path.join(self.app.approot, 'gfx/ship.png'), 48*self.app.aspect_ratio/128)
+            self.ship2 = picture.Picture(os.path.join(self.app.approot, 'gfx/ship2.png'), 66*self.app.aspect_ratio/175)
         
     def compute(self):
         """updates ship"""
@@ -135,7 +139,16 @@ class Ship(token.Token):
         x5 = (-18 * self.cosphi - -18 * self.sinphi)*self.app.aspect_ratio + self.position.x
         y5 = (-((-18 * self.cosphi) + (-18 * self.sinphi)))*self.app.aspect_ratio + self.position.y
         
-        pygame.draw.line(worldsurf, self.color, (x1,y1), (x2,y2), self.app.linewidth)
-        pygame.draw.line(worldsurf, self.color, (x3,y3), (x4,y4), self.app.linewidth)
-        pygame.draw.line(worldsurf, self.color, (x3,y3), (x5,y5), self.app.linewidth)
- 
+        if self.app.config.get_setting('Graphics','fancy'):
+            if not self.thrust_flag:
+                ship = pygame.transform.rotate(self.ship.image, self.orientation-90)
+            else:
+                ship = pygame.transform.rotate(self.ship2.image, self.orientation-90)
+            shiprect = ship.get_rect()
+            shiprect.centerx = self.position.x
+            shiprect.centery = self.position.y
+            worldsurf.blit(ship, shiprect)
+        else:
+            pygame.draw.line(worldsurf, self.color, (x1,y1), (x2,y2), self.app.linewidth)
+            pygame.draw.line(worldsurf, self.color, (x3,y3), (x4,y4), self.app.linewidth)
+            pygame.draw.line(worldsurf, self.color, (x3,y3), (x5,y5), self.app.linewidth)

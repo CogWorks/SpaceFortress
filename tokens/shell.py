@@ -6,9 +6,10 @@
 #Fall 2010
 from __future__ import division
 from vector2D import Vector2D
-import math
+import math, os
 import token
 import pygame
+import picture
 #from frame import Frame
 
 class Shell(token.Token):
@@ -23,6 +24,8 @@ class Shell(token.Token):
         self.collision_radius = 3*self.app.aspect_ratio
         self.velocity.x = math.cos(math.radians((self.orientation) % 360)) * self.speed
         self.velocity.y = -math.sin(math.radians((self.orientation) % 360)) * self.speed
+        if self.app.config.get_setting('Graphics','fancy'):
+            self.shell = picture.Picture(os.path.join(self.app.approot, 'gfx/plasma-red-big.png'), 24*self.app.aspect_ratio/43, self.orientation-90)
         
     def compute(self):
         """calculates new position of shell"""
@@ -47,10 +50,15 @@ class Shell(token.Token):
         x4 = -(6 * self.sinphi)*self.app.aspect_ratio + self.position.x
         y4 = -(6 * self.cosphi)*self.app.aspect_ratio + self.position.y
         
-        pygame.draw.line(worldsurf, (255,0,0), (x1, y1), (x2, y2), self.app.linewidth)
-        pygame.draw.line(worldsurf, (255,0,0), (x2, y2), (x3, y3), self.app.linewidth)
-        pygame.draw.line(worldsurf, (255,0,0), (x3, y3), (x4, y4), self.app.linewidth)
-        pygame.draw.line(worldsurf, (255,0,0), (x4, y4), (x1, y1), self.app.linewidth)
+        if self.app.config.get_setting('Graphics','fancy'):
+            self.shell.rect.centerx = self.position.x
+            self.shell.rect.centery = self.position.y
+            worldsurf.blit(self.shell.image, self.shell.rect)
+        else:
+            pygame.draw.line(worldsurf, (255,0,0), (x1, y1), (x2, y2), self.app.linewidth)
+            pygame.draw.line(worldsurf, (255,0,0), (x2, y2), (x3, y3), self.app.linewidth)
+            pygame.draw.line(worldsurf, (255,0,0), (x3, y3), (x4, y4), self.app.linewidth)
+            pygame.draw.line(worldsurf, (255,0,0), (x4, y4), (x1, y1), self.app.linewidth)
         
     def __str__(self):
         return '(%.2f,%.2f,%.2f)' % (self.position.x,self.position.y,self.orientation)
