@@ -229,6 +229,7 @@ class Game(object):
         self.pnts_key = eval("pygame.K_%s" % self.config.get_setting('Keybindings','pnts_key'))
             
         self.pause_key = eval("pygame.K_%s" % self.config.get_setting('Keybindings','pause_key'))
+        self.screenshot_key = eval("pygame.K_%s" % self.config.get_setting('Keybindings','screenshot_key'))
         
         self.vector_explosion = pygame.image.load(os.path.join(self.approot, "gfx/exp.png"))
         self.vector_explosion.set_colorkey((0, 0, 0))
@@ -379,6 +380,8 @@ class Game(object):
                         self.gameevents.add("press", "shots", type='EVENT_USER')
                     elif event.key == self.pnts_key:
                         self.gameevents.add("press", "pnts", type='EVENT_USER')
+                    elif event.key == self.screenshot_key:
+                        pygame.image.save(self.screen, "screenshot.jpeg")
                 elif event.type == pygame.KEYUP:
                     if event.key == self.thrust_key:
                         self.gameevents.add("release", "thrust", type='EVENT_USER')
