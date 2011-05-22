@@ -53,6 +53,7 @@ class Ship(token.Token):
             self.ship = picture.Picture(os.path.join(self.app.approot, 'gfx/ship.png'), 48*self.app.aspect_ratio/128)
             self.ship2 = picture.Picture(os.path.join(self.app.approot, 'gfx/ship2.png'), 66*self.app.aspect_ratio/175)
             self.shield = picture.Picture(os.path.join(self.app.approot, 'gfx/shield.png'), 70*self.app.aspect_ratio/400)
+            self.cur_shield = self.shield.image.copy()
         
     def compute(self):
         """updates ship"""
@@ -148,12 +149,11 @@ class Ship(token.Token):
             shiprect = ship.get_rect()
             shiprect.centerx = self.position.x
             shiprect.centery = self.position.y
-            self.shield.rect.centerx = self.position.x
-            self.shield.rect.centery = self.position.y
             worldsurf.blit(ship, shiprect)
             if self.health-1 > 0:
-                shield = self.shield.image.convert_alpha()
-                worldsurf.blit(shield, self.shield.rect)
+                self.shield.rect.centerx = self.position.x
+                self.shield.rect.centery = self.position.y
+                worldsurf.blit(self.cur_shield, self.shield.rect)
         else:
             pygame.draw.line(worldsurf, self.color, (x1,y1), (x2,y2), self.app.linewidth)
             pygame.draw.line(worldsurf, self.color, (x3,y3), (x4,y4), self.app.linewidth)
