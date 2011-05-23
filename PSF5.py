@@ -697,11 +697,12 @@ class Game(object):
                     self.gameevents.add("score+", "pnts", self.config.get_setting('Score','destroy_fortress'))
                     self.gameevents.add("score+", "fortress", self.config.get_setting('Score','destroy_fortress'))
                     self.score.vlner = 0
+                    self.gameevents.add("reset", "VLNER")
                     #do we reset the mine timer?
                     if self.config.get_setting('Mine','fortress_resets_mine'):
                         self.mine_list.timer.reset()
                         self.mine_list.flag = False
-                if self.ship.shot_timer.elapsed() < self.config.get_setting('Fortress','vlner_time') and self.score.vlner < self.config.get_setting('Fortress','vlner_threshold'):
+                elif self.ship.shot_timer.elapsed() < self.config.get_setting('Fortress','vlner_time') and self.score.vlner < self.config.get_setting('Fortress','vlner_threshold'):
                     self.gameevents.add("reset", "VLNER")
                     self.score.vlner = 0
                     self.sounds.vlner_reset.play()

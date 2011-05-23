@@ -20,6 +20,8 @@
   the fortress orientation
 * Add fancy graphics mode with fancy graphics
 * Add ability to take screenshots easily
+* Fix sound bug where sounds stop playing
+* Fix bug where vlner reset sound would play when fortress was destroyed
 
  v5.0.0_rc9
 ---------------------
