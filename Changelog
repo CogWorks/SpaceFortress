@@ -15,6 +15,11 @@
 * Add increasing counts each mine and bonus in log
 * Fix indexerror for mine_list bug
 * Added a "game n of m" screen
+* Add parallax starfield, can set max number of stars, max star speed.
+  Can also control whether they mode in a fixed (random) direction or opposite
+  the fortress orientation
+* Add fancy graphics mode with fancy graphics
+* Add ability to take screenshots easily
 
  v5.0.0_rc9
 ---------------------
