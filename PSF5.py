@@ -248,8 +248,8 @@ class Game(object):
             self.explosion_small = picture.Picture(os.path.join(self.approot, 'gfx/exp3.png'), 70*self.aspect_ratio/85)
             self.explosion_small.adjust_alpha(204)
         else:
-            self.explosion = picture.Picture(os.path.join(self.approot, 'gfx/exp1.png'), 182*self.aspect_ratio/182)
-            self.explosionsmall = picture.Picture(os.path.join(self.approot, 'gfx/exp1.png'), 91*self.aspect_ratio/182)
+            self.explosion = picture.Picture(os.path.join(self.approot, 'gfx/exp.png'),1)
+            self.explosion_small = picture.Picture(os.path.join(self.approot, 'gfx/exp.png'),1)
             
         self.clock = pygame.time.Clock()
         self.gametimer = tokens.timer.Timer()
@@ -679,8 +679,9 @@ class Game(object):
                 self.ship.color = (255,255,0)
             elif self.config.get_setting('Ship','colored_damage'):
                 g = 255 / self.ship.start_health * (self.ship.health-1)
-                self.ship.cur_shield = self.ship.shield.adjust_alpha(self.ship.health/self.ship.start_health * 128 + 128, inplace=False)
                 self.ship.color = (255,g,0)
+                if self.config.get_setting('Graphics','fancy'):
+                    self.ship.cur_shield = self.ship.shield.adjust_alpha(self.ship.health/self.ship.start_health * 128 + 128, inplace=False)
                 
         elif obj.startswith("missile_"):
             #if missile hits fortress, need to check if it takes damage when mine is onscreen
@@ -808,7 +809,8 @@ class Game(object):
         self.sounds.explosion.play()
         pygame.time.delay(1000)
         self.score.iff = ""
-        self.ship.cur_shield = self.ship.shield.image.copy()
+        if self.config.get_setting('Graphics','fancy'):
+            self.ship.cur_shield = self.ship.shield.image.copy()
         self.ship.alive = True
         self.ship.position.x = self.config.get_setting('Ship','ship_pos_x')*self.aspect_ratio
         self.ship.position.y = self.config.get_setting('Ship','ship_pos_y')*self.aspect_ratio
