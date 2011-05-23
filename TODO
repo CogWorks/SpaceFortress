@@ -3,12 +3,8 @@
 
 * Center world on non wide-screen displays that are windowed
 
-* Fortress does not always make explosion sound when destroyed
-
 * Convert all raw x,y settings in config to ratios of world dimentions or screen dimensions
 
 * If death IFF and mine on screen will disappear, if death axcpt disappear
 
 * not logging both scores!
-
-* add screen to replace foes screen when there are no foes
