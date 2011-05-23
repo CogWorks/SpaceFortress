@@ -231,10 +231,7 @@ class Game(object):
             
         self.pause_key = eval("pygame.K_%s" % self.config.get_setting('Keybindings','pause_key'))
         self.screenshot_key = eval("pygame.K_%s" % self.config.get_setting('Keybindings','screenshot_key'))
-        
-        self.vector_explosion = pygame.image.load(os.path.join(self.approot, "gfx/exp.png"))
-        self.vector_explosion.set_colorkey((0, 0, 0))
-        self.vector_explosion_rect = self.vector_explosion.get_rect()
+            
         self.sounds = tokens.sounds.Sounds(self)
         if self.config.get_setting('Display','display_mode') == 'Fullscreen':
             self.screen = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT), pygame.FULLSCREEN)
@@ -244,6 +241,15 @@ class Game(object):
             self.screen = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
         
         self.gameevents.add("display", 'setmode', (self.SCREEN_WIDTH, self.SCREEN_HEIGHT, self.aspect_ratio), type='EVENT_SYSTEM')
+            
+        if self.config.get_setting('Graphics','fancy'):
+            self.explosion = picture.Picture(os.path.join(self.approot, 'gfx/exp2.png'), 182*self.aspect_ratio/344)
+            self.explosion.adjust_alpha(204)
+            self.explosion_small = picture.Picture(os.path.join(self.approot, 'gfx/exp3.png'), 70*self.aspect_ratio/85)
+            self.explosion_small.adjust_alpha(204)
+        else:
+            self.explosion = picture.Picture(os.path.join(self.approot, 'gfx/exp1.png'), 182*self.aspect_ratio/182)
+            self.explosionsmall = picture.Picture(os.path.join(self.approot, 'gfx/exp1.png'), 91*self.aspect_ratio/182)
             
         self.clock = pygame.time.Clock()
         self.gametimer = tokens.timer.Timer()
@@ -684,6 +690,7 @@ class Game(object):
                 if self.ship.shot_timer.elapsed() < self.config.get_setting('Fortress','vlner_time') and self.score.vlner >= self.config.get_setting('Fortress','vlner_threshold'):
                     self.gameevents.add("destroyed", "fortress")
                     self.fortress.alive = False
+                    self.explosion.random_rotate()
                     self.fortress.reset_timer.reset()
                     self.sounds.explosion.play()
                     self.gameevents.add("score+", "pnts", self.config.get_setting('Score','destroy_fortress'))
@@ -857,15 +864,16 @@ class Game(object):
             if self.fortress.alive:
                 self.fortress.draw(self.worldsurf)
             else:
-                self.vector_explosion_rect.center = (self.fortress.position.x, self.fortress.position.y)
-                self.worldsurf.blit(self.vector_explosion, self.vector_explosion_rect)
+                self.explosion.rect.center = (self.fortress.position.x, self.fortress.position.y)
+                self.worldsurf.blit(self.explosion.image, self.explosion.rect)
         for missile in self.missile_list:
             missile.draw(self.worldsurf)
         if self.ship.alive:
             self.ship.draw(self.worldsurf)
         else:
-            self.vector_explosion_rect.center = (self.ship.position.x, self.ship.position.y)
-            self.worldsurf.blit(self.vector_explosion, self.vector_explosion_rect)
+            self.explosion_small.random_rotate()
+            self.explosion_small.rect.center = (self.ship.position.x, self.ship.position.y)
+            self.worldsurf.blit(self.explosion_small.image, self.explosion_small.rect)
         self.mine_list.draw()
         if self.bonus_exists:
             if self.bonus.visible:
