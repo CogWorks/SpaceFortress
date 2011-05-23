@@ -1486,6 +1486,15 @@ class Game(object):
             if self.config.get_setting('Logging','logging'):
                 self.log.close()
         pygame.quit()
+        #import pstats, StringIO
+        #global prof
+        #stream = StringIO.StringIO()
+        #stats = pstats.Stats(prof, stream=stream)
+        #stats.sort_stats("time")
+        #stats.print_stats(80)
+        #stats.print_callees()
+        #stats.print_callers()
+        #print "Profile data:\n%s" % stream.getvalue()
         sys.exit(ret)
 
 def main():
@@ -1547,6 +1556,10 @@ def main():
     g.quit()
 
 if __name__ == '__main__':
+    #import cProfile
+    #global prof
+    #prof = cProfile.Profile()
+    #prof = prof.runctx("main()", globals(), locals())
     main()
         
 
