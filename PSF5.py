@@ -75,6 +75,7 @@ class Game(object):
         self.header = {}
         
         self.stars = []
+        self.starfield_orientation = randrange(0,359)
 
         i = sys.argv[0].rfind('/')
         if i != -1:
@@ -816,9 +817,26 @@ class Game(object):
         
         if self.stars:
             for star in self.stars:
-                star[1] += star[2] * self.config.get_setting('Graphics','star_speed')
-                if star[1] >= self.WORLD_HEIGHT:
+                if self.config.get_setting('Graphics','parallax_mode') == 'Fortress':
+                    orientation = self.fortress.orientation
+                else:
+                    orientation = self.starfield_orientation
+                star[0] += star[2] * math.cos(math.radians(orientation-180)) * self.config.get_setting('Graphics','star_speed')
+                star[1] += star[2] * math.sin(math.radians(orientation)) * self.config.get_setting('Graphics','star_speed')
+                if star[0] >= self.WORLD_WIDTH:
+                    star[0] = 0
+                    star[1] = randrange(0,self.WORLD_WIDTH-self.linewidth)
+                    star[2] = choice([1,2,3])
+                elif star[0] <= 0:
+                    star[0] = self.WORLD_WIDTH
+                    star[1] = randrange(0,self.WORLD_WIDTH-self.linewidth)
+                    star[2] = choice([1,2,3])
+                elif star[1] >= self.WORLD_HEIGHT:
                     star[1] = 0
+                    star[0] = randrange(0,self.WORLD_WIDTH-self.linewidth)
+                    star[2] = choice([1,2,3])
+                elif star[1] <= 0:
+                    star[1] = self.WORLD_HEIGHT
                     star[0] = randrange(0,self.WORLD_WIDTH-self.linewidth)
                     star[2] = choice([1,2,3])
                 if star[2] == 1:
