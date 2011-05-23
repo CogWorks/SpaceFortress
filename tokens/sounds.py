@@ -17,7 +17,9 @@ class Sounds(object):
     """collection of game sounds"""
     def __init__(self, app):
         super(Sounds, self).__init__()
-        if app.config.get_setting('General','sound'): pygame.mixer.init()
+        if app.config.get_setting('General','sound'):
+            pygame.mixer.init()
+            pygame.mixer.set_num_channels(32)
         self.shell_fired = SFSound(app, os.path.join(app.approot, "sounds/ShellFired.wav"))
         self.missile_fired = SFSound(app, os.path.join(app.approot,"sounds/MissileFired.wav"))
         self.explosion = SFSound(app, os.path.join(app.approot,"sounds/ExpFort.wav"))
