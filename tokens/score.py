@@ -15,33 +15,33 @@ class ScoreAttr(object):
     def __get__(self, instance, owner):
         if instance is None:
             return self
-        if not self.both and self.old != instance.old_positions:
-            return 0
+        # if not self.both and self.old != instance.old_positions:
+        #     return 0
         return instance.positions[instance.position_map[self.name]]
 
     def __set__(self, instance, value):
-        if self.both or self.old == instance.old_positions:
-            instance.positions[instance.position_map[self.name]] = value
+        # if self.both or self.old == instance.old_positions:
+        instance.positions[instance.position_map[self.name]] = value
 
 class Score(object):
     """collection of game scores"""
 
-    vlner = ScoreAttr('VLNER_pos', both=True)
-    iff = ScoreAttr('IFF_pos', both=True)
-    intrvl = ScoreAttr('INTRVL_pos', both=True)
-    shots = ScoreAttr('SHOTS_pos', both=True)
-    
-    # Old scoring
-    pnts = ScoreAttr('PNTS_pos', old=True)
-    cntrl = ScoreAttr('CNTRL_pos', old=True)
-    vlcty = ScoreAttr('VLCTY_pos', old=True)
-    speed = ScoreAttr('SPEED_pos', old=True)
-    
-    # New scoring
-    flight = ScoreAttr('PNTS_pos')
-    fortress = ScoreAttr('CNTRL_pos')
-    mines = ScoreAttr('VLCTY_pos')
-    bonus = ScoreAttr('SPEED_pos')
+    # vlner = ScoreAttr('VLNER_pos', both=True)
+    # iff = ScoreAttr('IFF_pos', both=True)
+    # intrvl = ScoreAttr('INTRVL_pos', both=True)
+    # shots = ScoreAttr('SHOTS_pos', both=True)
+    # 
+    # # Old scoring
+    # pnts = ScoreAttr('PNTS_pos', old=True)
+    # cntrl = ScoreAttr('CNTRL_pos', old=True)
+    # vlcty = ScoreAttr('VLCTY_pos', old=True)
+    # speed = ScoreAttr('SPEED_pos', old=True)
+    # 
+    # # New scoring
+    # flight = ScoreAttr('PNTS_pos')
+    # fortress = ScoreAttr('CNTRL_pos')
+    # mines = ScoreAttr('VLCTY_pos')
+    # bonus = ScoreAttr('SPEED_pos')
         
     def __init__(self, app):
         self.app = app
@@ -58,6 +58,16 @@ class Score(object):
             self.f = self.app.f
         else:
             self.f = self.app.f28
+        self.vlner = 0
+        self.intrvl = 0
+        self.pnts = 0
+        self.cntrl = 0
+        self.vlcty = 0
+        self.speed = 0
+        self.flight = 0
+        self.fortress = 0
+        self.mines = 0
+        self.bonus = 0
         self.iff = ''
         self.shots = self.app.config.get_setting('Missile','missile_num')
         
@@ -82,13 +92,35 @@ class Score(object):
         self.NEW_SCORE_X_C_RIGHT = half_width + 148 * self.app.aspect_ratio
         self.NEW_SCORE_X_R_RIGHT = half_width + 428*self.app.aspect_ratio
         self.NEW_SCORE_X_L_LEFT = half_width - 432 * self.app.aspect_ratio
+    
+        
+    def update_score(self):
+        """updates positions list to reflect current scores"""
+        self.positions[self.position_map["SHOTS_pos"]] = self.shots
+        self.positions[self.position_map["VLNER_pos"]] = self.vlner
+        self.positions[self.position_map["IFF_pos"]] = self.iff
+        self.positions[self.position_map["INTRVL_pos"]] = self.intrvl
+        if self.app.config.get_setting('Score','new_scoring'):
+            #use Flight, Fortress, Mines, Bonus
+            self.positions[self.position_map["PNTS_pos"]] = self.flight
+            self.positions[self.position_map["VLCTY_pos"]] = self.mines
+            self.positions[self.position_map["CNTRL_pos"]] = self.fortress
+            self.positions[self.position_map["SPEED_pos"]] = self.bonus
+        else:
+            #use PNTS, VLCTY, CNTRL, SPEED
+            self.positions[self.position_map["PNTS_pos"]] = self.pnts
+            self.positions[self.position_map["VLCTY_pos"]] = self.vlcty
+            self.positions[self.position_map["CNTRL_pos"]] = self.cntrl
+            self.positions[self.position_map["SPEED_pos"]] = self.speed
+        for item in range(1,9):
+            if isinstance(self.positions[item], float):
+                self.positions[item] = int(self.positions[item])
         
     def draw(self, scoresurf):
         """draws all score values to screen"""     
         #get some floats from adding fractions. Change to int for font rendering
-        for item in range(1,9):
-            if isinstance(self.positions[item], float):
-                self.positions[item] = int(self.positions[item]) 
+        self.update_score()
+        print self.positions
         self.p1_surf = self.f.render("%s"%str(self.positions[1]),0, (255,255,0))
         self.p1_rect = self.p1_surf.get_rect()
         self.p1_rect.centery = self.OLD_SCORE_Y_BASE
