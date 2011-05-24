@@ -144,7 +144,7 @@ class Game(object):
         if not self.playback and self.config.get_setting('Logging','logging'):
             log_filename = "%s.txt" % (self.log_basename)
             self.log = open(log_filename, "w")
-            self.log.write("event_type\tsystem_clock\tgame_time\tcurrent_game\teid\te1\te2\te3\tfoes\tship_alive\tship_x\t"+
+            self.log.write("event_type\tsystem_time\tclock\tgame_time\tcurrent_game\teid\te1\te2\te3\tfoes\tship_alive\tship_x\t"+
                            "ship_y\tsmod\tdmod\tship_vel_x\tship_vel_y\tship_orientation\tdistance\tmine_no\tmine_id\tmine_x\tmine_y\tfortress_alive\tfortress_orientation\t"+
                            "missile\tshell\tbonus_no\tbonus_prev\tbonus_cur\tbonus_cur_x\tbonus_cur_y\t")
             if self.config.get_setting('General','bonus_system') == "AX-CPT":
@@ -496,6 +496,7 @@ class Game(object):
             currentevent = self.gameevents.pop(0)
             time = currentevent.time
             ticks = currentevent.ticks
+            clock = currentevent.clock
             eid = currentevent.eid
             game = currentevent.game
             command = currentevent.command
@@ -503,7 +504,7 @@ class Game(object):
             target = currentevent.target
             type = currentevent.type
             if not self.playback  and self.config.get_setting('Logging','logging') and currentevent.log:
-                self.log.write("%s\t%f\t%d\t%d\t%d\t%s\t%s\t%s\n"%(type, time, ticks, game, eid, command, obj, target))
+                self.log.write("%s\t%f\t%f\t%d\t%d\t%d\t%s\t%s\t%s\n"%(type, time, clock, ticks, game, eid, command, obj, target))
             if command == "press":
                 if obj == "pause":
                     self.pause_game()
@@ -902,7 +903,8 @@ class Game(object):
         
     def log_world(self):
         """logs current state of world to logfile"""
-        system_clock = time.time()
+        system_time = time.time()
+        clock = time.clock()
         game_time = pygame.time.get_ticks()
         if self.ingame:
             smod = self.smod
@@ -996,8 +998,8 @@ class Game(object):
         else:
             pnts_key = "n"
         
-        self.log.write("STATE\t%f\t%d\t%d\tNA\tNA\tNA\tNA\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t" %
-                       (system_clock, game_time, self.current_game, " ".join(self.mine_list.foe_letters), ship_alive, ship_x, ship_y, smod, dmod, ship_vel_x, ship_vel_y, ship_orientation,
+        self.log.write("STATE\t%f\t%f\t%d\t%d\tNA\tNA\tNA\tNA\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t" %
+                       (system_time, clock, game_time, self.current_game, " ".join(self.mine_list.foe_letters), ship_alive, ship_x, ship_y, smod, dmod, ship_vel_x, ship_vel_y, ship_orientation,
                         distance, mine_no, mine_id, mine_x, mine_y, fortress_alive, fortress_orientation, self.missile_list, self.shell_list))
         if self.config.get_setting('General','bonus_system') == "AX-CPT":
             self.log.write("%s\t%s\t%s\t%s\t%s\t%s\t" %

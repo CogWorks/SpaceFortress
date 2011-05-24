@@ -28,9 +28,9 @@ class SF5Plugin(object):
             return None
             
     def logCallback(self):
-        log = 'NA\tNA\tNA\tNA\tNA\tNA\tNA\tNA'
+        log = '\tNA\tNA\tNA\tNA\tNA\tNA\tNA\tNA'
         if self.eg and self.eg.eg_data:
-            log = '%f\t%d\t%d' % (self.eg.eg_data['gazetime'], self.eg.eg_data['x'], self.eg.eg_data['y'])
+            log = '\t%f\t%d\t%d' % (self.eg.eg_data['gazetime'], self.eg.eg_data['x'], self.eg.eg_data['y'])
             if self.eg.fix_data and self.eg.fix_data.eye_motion_state > 0:
                 log = "%s\t%d\t%d\t%d\t%d" % (log, self.eg.fix_count + 1, self.eg.fix_data.eye_motion_state, self.eg.fix_data.fix_x, self.eg.fix_data.fix_y, self.eg.fix_data.fix_duration)
             else:
