@@ -3,6 +3,7 @@
 from __future__ import division
 import subprocess, os, sys, platform, math
 from random import randrange, choice
+import gc
 
 githash = None
 env = os.environ
@@ -1515,6 +1516,7 @@ def main():
     g.display_intro()
     if not g.playback:
         while g.current_game < g.config.get_setting('General','games_per_session'):
+            gc.collect()
             g.current_game += 1
             g.gameevents.add("game", "ready", type='EVENT_SYSTEM')
             g.display_game_number()
@@ -1568,6 +1570,7 @@ def main():
     g.quit()
 
 if __name__ == '__main__':
+    gc.disable()
     #import cProfile
     #global prof
     #prof = cProfile.Profile()
