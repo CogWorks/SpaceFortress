@@ -747,6 +747,7 @@ class Game(object):
             self.mine_list.iff_flag = False
             self.mine_list.timer.reset()
             self.gameevents.add("score+", "mines", self.config.get_setting('Score','energize_friend'))
+            self.gameevents.add("score+", "pnts", self.config.get_setting('Score','energize_friend'))
             self.mine2 += 50
             #amazingly, missile can hit the mine in the same frame as the mine hits the ship
             if len(self.mine_list) > 0:
@@ -759,6 +760,7 @@ class Game(object):
             self.mine_list.iff_flag = False
             self.mine_list.timer.reset()
             self.gameevents.add("score+", "mines", self.config.get_setting('Score','destroy_foe'))
+            self.gameevents.add("score+", "pnts", self.config.get_setting('Score','destroy_foe'))
             self.mine2 += 75
             if len(self.mine_list) > 0:
                 del self.mine_list[0]
