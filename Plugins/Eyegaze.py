@@ -23,15 +23,19 @@ class SF5Plugin(object):
             
     def logHeader(self):
         if self.eg:
-            return '\tfixation_number\teye_motion_state\tfix_x\tfix_y'
+            return 'egtime\tgaze_x\tgaze_y\tfixation_number\teye_motion_state\tfix_x\tfix_y\tsamples'
         else:
             return None
             
     def logCallback(self):
-        if self.eg and self.eg.fix_data and self.eg.fix_data.eye_motion_state > 0:
-            return "\t%d\t%d\t%d\t%d" % (self.eg.fix_count + 1, self.eg.fix_data.eye_motion_state, self.eg.fix_data.fix_x, self.eg.fix_data.fix_y)
-        else:
-            return None
+        log = 'NA\tNA\tNA\tNA\tNA\tNA\tNA\tNA'
+        if self.eg and self.eg.eg_data:
+            log = '%f\t%d\t%d' % (self.eg.eg_data['gazetime'], self.eg.eg_data['x'], self.eg.eg_data['y'])
+            if self.eg.fix_data and self.eg.fix_data.eye_motion_state > 0:
+                log = "%s\t%d\t%d\t%d\t%d" % (log, self.eg.fix_count + 1, self.eg.fix_data.eye_motion_state, self.eg.fix_data.fix_x, self.eg.fix_data.fix_y, self.eg.fix_data.fix_duration)
+            else:
+                log = '%s\t\t\t\t\t' % (log)
+        return log
     
     def eventCallback(self, *args, **kwargs):
         
