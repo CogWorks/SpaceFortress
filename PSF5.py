@@ -70,6 +70,9 @@ class Game(object):
         self.playback_available_games = 0
         self.playback_game = 0
         self.playback_aspect_ratio = 0
+        self.playback_aspect_ratio2 = [0,0]
+        self.playback_screen_w = 0
+        self.playback_screen_h = 0
         self.playback_index = 0
         self.playback_keyheld = [0,0]
         self.playback_start = 0
@@ -103,6 +106,16 @@ class Game(object):
         self.config.update_from_user_file()
         self.gameevents.add("config", "load", "user", type='EVENT_SYSTEM')
         
+        pygame.display.init()
+        pygame.font.init()
+        mode_list = pygame.display.list_modes()
+        if self.config.get_setting('Display','display_mode') == 'Windowed':
+            best_mode = mode_list[1]
+        else:
+            best_mode = mode_list[0]
+        self.SCREEN_WIDTH = best_mode[0]
+        self.SCREEN_HEIGHT = best_mode[1]
+        
         if self.config.get_setting('Playback','playback'):
             import playback
             #logfile = playback.pickLog()
@@ -118,6 +131,7 @@ class Game(object):
                     if line[5] == 'display' and line[6] == 'setmode':
                         info = eval(line[7])
                         self.playback_aspect_ratio = info[2]
+                        self.playback_aspect_ratio2 = (self.SCREEN_WIDTH/info[0],self.SCREEN_HEIGHT/info[1])
                     elif line[5] == 'log' and line[6] == 'version':
                         self.playback_logver = int(line[7])
                     if abs(int(line[3])) > self.playback_available_games:
@@ -171,17 +185,8 @@ class Game(object):
         if not self.playback:
             self.gameevents.add("config","running",str(self.config), type='EVENT_SYSTEM')
         
-        pygame.display.init()
-        pygame.font.init()
         pygame.mouse.set_visible(False)
-        display_info = pygame.display.Info()
-        mode_list = pygame.display.list_modes()
-        if self.config.get_setting('Display','display_mode') == 'Windowed':
-            best_mode = mode_list[1]
-        else:
-            best_mode = mode_list[0]
-        self.SCREEN_WIDTH = best_mode[0]
-        self.SCREEN_HEIGHT = best_mode[1]
+        
         self.set_aspect_ratio()
         os.environ['SDL_VIDEO_WINDOW_POS'] = str(int(mode_list[0][0]/2-self.SCREEN_WIDTH/2)) + "," + str(int(mode_list[0][1]/2-self.SCREEN_HEIGHT/2))
         self.WORLD_WIDTH = int(710 * self.aspect_ratio)
