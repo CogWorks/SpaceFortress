@@ -120,7 +120,7 @@ class Score(object):
         """draws all score values to screen"""     
         #get some floats from adding fractions. Change to int for font rendering
         self.update_score()
-        print self.positions
+        #print self.positions
         self.p1_surf = self.f.render("%s"%str(self.positions[1]),0, (255,255,0))
         self.p1_rect = self.p1_surf.get_rect()
         self.p1_rect.centery = self.OLD_SCORE_Y_BASE

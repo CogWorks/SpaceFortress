@@ -750,8 +750,8 @@ class Game(object):
             #see how long mine has been alive. 0-100 points if destroyed within 10 seconds
             self.gameevents.add("score+", "mines", 100 - 10 * math.floor(self.mine_list.timer.elapsed()/1000))
             self.gameevents.add("score+", "speed", 100 - 10 * math.floor(self.mine_list.timer.elapsed()/1000))
-            print self.mine_list.timer.elapsed()
-            print 100 - 10 * math.floor(self.mine_list.timer.elapsed()/1000)
+            #print self.mine_list.timer.elapsed()
+            #print 100 - 10 * math.floor(self.mine_list.timer.elapsed()/1000)
             self.mine_list.timer.reset()
             self.mine2 += 50
             #amazingly, missile can hit the mine in the same frame as the mine hits the ship
