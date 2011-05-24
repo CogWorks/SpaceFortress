@@ -166,7 +166,7 @@ class Game(object):
                     pass
             self.log.write("\n")
             self.gameevents.add("log", "header", "ready", log=False, type='EVENT_SYSTEM')
-            self.gameevents.add("log", "version", "4", type='EVENT_SYSTEM')
+            self.gameevents.add("log", "version", "5", type='EVENT_SYSTEM')
         
         if not self.playback:
             self.gameevents.add("config","running",str(self.config), type='EVENT_SYSTEM')
