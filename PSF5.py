@@ -73,6 +73,7 @@ class Game(object):
         self.playback_index = 0
         self.playback_keyheld = [0,0]
         self.playback_start = 0
+        self.playback_logver = 0
         self.header = {}
         
         self.stars = []
@@ -104,7 +105,8 @@ class Game(object):
         
         if self.config.get_setting('Playback','playback'):
             import playback
-            logfile = playback.pickLog()
+            #logfile = playback.pickLog()
+            logfile = '/Users/ryan/SFData/c83e3d50/c83e3d50_2011-5-19_14-12-44.txt'
             if logfile and os.path.exists(logfile):
                 self.logfile = open(logfile,'r')
                 header = self.logfile.readline()[:-1].split('\t')
@@ -116,6 +118,8 @@ class Game(object):
                     if line[5] == 'display' and line[6] == 'setmode':
                         info = eval(line[7])
                         self.playback_aspect_ratio = info[2]
+                    elif line[5] == 'log' and line[6] == 'version':
+                        self.playback_logver = int(line[7])
                     if abs(int(line[3])) > self.playback_available_games:
                         self.playback_available_games = abs(int(line[3]))
                     self.playback_data.append(line)
@@ -410,18 +414,6 @@ class Game(object):
                     self.gameevents.add("press", "quit", type='EVENT_USER')
                 elif event.key == self.pause_key and self.config.get_setting('General','allow_pause'):
                     self.gameevents.add("press", "pause", type='EVENT_USER')
-    
-    def process_playback_logic(self):
-        self.ship.compute()
-        for missile in self.missile_list:
-            missile.compute()
-        if self.fortress_exists == True:
-            self.fortress.compute()
-        for shell in self.shell_list:
-            shell.compute()
-        self.mine_list.compute()
-        self.check_bounds()
-        self.test_collisions()
         
     def process_game_logic(self):
         """processes game logic to produce game events"""
@@ -1352,7 +1344,10 @@ class Game(object):
         if mine_x != 'NA' and mine_y != 'NA':
             mine_x = float(mine_x) / self.playback_aspect_ratio * self.aspect_ratio
             mine_y = float(mine_y) / self.playback_aspect_ratio * self.aspect_ratio
-            self.mine_list.append(tokens.mine.Mine(self))
+            if self.playback_logver <= 4:
+                self.mine_list.append(tokens.mine.Mine(self, type=0, orientation=0))
+            else:
+                self.mine_list.append(tokens.mine.Mine(self))
             self.mine_list[0].position.x = mine_x
             self.mine_list[0].position.y = mine_y
             self.score.iff = state[self.header['mine_id']]
