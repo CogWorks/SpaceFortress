@@ -22,6 +22,8 @@
 * Add ability to take screenshots easily
 * Fix sound bug where sounds stop playing
 * Fix bug where vlner reset sound would play when fortress was destroyed
+* Add playback support with Fastforward, Rewind, Pause, FPS Up/Down controls
+* Add video recording support to playback
 
  v5.0.0_rc9
 ---------------------

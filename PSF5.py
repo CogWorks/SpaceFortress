@@ -837,52 +837,55 @@ class Game(object):
         self.ship.velocity.y = self.config.get_setting('Ship','ship_vel_y')
         self.ship.orientation = self.config.get_setting('Ship','ship_orientation')
     
+    def draw_stars(self):
+        
+        for star in self.stars:
+            if sum(self.playback_keyheld) > 0:
+                diff = self.playback_index - self.playback_index_prev
+            else:
+                if self.playback_pause:
+                    diff = 0
+                else:
+                    diff = 1
+            if diff != 0:
+                if self.config.get_setting('Graphics','parallax_mode') == 'Fortress':
+                    orientation = self.fortress.orientation
+                else:
+                    orientation = self.starfield_orientation
+                star[0] += star[2] * math.cos(math.radians(orientation-180)) * self.config.get_setting('Graphics','star_speed') * diff
+                star[1] += star[2] * math.sin(math.radians(orientation)) * self.config.get_setting('Graphics','star_speed') * diff
+                if star[0] >= self.WORLD_WIDTH:
+                    star[0] = 0
+                    star[1] = randrange(0,self.WORLD_WIDTH-self.linewidth)
+                    star[2] = choice([1,2,3])
+                elif star[0] <= 0:
+                    star[0] = self.WORLD_WIDTH
+                    star[1] = randrange(0,self.WORLD_WIDTH-self.linewidth)
+                    star[2] = choice([1,2,3])
+                elif star[1] >= self.WORLD_HEIGHT:
+                    star[1] = 0
+                    star[0] = randrange(0,self.WORLD_WIDTH-self.linewidth)
+                    star[2] = choice([1,2,3])
+                elif star[1] <= 0:
+                    star[1] = self.WORLD_HEIGHT
+                    star[0] = randrange(0,self.WORLD_WIDTH-self.linewidth)
+                    star[2] = choice([1,2,3])
+            if star[2] == 1:
+                color = (100,100,100)
+            elif star[2] == 2:
+                color = (190,190,190)
+            elif star[2] == 3:
+                color = (255,255,255)
+            self.worldsurf.fill(color,(star[0],star[1],star[2],star[2]))
+    
     def draw(self):
         """draws the world"""
         self.screen.fill((0,0,0))
         self.frame.draw(self.worldsurf, self.scoresurf)
         self.score.draw(self.scoresurf)
-        
+
         if self.stars:
-            for star in self.stars:
-                if sum(self.playback_keyheld) > 0:
-                    diff = self.playback_index - self.playback_index_prev
-                else:
-                    if self.playback_pause:
-                        diff = 0
-                    else:
-                        diff = 1
-                if diff != 0:
-                    print diff
-                    if self.config.get_setting('Graphics','parallax_mode') == 'Fortress':
-                        orientation = self.fortress.orientation
-                    else:
-                        orientation = self.starfield_orientation
-                    star[0] += star[2] * math.cos(math.radians(orientation-180)) * self.config.get_setting('Graphics','star_speed') * diff
-                    star[1] += star[2] * math.sin(math.radians(orientation)) * self.config.get_setting('Graphics','star_speed') * diff
-                    if star[0] >= self.WORLD_WIDTH:
-                        star[0] = 0
-                        star[1] = randrange(0,self.WORLD_WIDTH-self.linewidth)
-                        star[2] = choice([1,2,3])
-                    elif star[0] <= 0:
-                        star[0] = self.WORLD_WIDTH
-                        star[1] = randrange(0,self.WORLD_WIDTH-self.linewidth)
-                        star[2] = choice([1,2,3])
-                    elif star[1] >= self.WORLD_HEIGHT:
-                        star[1] = 0
-                        star[0] = randrange(0,self.WORLD_WIDTH-self.linewidth)
-                        star[2] = choice([1,2,3])
-                    elif star[1] <= 0:
-                        star[1] = self.WORLD_HEIGHT
-                        star[0] = randrange(0,self.WORLD_WIDTH-self.linewidth)
-                        star[2] = choice([1,2,3])
-                if star[2] == 1:
-                    color = (100,100,100)
-                elif star[2] == 2:
-                    color = (190,190,190)
-                elif star[2] == 3:
-                    color = (255,255,255)
-                self.worldsurf.fill(color,(star[0],star[1],star[2],star[2]))
+            self.draw_stars()
                 
         self.bighex.draw(self.worldsurf)
         self.smallhex.draw(self.worldsurf)
