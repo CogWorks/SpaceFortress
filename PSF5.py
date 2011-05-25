@@ -688,8 +688,6 @@ class Game(object):
             elif self.config.get_setting('Ship','colored_damage'):
                 g = 255 / self.ship.start_health * (self.ship.health-1)
                 self.ship.color = (255,g,0)
-                if self.config.get_setting('Graphics','fancy'):
-                    self.ship.cur_shield = self.ship.shield.adjust_alpha(self.ship.health/self.ship.start_health * 128 + 128, inplace=False)
                 
         elif obj.startswith("missile_"):
             #if missile hits fortress, need to check if it takes damage when mine is onscreen
@@ -699,7 +697,9 @@ class Game(object):
                 if self.ship.shot_timer.elapsed() < self.config.get_setting('Fortress','vlner_time') and self.score.vlner >= self.config.get_setting('Fortress','vlner_threshold'):
                     self.gameevents.add("destroyed", "fortress")
                     self.fortress.alive = False
-                    self.explosion.random_rotate()
+                    #r = choice([0,45,90,135,180,225,270,315])
+                    #if r:
+                    #    self.explosion.rotate(r)
                     self.fortress.reset_timer.reset()
                     self.sounds.explosion.play()
                     self.gameevents.add("score+", "pnts", self.config.get_setting('Score','destroy_fortress'))
@@ -827,9 +827,11 @@ class Game(object):
         """pauses the game and resets"""
         self.sounds.explosion.play()
         pygame.time.delay(1000)
+        #if self.config.get_setting('Graphics','fancy'):
+            #r = choice([0,45,90,135,180,225,270,315])
+            #if r:
+            #    self.explosion_small.rotate(r)
         self.score.iff = ""
-        if self.config.get_setting('Graphics','fancy'):
-            self.ship.cur_shield = self.ship.shield.image.copy()
         self.ship.alive = True
         self.ship.position.x = self.config.get_setting('Ship','ship_pos_x')*self.aspect_ratio
         self.ship.position.y = self.config.get_setting('Ship','ship_pos_y')*self.aspect_ratio
@@ -904,8 +906,6 @@ class Game(object):
         if self.ship.alive:
             self.ship.draw(self.worldsurf)
         else:
-            if self.config.get_setting('Graphics','fancy'):
-                self.explosion_small.random_rotate()
             self.explosion_small.rect.center = (self.ship.position.x, self.ship.position.y)
             self.worldsurf.blit(self.explosion_small.image, self.explosion_small.rect)
         self.mine_list.draw()
@@ -1592,8 +1592,6 @@ def main():
             g.playback_index_prev = g.playback_index
             g.clock.tick(g.fps)
             while g.playback_data[g.playback_index][0][:5] == 'EVENT':
-                if sum(g.playback_shifts) > 0:
-                    print g.playback_index
                 g.process_playback_event(g.playback_data[g.playback_index])
                 if g.playback_index < len(g.playback_data) - 1 and g.playback_index > -1:
                     if g.playback_keyheld[1]:

@@ -52,8 +52,12 @@ class Ship(token.Token):
         if self.app.config.get_setting('Graphics','fancy'):
             self.ship = picture.Picture(os.path.join(self.app.approot, 'gfx/ship.png'), 48*self.app.aspect_ratio/128)
             self.ship2 = picture.Picture(os.path.join(self.app.approot, 'gfx/ship2.png'), 66*self.app.aspect_ratio/175)
-            self.shield = picture.Picture(os.path.join(self.app.approot, 'gfx/shield.png'), 70*self.app.aspect_ratio/400)
-            self.cur_shield = self.shield.image.copy()
+            self.shields = []
+            for i in range(0,self.start_health):
+                self.shields.append(picture.Picture(os.path.join(self.app.approot, 'gfx/shield.png'),
+                                                    70*self.app.aspect_ratio/400,
+                                                    alpha=int(255.0 / (self.start_health-1) * i)))
+                
         
     def compute(self):
         """updates ship"""
@@ -153,10 +157,10 @@ class Ship(token.Token):
             if self.app.playback and self.app.playback_logver <= 4:
                 pass
             else:
-                if self.health-1 > 0:
-                    self.shield.rect.centerx = self.position.x
-                    self.shield.rect.centery = self.position.y
-                    worldsurf.blit(self.cur_shield, self.shield.rect)
+                s = self.health-1
+                self.shields[s].rect.centerx = self.position.x
+                self.shields[s].rect.centery = self.position.y
+                worldsurf.blit(self.shields[s].image, self.shields[s].rect)
         else:
             pygame.draw.line(worldsurf, self.color, (x1,y1), (x2,y2), self.app.linewidth)
             pygame.draw.line(worldsurf, self.color, (x3,y3), (x4,y4), self.app.linewidth)
