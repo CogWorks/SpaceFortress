@@ -889,7 +889,8 @@ class Game(object):
         if self.ship.alive:
             self.ship.draw(self.worldsurf)
         else:
-            self.explosion_small.random_rotate()
+            if self.config.get_setting('Graphics','fancy'):
+                self.explosion_small.random_rotate()
             self.explosion_small.rect.center = (self.ship.position.x, self.ship.position.y)
             self.worldsurf.blit(self.explosion_small.image, self.explosion_small.rect)
         self.mine_list.draw()
