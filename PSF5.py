@@ -1300,6 +1300,10 @@ class Game(object):
             self.ship.position.x = float(ship_x) / self.playback_aspect_ratio * self.aspect_ratio
             self.ship.position.y = float(ship_y) / self.playback_aspect_ratio * self.aspect_ratio
             self.ship.orientation = float(ship_orientation)
+            if state[self.header['thrust_key']] == 'y':
+                self.ship.thrust_flag = True
+            else:
+                self.ship.thrust_flag = False
         
         bonus_cur_x = state[self.header['bonus_cur_x']]
         bonus_cur_y = state[self.header['bonus_cur_y']]
