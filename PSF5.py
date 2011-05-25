@@ -127,8 +127,8 @@ class Game(object):
             import playback
             if self.config.get_setting('Playback','makevideo'):
                 self.video_writer = cv.CreateVideoWriter("playback.avi", cv.CV_FOURCC('D','I','V','3'), 30, (int(self.SCREEN_WIDTH/2),int(self.SCREEN_HEIGHT/2)), is_color=1)
-            #logfile = playback.pickLog()
-            logfile = '/Users/ryan/SFData/c83e3d50/c83e3d50_2011-5-19_14-12-44.txt'
+            logfile = playback.pickLog()
+            #logfile = '/Users/ryan/SFData/c83e3d50/c83e3d50_2011-5-19_14-12-44.txt'
             if logfile and os.path.exists(logfile):
                 self.logfile = open(logfile,'r')
                 header = self.logfile.readline()[:-1].split('\t')
