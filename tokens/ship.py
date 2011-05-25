@@ -150,10 +150,13 @@ class Ship(token.Token):
             shiprect.centerx = self.position.x
             shiprect.centery = self.position.y
             worldsurf.blit(ship, shiprect)
-            if self.health-1 > 0:
-                self.shield.rect.centerx = self.position.x
-                self.shield.rect.centery = self.position.y
-                worldsurf.blit(self.cur_shield, self.shield.rect)
+            if self.app.playback and self.app.playback_logver <= 4:
+                pass
+            else:
+                if self.health-1 > 0:
+                    self.shield.rect.centerx = self.position.x
+                    self.shield.rect.centery = self.position.y
+                    worldsurf.blit(self.cur_shield, self.shield.rect)
         else:
             pygame.draw.line(worldsurf, self.color, (x1,y1), (x2,y2), self.app.linewidth)
             pygame.draw.line(worldsurf, self.color, (x3,y3), (x4,y4), self.app.linewidth)
