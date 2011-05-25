@@ -78,9 +78,12 @@ class Game(object):
         self.playback_screen_w = 0
         self.playback_screen_h = 0
         self.playback_index = 0
+        self.playback_index_prev = 0
         self.playback_keyheld = [0,0]
+        self.playback_shifts = [0,0]
         self.playback_start = 0
         self.playback_logver = 0
+        self.playback_pause = False
         self.header = {}
         
         self.stars = []
@@ -124,8 +127,8 @@ class Game(object):
             import playback
             if self.config.get_setting('Playback','makevideo'):
                 self.video_writer = cv.CreateVideoWriter("playback.avi", cv.CV_FOURCC('D','I','V','3'), 30, (int(self.SCREEN_WIDTH/2),int(self.SCREEN_HEIGHT/2)), is_color=1)
-            logfile = playback.pickLog()
-            #logfile = '/Users/ryan/SFData/c83e3d50/c83e3d50_2011-5-19_14-12-44.txt'
+            #logfile = playback.pickLog()
+            logfile = '/Users/ryan/SFData/c83e3d50/c83e3d50_2011-5-19_14-12-44.txt'
             if logfile and os.path.exists(logfile):
                 self.logfile = open(logfile,'r')
                 header = self.logfile.readline()[:-1].split('\t')
@@ -842,28 +845,37 @@ class Game(object):
         
         if self.stars:
             for star in self.stars:
-                if self.config.get_setting('Graphics','parallax_mode') == 'Fortress':
-                    orientation = self.fortress.orientation
+                if sum(self.playback_keyheld) > 0:
+                    diff = self.playback_index - self.playback_index_prev
                 else:
-                    orientation = self.starfield_orientation
-                star[0] += star[2] * math.cos(math.radians(orientation-180)) * self.config.get_setting('Graphics','star_speed')
-                star[1] += star[2] * math.sin(math.radians(orientation)) * self.config.get_setting('Graphics','star_speed')
-                if star[0] >= self.WORLD_WIDTH:
-                    star[0] = 0
-                    star[1] = randrange(0,self.WORLD_WIDTH-self.linewidth)
-                    star[2] = choice([1,2,3])
-                elif star[0] <= 0:
-                    star[0] = self.WORLD_WIDTH
-                    star[1] = randrange(0,self.WORLD_WIDTH-self.linewidth)
-                    star[2] = choice([1,2,3])
-                elif star[1] >= self.WORLD_HEIGHT:
-                    star[1] = 0
-                    star[0] = randrange(0,self.WORLD_WIDTH-self.linewidth)
-                    star[2] = choice([1,2,3])
-                elif star[1] <= 0:
-                    star[1] = self.WORLD_HEIGHT
-                    star[0] = randrange(0,self.WORLD_WIDTH-self.linewidth)
-                    star[2] = choice([1,2,3])
+                    if self.playback_pause:
+                        diff = 0
+                    else:
+                        diff = 1
+                if diff != 0:
+                    print diff
+                    if self.config.get_setting('Graphics','parallax_mode') == 'Fortress':
+                        orientation = self.fortress.orientation
+                    else:
+                        orientation = self.starfield_orientation
+                    star[0] += star[2] * math.cos(math.radians(orientation-180)) * self.config.get_setting('Graphics','star_speed') * diff
+                    star[1] += star[2] * math.sin(math.radians(orientation)) * self.config.get_setting('Graphics','star_speed') * diff
+                    if star[0] >= self.WORLD_WIDTH:
+                        star[0] = 0
+                        star[1] = randrange(0,self.WORLD_WIDTH-self.linewidth)
+                        star[2] = choice([1,2,3])
+                    elif star[0] <= 0:
+                        star[0] = self.WORLD_WIDTH
+                        star[1] = randrange(0,self.WORLD_WIDTH-self.linewidth)
+                        star[2] = choice([1,2,3])
+                    elif star[1] >= self.WORLD_HEIGHT:
+                        star[1] = 0
+                        star[0] = randrange(0,self.WORLD_WIDTH-self.linewidth)
+                        star[2] = choice([1,2,3])
+                    elif star[1] <= 0:
+                        star[1] = self.WORLD_HEIGHT
+                        star[0] = randrange(0,self.WORLD_WIDTH-self.linewidth)
+                        star[2] = choice([1,2,3])
                 if star[2] == 1:
                     color = (100,100,100)
                 elif star[2] == 2:
@@ -1400,14 +1412,22 @@ class Game(object):
                             self.fps = 1
                     elif event.key == pygame.K_LEFT:
                         self.playback_keyheld[0] = 1
-                        self.playback_index -= 10
+                        mod = 10
+                        if pygame.key.get_mods() & pygame.KMOD_LSHIFT:
+                            mod = 1
+                        self.playback_index -= mod
                         if self.playback_index < 0:
                             self.playback_index = 0
                     elif event.key == pygame.K_RIGHT:
                         self.playback_keyheld[1] = 1
-                        self.playback_index += 10
+                        mod = 10
+                        if pygame.key.get_mods() & pygame.KMOD_LSHIFT:
+                            mod = 1
+                        self.playback_index += mod
                         if self.playback_index > len(self.playback_data) - 1:
                             self.playback_index = len(self.playback_data) - 1
+                    elif event.key == pygame.K_p:
+                        self.playback_pause = not self.playback_pause
                 elif event.type == pygame.KEYUP:
                     if event.key == pygame.K_LEFT:
                         self.playback_keyheld[0] = 0
@@ -1561,25 +1581,28 @@ def main():
                     break
             g.gameevents.add("game", "over", type='EVENT_SYSTEM')
     else:
-        pygame.key.set_repeat(1,10)
         g.display_game_number()
         g.setup_world()
+        pygame.key.set_repeat(50,10)
         while True:
+            g.playback_index_prev = g.playback_index
             g.clock.tick(g.fps)
             while g.playback_data[g.playback_index][0][:5] == 'EVENT':
+                if sum(g.playback_shifts) > 0:
+                    print g.playback_index
                 g.process_playback_event(g.playback_data[g.playback_index])
-                if g.playback_index < len(g.playback_data) - 1:
+                if g.playback_index < len(g.playback_data) - 1 and g.playback_index > -1:
                     if g.playback_keyheld[1]:
                         g.playback_index -= 1
                     else:
                         g.playback_index += 1
             g.process_state(g.playback_data[g.playback_index])
+            g.process_playback_input()
             g.draw()
             if g.config.get_setting('Playback','makevideo'):
                 cvImage = video_utils.surf2CV(g.screen)
                 cv.WriteFrame(g.video_writer, cvImage)
-            g.process_playback_input()
-            if sum(g.playback_keyheld) == 0:
+            if sum(g.playback_keyheld) == 0 and not g.playback_pause:
                 if g.playback_index < len(g.playback_data) - 1:
                     g.playback_index += 1
             if g.config.get_setting('Playback','makevideo') and g.playback_index == len(g.playback_data) - 1:
