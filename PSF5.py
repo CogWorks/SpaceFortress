@@ -4,7 +4,10 @@ from __future__ import division
 import subprocess, os, sys, platform, math
 from random import randrange, choice
 import gc
-import video_utils, cv
+try:
+    import video_utils, cv
+except ImportError:
+    pass
                 
 githash = None
 env = os.environ
