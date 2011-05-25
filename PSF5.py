@@ -898,9 +898,9 @@ class Game(object):
                 self.bonus.draw(self.worldsurf)
         self.screen.blit(self.scoresurf, self.scorerect)
         self.screen.blit(self.worldsurf, self.worldrect)
-        if self.config.get_setting('Display','show_fps') and self.config.get_setting('Playback','makevideo'):
+        if self.config.get_setting('Display','show_fps') and not self.config.get_setting('Playback','makevideo'):
             self.draw_fps()
-        if self.config.get_setting('Display','show_et'):
+        if self.config.get_setting('Display','show_et') and not self.config.get_setting('Playback','makevideo'):
             self.draw_et()
         self.gameevents.add("display", 'preflip', 'main', False, type='EVENT_SYSTEM')
         pygame.display.flip()
@@ -1390,7 +1390,7 @@ class Game(object):
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     self.quit(1)
-            if self.config.get_setting('Playback','makevideo'):
+            if not self.config.get_setting('Playback','makevideo'):
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_UP:
                         self.fps += 1
