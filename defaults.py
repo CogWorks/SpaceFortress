@@ -235,5 +235,6 @@ def get_config():
     cfg.add_setting('Joystick', 'pnts_button', 2)
     
     cfg.add_setting('Playback', 'playback', False, type=2)
+    cfg.add_setting('Playback', 'makevideo', False, type=2)
     
     return cfg

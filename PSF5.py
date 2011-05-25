@@ -4,7 +4,8 @@ from __future__ import division
 import subprocess, os, sys, platform, math
 from random import randrange, choice
 import gc
-
+import video_utils, cv
+                
 githash = None
 env = os.environ
 env['PATH'] = '/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/local/git/bin:/opt/local/bin:/opt/local/sbin'
@@ -118,6 +119,8 @@ class Game(object):
         
         if self.config.get_setting('Playback','playback'):
             import playback
+            if self.config.get_setting('Playback','makevideo'):
+                self.video_writer = cv.CreateVideoWriter("playback.avi", cv.CV_FOURCC('D','I','V','3'), 30, (int(self.SCREEN_WIDTH/2),int(self.SCREEN_HEIGHT/2)), is_color=1)
             #logfile = playback.pickLog()
             logfile = '/Users/ryan/SFData/c83e3d50/c83e3d50_2011-5-19_14-12-44.txt'
             if logfile and os.path.exists(logfile):
@@ -892,7 +895,7 @@ class Game(object):
                 self.bonus.draw(self.worldsurf)
         self.screen.blit(self.scoresurf, self.scorerect)
         self.screen.blit(self.worldsurf, self.worldrect)
-        if self.config.get_setting('Display','show_fps'):
+        if self.config.get_setting('Display','show_fps') and self.config.get_setting('Playback','makevideo'):
             self.draw_fps()
         if self.config.get_setting('Display','show_et'):
             self.draw_et()
@@ -1380,27 +1383,29 @@ class Game(object):
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     self.quit(1)
-                elif event.key == pygame.K_UP:
-                    self.fps += 1
-                elif event.key == pygame.K_DOWN:
-                    self.fps -= 1
-                    if self.fps < 1:
-                        self.fps = 1
-                elif event.key == pygame.K_LEFT:
-                    self.playback_keyheld[0] = 1
-                    self.playback_index -= 10
-                    if self.playback_index < 0:
-                        self.playback_index = 0
-                elif event.key == pygame.K_RIGHT:
-                    self.playback_keyheld[1] = 1
-                    self.playback_index += 10
-                    if self.playback_index > len(self.playback_data) - 1:
-                        self.playback_index = len(self.playback_data) - 1
-            elif event.type == pygame.KEYUP:
-                if event.key == pygame.K_LEFT:
-                    self.playback_keyheld[0] = 0
-                elif event.key == pygame.K_RIGHT:
-                    self.playback_keyheld[1] = 0
+            if self.config.get_setting('Playback','makevideo'):
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_UP:
+                        self.fps += 1
+                    elif event.key == pygame.K_DOWN:
+                        self.fps -= 1
+                        if self.fps < 1:
+                            self.fps = 1
+                    elif event.key == pygame.K_LEFT:
+                        self.playback_keyheld[0] = 1
+                        self.playback_index -= 10
+                        if self.playback_index < 0:
+                            self.playback_index = 0
+                    elif event.key == pygame.K_RIGHT:
+                        self.playback_keyheld[1] = 1
+                        self.playback_index += 10
+                        if self.playback_index > len(self.playback_data) - 1:
+                            self.playback_index = len(self.playback_data) - 1
+                elif event.type == pygame.KEYUP:
+                    if event.key == pygame.K_LEFT:
+                        self.playback_keyheld[0] = 0
+                    elif event.key == pygame.K_RIGHT:
+                        self.playback_keyheld[1] = 0
 
     def init_stars(self):
         """ Create the starfield """
@@ -1563,10 +1568,15 @@ def main():
                         g.playback_index += 1
             g.process_state(g.playback_data[g.playback_index])
             g.draw()
+            if g.config.get_setting('Playback','makevideo'):
+                cvImage = video_utils.surf2CV(g.screen)
+                cv.WriteFrame(g.video_writer, cvImage)
             g.process_playback_input()
             if sum(g.playback_keyheld) == 0:
                 if g.playback_index < len(g.playback_data) - 1:
                     g.playback_index += 1
+            if g.config.get_setting('Playback','makevideo') and g.playback_index == len(g.playback_data) - 1:
+                break
     g.quit()
 
 if __name__ == '__main__':
