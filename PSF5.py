@@ -172,8 +172,8 @@ class Game(object):
         if not self.playback and self.config.get_setting('Logging','logging'):
             log_filename = "%s.txt" % (self.log_basename)
             self.log = open(log_filename, "w")
-            self.log.write("event_type\tsystem_time\tclock\tgame_time\tcurrent_game\teid\te1\te2\te3\tfoes\tship_alive\tship_x\t"+
-                           "ship_y\tsmod\tdmod\tship_vel_x\tship_vel_y\tship_orientation\tdistance\tmine_no\tmine_id\tmine_x\tmine_y\tfortress_alive\tfortress_orientation\t"+
+            self.log.write("event_type\tsystem_time\tclock\tgame_time\tcurrent_game\teid\te1\te2\te3\tfoes\tship_alive\tship_health\tship_x\t"+
+                           "ship_y\tsmod\tdmod\tship_vel_x\tship_vel_y\tship_orientation\tdistance\tmine_no\tmine_id\tmine_x\tmine_y\tfortress_alive\tfortress_x\tfortress_y\tfortress_orientation\t"+
                            "missile\tshell\tbonus_no\tbonus_prev\tbonus_cur\tbonus_cur_x\tbonus_cur_y\t")
             if self.config.get_setting('General','bonus_system') == "AX-CPT":
                 self.log.write('bonus_isi\t')
@@ -189,7 +189,7 @@ class Game(object):
                     pass
             self.log.write("\n")
             self.gameevents.add("log", "header", "ready", log=False, type='EVENT_SYSTEM')
-            self.gameevents.add("log", "version", "5", type='EVENT_SYSTEM')
+            self.gameevents.add("log", "version", "6", type='EVENT_SYSTEM')
         
         if not self.playback:
             self.gameevents.add("config","running",str(self.config), type='EVENT_SYSTEM')
@@ -939,7 +939,8 @@ class Game(object):
             ship_vel_x = "%.3f"%(self.ship.velocity.x)
             ship_vel_y = "%.3f"%(self.ship.velocity.y)
             ship_orientation = "%.3f"%(self.ship.orientation)
-            distance = self.ship.get_distance_to_point(self.WORLD_WIDTH/2,self.WORLD_HEIGHT/2)
+            ship_health = str(self.ship.health)
+            distance = str(self.ship.get_distance_to_point(self.WORLD_WIDTH/2,self.WORLD_HEIGHT/2))
         else:
             ship_alive = "n"
             ship_x = "NA"
@@ -947,7 +948,8 @@ class Game(object):
             ship_vel_x = "NA"
             ship_vel_y = "NA"
             ship_orientation = "NA"
-            distance = 0
+            ship_health = "NA"
+            distance = "NA"
         if len(self.mine_list) > 0:
             mine_no = self.mine_list.mine_count
             mine_id = self.mine_list[0].iff
@@ -961,9 +963,13 @@ class Game(object):
         if self.fortress_exists and self.fortress.alive:
             fortress_alive = "y"
             fortress_orientation = str(self.fortress.orientation)
+            fortress_x = str(self.fortress.position.x)
+            fortress_y = str(self.fortress.position.y)
         else:
             fortress_alive = "n"
             fortress_orientation = "NA"
+            fortress_x = "NA"
+            fortress_y = "NA"
         if self.config.get_setting('General','bonus_system') == "AX-CPT":
             bonus_isi = str(self.bonus.isi_time)
         else:
@@ -1018,9 +1024,9 @@ class Game(object):
         else:
             pnts_key = "n"
         
-        self.log.write("STATE\t%f\t%f\t%d\t%d\tNA\tNA\tNA\tNA\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t" %
-                       (system_time, clock, game_time, self.current_game, " ".join(self.mine_list.foe_letters), ship_alive, ship_x, ship_y, smod, dmod, ship_vel_x, ship_vel_y, ship_orientation,
-                        distance, mine_no, mine_id, mine_x, mine_y, fortress_alive, fortress_orientation, self.missile_list, self.shell_list))
+        self.log.write("STATE\t%f\t%f\t%d\t%d\tNA\tNA\tNA\tNA\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t" %
+                       (system_time, clock, game_time, self.current_game, " ".join(self.mine_list.foe_letters), ship_alive, ship_health, ship_x, ship_y, smod, dmod, ship_vel_x, ship_vel_y, ship_orientation,
+                        distance, mine_no, mine_id, mine_x, mine_y, fortress_alive, fortress_x, fortress_y, fortress_orientation, self.missile_list, self.shell_list))
         if self.config.get_setting('General','bonus_system') == "AX-CPT":
             self.log.write("%s\t%s\t%s\t%s\t%s\t%s\t" %
                            (bonus_no, bonus_prev, bonus_cur, bonus_cur_x, bonus_cur_y, bonus_isi))
