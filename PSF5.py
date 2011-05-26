@@ -219,16 +219,16 @@ class Game(object):
         self.f36 = pygame.font.Font(self.fp, int(36*self.aspect_ratio))
         
         self.frame = tokens.frame.Frame(self)
-        self.gameevents.add("score1",self.frame.p1_rect.centerx,self.frame.p1_rect.centery, type='EVENT_SYSTEM')
-        self.gameevents.add("score2",self.frame.p2_rect.centerx,self.frame.p2_rect.centery, type='EVENT_SYSTEM')
-        self.gameevents.add("score3",self.frame.p3_rect.centerx,self.frame.p3_rect.centery, type='EVENT_SYSTEM')
-        self.gameevents.add("score4",self.frame.p4_rect.centerx,self.frame.p4_rect.centery, type='EVENT_SYSTEM')
-        self.gameevents.add("score5",self.frame.p5_rect.centerx,self.frame.p5_rect.centery, type='EVENT_SYSTEM')
-        self.gameevents.add("score6",self.frame.p6_rect.centerx,self.frame.p6_rect.centery, type='EVENT_SYSTEM')
-        self.gameevents.add("score7",self.frame.p7_rect.centerx,self.frame.p7_rect.centery, type='EVENT_SYSTEM')
-        self.gameevents.add("score8",self.frame.p8_rect.centerx,self.frame.p8_rect.centery, type='EVENT_SYSTEM')
-
         self.score = tokens.score.Score(self)
+        
+        self.gameevents.add("score1",self.score.scores_locations[0][0],self.score.scores_locations[0][1], type='EVENT_SYSTEM')
+        self.gameevents.add("score2",self.score.scores_locations[1][0],self.score.scores_locations[1][1], type='EVENT_SYSTEM')
+        self.gameevents.add("score3",self.score.scores_locations[2][0],self.score.scores_locations[2][1], type='EVENT_SYSTEM')
+        self.gameevents.add("score4",self.score.scores_locations[3][0],self.score.scores_locations[3][1], type='EVENT_SYSTEM')
+        self.gameevents.add("score5",self.score.scores_locations[4][0],self.score.scores_locations[4][1], type='EVENT_SYSTEM')
+        self.gameevents.add("score6",self.score.scores_locations[5][0],self.score.scores_locations[5][1], type='EVENT_SYSTEM')
+        self.gameevents.add("score7",self.score.scores_locations[6][0],self.score.scores_locations[6][1], type='EVENT_SYSTEM')
+        self.gameevents.add("score8",self.score.scores_locations[7][0],self.score.scores_locations[7][1], type='EVENT_SYSTEM')
         
         self.joystick = None
         if self.config.get_setting('Joystick','use_joystick'):
