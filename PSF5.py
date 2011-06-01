@@ -718,15 +718,16 @@ class Game(object):
             elif target.startswith("mine_"):
                 #deal with missile hitting mine
                 #can the mine be hit?
-                if self.mine_list[0].tagged == "fail":
-                    self.gameevents.add("collide", "fail_tagged_mine")
-                elif self.mine_list[0].tagged == "untagged":
-                    if self.score.iff in self.mine_list.foe_letters:
-                        self.gameevents.add("collide", "untagged_foe_mine")
-                    else:
-                        self.gameevents.add("collide", "friend_mine")
-                elif self.mine_list[0].tagged == "tagged" and self.score.iff in self.mine_list.foe_letters:
-                    self.gameevents.add("collide", "tagged_foe_mine")
+                if len(self.mine_list) > 0:
+                    if self.mine_list[0].tagged == "fail":
+                        self.gameevents.add("collide", "fail_tagged_mine")
+                    elif self.mine_list[0].tagged == "untagged":
+                        if self.score.iff in self.mine_list.foe_letters:
+                            self.gameevents.add("collide", "untagged_foe_mine")
+                        else:
+                            self.gameevents.add("collide", "friend_mine")
+                    elif self.mine_list[0].tagged == "tagged" and self.score.iff in self.mine_list.foe_letters:
+                        self.gameevents.add("collide", "tagged_foe_mine")
         elif obj.startswith("mine_"):
             #mine hit the ship
             index = int(obj[-1])
