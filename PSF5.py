@@ -198,8 +198,12 @@ class Game(object):
         
         self.set_aspect_ratio()
         os.environ['SDL_VIDEO_WINDOW_POS'] = str(int(mode_list[0][0]/2-self.SCREEN_WIDTH/2)) + "," + str(int(mode_list[0][1]/2-self.SCREEN_HEIGHT/2))
-        self.WORLD_WIDTH = int(710 * self.aspect_ratio)
-        self.WORLD_HEIGHT = int(626 * self.aspect_ratio)
+        if self.config.get_setting('Next Gen','next_gen'):
+            self.WORLD_WIDTH = int((710+57) * self.aspect_ratio)
+            self.WORLD_HEIGHT = int((626+57) * self.aspect_ratio)
+        else:
+            self.WORLD_WIDTH = int(710 * self.aspect_ratio)
+            self.WORLD_HEIGHT = int(626 * self.aspect_ratio)
         self.linewidth = self.config.get_setting('Display','linewidth')
         
         self.kp_space = self.linewidth

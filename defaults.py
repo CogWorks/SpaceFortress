@@ -82,6 +82,8 @@ def get_config():
     cfg.add_setting('General', 'sound', True, alias='Sound', type=config.constants.CT_CHECKBOX, about='Enable/disable sound')
     cfg.add_setting('General', 'allow_pause', True, alias='Allow Pausing', type=config.constants.CT_CHECKBOX, about='Enable/disable whether or not pausing is allowed.')
     
+    cfg.add_setting('Next Gen', 'next_gen', True, type=2, alias='Next Gen Mode')
+    
     cfg.add_setting('Display', 'display_mode', 'Fullscreen', alias='Display Mode', options=['Fullscreen','Windowed','Fake Fullscreen'], type=config.constants.CT_COMBO, about='Run at full screen? Set to f to run in a window')
     cfg.add_setting('Display', 'linewidth', 1, alias='Linewidth', about='Width of lines drawn on screen. Increase for a more "projector-friendly" game')
     cfg.add_setting('Display', 'pause_overlay', True, alias='Pause Overlay', type=config.constants.CT_CHECKBOX, about='Blank screen and show "Paused!" when game is paused.')

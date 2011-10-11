@@ -90,8 +90,12 @@ class Score(object):
         self.NEW_SCORE_Y_LR_BOTTOM = 545 * self.app.aspect_ratio
         self.NEW_SCORE_X_C_LEFT = half_width - 192 * self.app.aspect_ratio
         self.NEW_SCORE_X_C_RIGHT = half_width + 148 * self.app.aspect_ratio
-        self.NEW_SCORE_X_R_RIGHT = half_width + 428*self.app.aspect_ratio
-        self.NEW_SCORE_X_L_LEFT = half_width - 432 * self.app.aspect_ratio
+        if self.app.config.get_setting('Next Gen','next_gen'):
+            self.NEW_SCORE_X_R_RIGHT = half_width + 456*self.app.aspect_ratio
+            self.NEW_SCORE_X_L_LEFT = half_width - 460 * self.app.aspect_ratio
+        else:
+            self.NEW_SCORE_X_R_RIGHT = half_width + 428*self.app.aspect_ratio
+            self.NEW_SCORE_X_L_LEFT = half_width - 432 * self.app.aspect_ratio
         
         self.scores_locations = []
         if self.app.config.get_setting('Score','new_scoring_pos'):
@@ -190,10 +194,11 @@ class Score(object):
             scoresurf.blit(self.p3_surf, self.p3_rect)
         if not(self.app.config.get_setting('Score','INTRVL_pos') == 4 and self.intrvl == 0):
             scoresurf.blit(self.p4_surf, self.p4_rect)
-        if not(self.app.config.get_setting('Score','INTRVL_pos') == 5 and self.intrvl == 0):
-            scoresurf.blit(self.p5_surf, self.p5_rect)
-        if not(self.app.config.get_setting('Score','INTRVL_pos') == 6 and self.intrvl == 0):
-            scoresurf.blit(self.p6_surf, self.p6_rect)
+        if not self.app.config.get_setting('Next Gen','next_gen'):
+            if not(self.app.config.get_setting('Score','INTRVL_pos') == 5 and self.intrvl == 0):
+                scoresurf.blit(self.p5_surf, self.p5_rect)
+            if not(self.app.config.get_setting('Score','INTRVL_pos') == 6 and self.intrvl == 0):
+                scoresurf.blit(self.p6_surf, self.p6_rect)
         if not(self.app.config.get_setting('Score','INTRVL_pos') == 7 and self.intrvl == 0):
             scoresurf.blit(self.p7_surf, self.p7_rect)
         if not(self.app.config.get_setting('Score','INTRVL_pos') == 8 and self.intrvl == 0):
