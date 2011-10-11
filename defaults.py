@@ -83,6 +83,7 @@ def get_config():
     cfg.add_setting('General', 'allow_pause', True, alias='Allow Pausing', type=config.constants.CT_CHECKBOX, about='Enable/disable whether or not pausing is allowed.')
     
     cfg.add_setting('Next Gen', 'next_gen', True, type=2, alias='Next Gen Mode')
+    cfg.add_setting('Next Gen', 'empty_penalty', True, type=2, alias='Fire when empty penalty')
     
     cfg.add_setting('Display', 'display_mode', 'Fullscreen', alias='Display Mode', options=['Fullscreen','Windowed','Fake Fullscreen'], type=config.constants.CT_COMBO, about='Run at full screen? Set to f to run in a window')
     cfg.add_setting('Display', 'linewidth', 1, alias='Linewidth', about='Width of lines drawn on screen. Increase for a more "projector-friendly" game')
@@ -122,8 +123,8 @@ def get_config():
     cfg.add_setting('Ship', 'ship_vel_y', 0, 'Initial ship velocity in y direction.')
     cfg.add_setting('Ship', 'colored_damage', True, type=config.constants.CT_CHECKBOX)
     
-    cfg.add_setting('Missile', 'missile_max', 100, 'Maximum number of missiles possible')
-    cfg.add_setting('Missile', 'missile_num', 100, 'Number of missiles at start of game')
+    cfg.add_setting('Missile', 'missile_max', 50, 'Maximum number of missiles possible')
+    cfg.add_setting('Missile', 'missile_num', 50, 'Number of missiles at start of game')
     cfg.add_setting('Missile', 'missile_penalty', 3, 'Points lost when you fire a missile when none remain')
     cfg.add_setting('Missile', 'missile_radius', 5, 'Missile collision radius')
     cfg.add_setting('Missile', 'missile_speed', 20, 'Speed of missile fired from ship')

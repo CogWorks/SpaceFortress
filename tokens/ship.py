@@ -111,13 +111,25 @@ class Ship(token.Token):
             
     def fire(self):
         """fires missile"""
-        self.app.missile_list.append(missile.Missile(self.app))
-        self.app.sounds.missile_fired.play()
-        if self.app.score.shots > 0:
-            self.app.score.shots -= 1
+        if self.app.config.get_setting('Next Gen','next_gen'):
+            if self.app.score.shots > 0:
+                self.app.missile_list.append(missile.Missile(self.app))
+                self.app.sounds.missile_fired.play()
+                self.app.score.shots -= 1
+            else:
+                self.app.sounds.empty.play()
+                if self.app.config.get_setting('Next Gen','empty_penalty'):
+                    self.app.score.pnts -= self.app.config.get_setting('Missile','missile_penalty')
+                    self.app.score.bonus -= self.app.config.get_setting('Missile','missile_penalty')
         else:
-            self.app.score.pnts -= self.app.config.get_setting('Missile','missile_penalty')
-            self.app.score.bonus -= self.app.config.get_setting('Missile','missile_penalty')
+            self.app.missile_list.append(missile.Missile(self.app))
+            self.app.sounds.missile_fired.play()
+            if self.app.score.shots > 0:
+                self.app.score.shots -= 1
+            else:
+                self.app.sounds.empty.play()
+                self.app.score.pnts -= self.app.config.get_setting('Missile','missile_penalty')
+                self.app.score.bonus -= self.app.config.get_setting('Missile','missile_penalty')
             
     def draw(self, worldsurf):
         """draw ship to worldsurf"""
