@@ -85,6 +85,9 @@ class Game(object):
         self.playback_logver = 0
         self.playback_pause = False
         self.header = {}
+
+        self.sessionTotal = 0
+        self.sessionOver = False
         
         self.stars = []
         self.starfield_orientation = randrange(0,359)
@@ -1085,6 +1088,8 @@ class Game(object):
         self.screen.fill((0,0,0))
         if self.playback:
             title = '~~~ Playback Mode ~~~'
+        elif self.config.get_setting('Next Gen','next_gen'):
+            title = "Game %d" % (self.current_game)
         else:
             title = "Game: %d of %d" % (self.current_game, self.config.get_setting('General','games_per_session'))
         gamesurf = self.f36.render(title, True, (255,255,0))
@@ -1562,7 +1567,7 @@ def main():
     g = Game()
     g.display_intro()
     if not g.playback:
-        while g.current_game < g.config.get_setting('General','games_per_session'):
+        while not g.sessionOver:
             gc.collect()
             g.current_game += 1
             g.gameevents.add("game", "ready", type='EVENT_SYSTEM')
@@ -1573,7 +1578,12 @@ def main():
             gameTimer = tokens.timer.Timer()
             g.gameevents.add("game","start", type='EVENT_SYSTEM')
             g.ingame = 1
+            g.gameStart = pygame.time.get_ticks()
             while True:
+                print g.sessionTotal + gameTimer.elapsed() / 60000.0
+                if g.sessionTotal + gameTimer.elapsed() / 60000.0 >= g.config.get_setting('Next Gen','session_length'):
+                    g.sessionOver = True
+                    break
                 g.clock.tick(g.fps)
                 g.process_input()
                 g.process_game_logic()
@@ -1584,6 +1594,7 @@ def main():
                 if g.ship.alive == False:
                     g.reset_position()
                 if gameTimer.elapsed() > g.config.get_setting('General','game_time'):
+                    g.sessionTotal = g.sessionTotal + gameTimer.elapsed() / 60000.0
                     g.ingame = -1
                     g.gameevents.add("game","end", type='EVENT_SYSTEM')
                     g.fade()
@@ -1595,6 +1606,8 @@ def main():
                     g.gameevents.add("scores","hide", type='EVENT_SYSTEM')
                     break
             g.gameevents.add("game", "over", type='EVENT_SYSTEM')
+            if not g.config.get_setting('Next Gen','next_gen') and g.current_game >= g.config.get_setting('General','games_per_session'):
+                g.sessionOver = True;
     else:
         g.display_game_number()
         g.setup_world()

@@ -84,6 +84,7 @@ def get_config():
     
     cfg.add_setting('Next Gen', 'next_gen', True, type=2, alias='Next Gen Mode')
     cfg.add_setting('Next Gen', 'empty_penalty', True, type=2, alias='Fire when empty penalty')
+    cfg.add_setting('Next Gen', 'session_length', 50, alias="Session Duration (min)")
     
     cfg.add_setting('Display', 'display_mode', 'Fullscreen', alias='Display Mode', options=['Fullscreen','Windowed','Fake Fullscreen'], type=config.constants.CT_COMBO, about='Run at full screen? Set to f to run in a window')
     cfg.add_setting('Display', 'linewidth', 1, alias='Linewidth', about='Width of lines drawn on screen. Increase for a more "projector-friendly" game')
