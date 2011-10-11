@@ -119,26 +119,33 @@ class Score(object):
         
     def update_score(self):
         """updates positions list to reflect current scores"""
-        self.positions[self.position_map["SHOTS_pos"]] = self.shots
-        self.positions[self.position_map["VLNER_pos"]] = self.vlner
-        self.positions[self.position_map["IFF_pos"]] = self.iff
-        self.positions[self.position_map["INTRVL_pos"]] = self.intrvl
-        if self.app.config.get_setting('Score','new_scoring'):
-            #use Flight, Fortress, Mines, Bonus
-            self.positions[self.position_map["PNTS_pos"]] = self.flight
-            self.positions[self.position_map["VLCTY_pos"]] = self.mines
-            self.positions[self.position_map["CNTRL_pos"]] = self.fortress
-            self.positions[self.position_map["SPEED_pos"]] = self.bonus
+        if self.app.config.get_setting('Next Gen','next_gen'):
+            self.positions[1] = self.pnts
+            self.positions[3] = self.shots
+            self.positions[4] = self.intrvl
+            self.positions[7] = self.iff
+            self.positions[8] = self.vlner
         else:
-            #use PNTS, VLCTY, CNTRL, SPEED
-            self.positions[self.position_map["PNTS_pos"]] = self.pnts
-            self.positions[self.position_map["VLCTY_pos"]] = self.vlcty
-            self.positions[self.position_map["CNTRL_pos"]] = self.cntrl
-            self.positions[self.position_map["SPEED_pos"]] = self.speed
+            self.positions[self.position_map["SHOTS_pos"]] = self.shots
+            self.positions[self.position_map["VLNER_pos"]] = self.vlner
+            self.positions[self.position_map["IFF_pos"]] = self.iff
+            self.positions[self.position_map["INTRVL_pos"]] = self.intrvl
+            if self.app.config.get_setting('Score','new_scoring'):
+                #use Flight, Fortress, Mines, Bonus
+                self.positions[self.position_map["PNTS_pos"]] = self.flight
+                self.positions[self.position_map["VLCTY_pos"]] = self.mines
+                self.positions[self.position_map["CNTRL_pos"]] = self.fortress
+                self.positions[self.position_map["SPEED_pos"]] = self.bonus
+            else:
+                #use PNTS, VLCTY, CNTRL, SPEED
+                self.positions[self.position_map["PNTS_pos"]] = self.pnts
+                self.positions[self.position_map["VLCTY_pos"]] = self.vlcty
+                self.positions[self.position_map["CNTRL_pos"]] = self.cntrl
+                self.positions[self.position_map["SPEED_pos"]] = self.speed
         for item in range(1,9):
             if isinstance(self.positions[item], float):
                 self.positions[item] = int(self.positions[item])
-        
+                        
     def draw(self, scoresurf):
         """draws all score values to screen"""     
         #get some floats from adding fractions. Change to int for font rendering
@@ -147,9 +154,14 @@ class Score(object):
         self.p1_surf = self.f.render("%s"%str(self.positions[1]),0, (255,255,0))
         self.p1_rect = self.p1_surf.get_rect()
         self.p1_rect.center = self.scores_locations[0]
-        self.p2_surf = self.f.render("%s"%str(self.positions[2]),0, (255,255,0))
-        self.p2_rect = self.p2_surf.get_rect()
-        self.p2_rect.center = self.scores_locations[1]
+        if self.app.config.get_setting('Next Gen','next_gen'):
+            self.p2_surf = self.f.render("%d" % ((self.app.config.get_setting('General','game_time')-self.app.gametimer.elapsed()) / 1000),0, (255,255,0))
+            self.p2_rect = self.p2_surf.get_rect()
+            self.p2_rect.center = self.scores_locations[1]
+        else:
+            self.p2_surf = self.f.render("%s"%str(self.positions[2]),0, (255,255,0))
+            self.p2_rect = self.p2_surf.get_rect()
+            self.p2_rect.center = self.scores_locations[1]
         self.p3_surf = self.f.render("%s"%str(self.positions[3]),0, (255,255,0))
         self.p3_rect = self.p3_surf.get_rect()
         self.p3_rect.center = self.scores_locations[2]

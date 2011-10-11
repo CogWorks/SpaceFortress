@@ -175,7 +175,7 @@ def get_config():
     cfg.add_setting('AX-CPT', 'state', 'iti', type=config.constants.CT_COMBO, options=['iti','isi','cue','target'], alias="State")
 
     cfg.add_setting('Mine', 'mine_exists', True, type=config.constants.CT_CHECKBOX, about='Do mines exists?')
-    cfg.add_setting('Mine', 'mine_mode', 'standard', type=config.constants.CT_LINEEDIT, about='Set mine behavior to standard or MOT')
+    cfg.add_setting('Mine', 'mine_mode', 'standard', type=config.constants.CT_COMBO, options=['standard'], about='Set mine behavior to standard or MOT')
     cfg.add_setting('Mine', 'num_foes', 3, 'Number of foe mines')
     cfg.add_setting('Mine', 'mine_radius', 20, 'Mine collision radius')
     cfg.add_setting('Mine', 'mine_speed', 3, 'Mine speed')
@@ -186,7 +186,7 @@ def get_config():
     cfg.add_setting('Mine', 'mine_probability', 0.3, 'Probability that next mine will be a foe', type=config.constants.CT_DBLSPINBOX)
     cfg.add_setting('Mine', 'mine_timeout', 10000, 'Time in milliseconds for a mine to timeout and disappear')
     cfg.add_setting('Mine', 'mine_spawn', 5000, 'Time in milliseconds for a mine to spawn')
-    cfg.add_setting('Mine', 'fortress_resets_mine', True, type=config.constants.CT_CHECKBOX, about='Does destroying the fortress reset the mine timer?')
+    cfg.add_setting('Mine', 'fortress_resets_mine', False, type=config.constants.CT_CHECKBOX, about='Does destroying the fortress reset the mine timer?')
     
     cfg.add_setting('MOT', 'MOT_count', 5, 'Number of mines')
     cfg.add_setting('MOT', 'MOT_identification_time', 5000, 'Time to allow for MOT identification')
