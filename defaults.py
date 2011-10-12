@@ -85,6 +85,10 @@ def get_config():
     cfg.add_setting('Next Gen', 'next_gen', True, type=2, alias='Next Gen Mode')
     cfg.add_setting('Next Gen', 'empty_penalty', True, type=2, alias='Fire when empty penalty')
     cfg.add_setting('Next Gen', 'session_length', 50, alias="Session Duration (min)")
+    cfg.add_setting('Next Gen', 'starting_goal', 3, alias="Initial Fortress Goal")
+    cfg.add_setting('Next Gen', 'forward', 3)
+    cfg.add_setting('Next Gen', 'back', 1)
+    cfg.add_setting('Next Gen', 'time_modifier', 1.0075, type=config.constants.CT_LINEEDIT)
     
     cfg.add_setting('Display', 'display_mode', 'Fullscreen', alias='Display Mode', options=['Fullscreen','Windowed','Fake Fullscreen'], type=config.constants.CT_COMBO, about='Run at full screen? Set to f to run in a window')
     cfg.add_setting('Display', 'linewidth', 1, alias='Linewidth', about='Width of lines drawn on screen. Increase for a more "projector-friendly" game')
@@ -96,7 +100,7 @@ def get_config():
     cfg.add_setting('Graphics', 'show_starfield', True, type=2)
     cfg.add_setting('Graphics', 'max_stars', 250)
     cfg.add_setting('Graphics', 'star_speed', .5, type=config.constants.CT_DBLSPINBOX)
-    cfg.add_setting('Graphics', 'fancy', False, type=config.constants.CT_CHECKBOX)
+    cfg.add_setting('Graphics', 'fancy', True, type=config.constants.CT_CHECKBOX)
     cfg.add_setting('Graphics', 'parallax_mode', 'Random', type=config.constants.CT_COMBO, options=['Random','Fortress'])
     
     cfg.add_setting('Logging', 'logging', True, alias='Logging', type=config.constants.CT_CHECKBOX, about='Enable/disable logging')

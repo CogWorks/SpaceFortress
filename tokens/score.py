@@ -155,7 +155,9 @@ class Score(object):
         self.p1_rect = self.p1_surf.get_rect()
         self.p1_rect.center = self.scores_locations[0]
         if self.app.config.get_setting('Next Gen','next_gen'):
-            self.p2_surf = self.f.render("%.1f" % ((self.app.config.get_setting('General','game_time')-self.app.gametimer.elapsed()) / 1000.0),0, (255,255,0))
+            time = (self.app.config.get_setting('General','game_time')-self.app.gametimer.elapsed()) / 1000.0
+            if (time<0): time = 0
+            self.p2_surf = self.f.render("%.1f" % (time),0, (255,255,0))
             self.p2_rect = self.p2_surf.get_rect()
             self.p2_rect.center = self.scores_locations[1]
         else:

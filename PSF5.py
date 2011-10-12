@@ -89,6 +89,10 @@ class Game(object):
         self.sessionTotal = 0
         self.sessionOver = False
         
+        self.targetFortresses = 0
+        self.destroyedFortresses = 0
+        self.progress = 0
+        
         self.stars = []
         self.starfield_orientation = randrange(0,359)
 
@@ -712,7 +716,11 @@ class Game(object):
                     self.gameevents.add("score+", "pnts", self.config.get_setting('Score','destroy_fortress'))
                     self.gameevents.add("score+", "fortress", self.config.get_setting('Score','destroy_fortress'))
                     self.score.vlner = 0
-                    self.gameevents.add("reset", "VLNER")
+                    self.destroyedFortresses = self.destroyedFortresses + 1
+                    if self.destroyedFortresses == self.targetFortresses:
+                        self.gameevents.add("game", "fortress_goal", type='EVENT_SYSTEM')
+                    else:
+                        self.gameevents.add("reset", "VLNER")
                     #do we reset the mine timer?
                     if self.config.get_setting('Mine','fortress_resets_mine'):
                         self.mine_list.timer.reset()
@@ -1094,9 +1102,15 @@ class Game(object):
             title = "Game: %d of %d" % (self.current_game, self.config.get_setting('General','games_per_session'))
         gamesurf = self.f36.render(title, True, (255,255,0))
         gamerect = gamesurf.get_rect()
-        gamerect.centery = self.SCREEN_HEIGHT / 16 * 7
+        gamerect.centery = self.SCREEN_HEIGHT / 16 * 6.5
         gamerect.centerx = self.SCREEN_WIDTH / 2
         self.screen.blit(gamesurf, gamerect)
+        if self.config.get_setting('Next Gen','next_gen'):
+            goalsurf = self.f24.render('Destroy %d fortresses before time runs out!' % (self.targetFortresses), True, (255,255,0))
+            goalrect = goalsurf.get_rect()
+            goalrect.centery = self.SCREEN_HEIGHT / 16 * 7.5
+            goalrect.centerx = self.SCREEN_WIDTH / 2
+            self.screen.blit(goalsurf, goalrect)
         pygame.draw.line(self.screen, (255, 255, 255), (self.SCREEN_WIDTH / 4 , self.SCREEN_HEIGHT / 16 * 8.5), (self.SCREEN_WIDTH / 4 * 3, self.SCREEN_HEIGHT / 16 * 8.5))
         pygame.draw.line(self.screen, (255, 255, 255), (self.SCREEN_WIDTH / 4 , self.SCREEN_HEIGHT / 16 * 5.5), (self.SCREEN_WIDTH / 4 * 3, self.SCREEN_HEIGHT / 16 * 5.5))
         bottom = self.f24.render("Press any key to continue", True, (255,255,0))
@@ -1235,7 +1249,85 @@ class Game(object):
                         self.quit(1)
                     else:
                         return
-                        
+
+    def show_ng_score(self, time):
+        pygame.event.get() #clear event list? Otherwise it skips
+        self.screen.fill((0, 0, 0))
+        gamesurf = self.f36.render("Game %d" % (self.current_game), True, (255,255,0))
+        gamerect = gamesurf.get_rect()
+        gamerect.centery = self.SCREEN_HEIGHT / 16 * 2
+        gamerect.centerx = self.SCREEN_WIDTH / 2
+        self.screen.blit(gamesurf, gamerect)
+        pygame.draw.line(self.screen, (255, 255, 255), (self.SCREEN_WIDTH / 4 , self.SCREEN_HEIGHT / 16 * 3), (self.SCREEN_WIDTH / 4 * 3, self.SCREEN_HEIGHT / 16 * 3))
+        pntssurf = self.f24.render("Points:", True, (255, 255,0))
+        pntsrect = pntssurf.get_rect()
+        pntsrect.left = self.SCREEN_WIDTH / 3
+        pntsrect.centery = self.SCREEN_HEIGHT / 16 * 4
+        self.screen.blit(pntssurf, pntsrect)
+        pntsnsurf = self.f24.render("%d"%self.score.pnts, True, (255, 255,255))
+        pntsnrect = pntsnsurf.get_rect()
+        pntsnrect.right = self.SCREEN_WIDTH / 3 * 2
+        pntsnrect.centery = self.SCREEN_HEIGHT / 16 * 4
+        self.screen.blit(pntsnsurf, pntsnrect)
+        cntrlsurf = self.f24.render("Remaining time:", True, (255, 255,0))
+        cntrlrect = cntrlsurf.get_rect()
+        cntrlrect.left = self.SCREEN_WIDTH / 3 
+        cntrlrect.centery = self.SCREEN_HEIGHT / 16 * 6
+        self.screen.blit(cntrlsurf, cntrlrect)
+        cntrlnsurf = self.f24.render("%ss"%time, True, (255, 255,255))
+        cntrlnrect = cntrlnsurf.get_rect()
+        cntrlnrect.right = self.SCREEN_WIDTH / 3 * 2
+        cntrlnrect.centery = self.SCREEN_HEIGHT / 16 * 6
+        self.screen.blit(cntrlnsurf, cntrlnrect)
+        vlctysurf = self.f24.render("Time bonus modifier:", True, (255, 255,0))
+        vlctyrect = vlctysurf.get_rect()
+        vlctyrect.left = self.SCREEN_WIDTH / 3
+        vlctyrect.centery = self.SCREEN_HEIGHT / 16 * 8
+        self.screen.blit(vlctysurf, vlctyrect)
+        bonus = math.pow(float(self.config.get_setting('Next Gen','time_modifier')),time)
+        vlctynsurf = self.f24.render("%.2fx"%bonus, True, (255, 255,255))
+        vlctynrect = vlctynsurf.get_rect()
+        vlctynrect.right = self.SCREEN_WIDTH / 3 * 2
+        vlctynrect.centery = self.SCREEN_HEIGHT / 16 * 8
+        self.screen.blit(vlctynsurf, vlctynrect)
+        speedsurf = self.f24.render("Difficulty modifier:", True, (255, 255,0))
+        speedrect = speedsurf.get_rect()
+        speedrect.left = self.SCREEN_WIDTH / 3
+        speedrect.centery = self.SCREEN_HEIGHT / 16 * 10
+        self.screen.blit(speedsurf, speedrect)
+        speednsurf = self.f24.render("%dx"%self.targetFortresses, True, (255, 255,255))
+        speednrect = speednsurf.get_rect()
+        speednrect.right = self.SCREEN_WIDTH / 3 * 2
+        speednrect.centery = self.SCREEN_HEIGHT / 16 * 10
+        self.screen.blit(speednsurf, speednrect)
+        pygame.draw.line(self.screen, (255, 255, 255), (self.SCREEN_WIDTH / 4 , self.SCREEN_HEIGHT / 16 * 11), (self.SCREEN_WIDTH / 4 * 3, self.SCREEN_HEIGHT / 16 * 11))
+        totalsurf = self.f24.render("Total game score:", True, (255, 255,0))
+        totalrect = totalsurf.get_rect()
+        totalrect.left = self.SCREEN_WIDTH / 3
+        totalrect.centery = self.SCREEN_HEIGHT / 16 * 12
+        self.screen.blit(totalsurf, totalrect)
+        totalnsurf = self.f24.render("%d"%(self.score.pnts * bonus * self.targetFortresses), True, (255, 255,255))
+        totalnrect = totalnsurf.get_rect()
+        totalnrect.right = self.SCREEN_WIDTH / 3 * 2
+        totalnrect.centery = self.SCREEN_HEIGHT / 16 * 12
+        self.screen.blit(totalnsurf, totalnrect)
+        if self.current_game == self.config.get_setting('General','games_per_session'):
+            finalsurf = self.f24.render("You're done! Press any key to exit", True, (0,255,0))
+        else:
+            finalsurf = self.f24.render("Press any key for next game", True, (0,255,0))
+        finalrect = finalsurf.get_rect()
+        finalrect.centerx = self.SCREEN_WIDTH /2
+        finalrect.centery = self.SCREEN_HEIGHT / 16 * 14
+        self.screen.blit(finalsurf, finalrect)
+        pygame.display.flip()
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        self.quit(1)
+                    else:
+                        return
+        
     def show_new_score(self):
         """shows score for last game and waits to continue"""
         pygame.event.get() #clear event list? Otherwise it skips
@@ -1561,12 +1653,28 @@ class Game(object):
         #stats.print_callers()
         #print "Profile data:\n%s" % stream.getvalue()
         sys.exit(ret)
+        
+    def doScores(self, time=0):
+        self.sessionTotal = self.sessionTotal + self.gametimer.elapsed() / 60000.0
+        self.ingame = -1
+        self.gameevents.add("game","end", type='EVENT_SYSTEM')
+        self.fade()
+        self.gameevents.add("scores","show", type='EVENT_SYSTEM')
+        if self.config.get_setting('Next Gen','next_gen'):
+            self.show_ng_score(time)
+        elif self.config.get_setting('Score','new_scoring'):
+            self.show_new_score()
+        else:
+            self.show_old_score()
+        self.gameevents.add("scores","hide", type='EVENT_SYSTEM')
 
 def main():
     
     g = Game()
     g.display_intro()
     if not g.playback:
+        g.targetFortresses = g.config.get_setting('Next Gen','starting_goal')
+        g.destroyedFortresses = 0
         while not g.sessionOver:
             gc.collect()
             g.current_game += 1
@@ -1580,7 +1688,6 @@ def main():
             g.ingame = 1
             g.gameStart = pygame.time.get_ticks()
             while True:
-                print g.sessionTotal + gameTimer.elapsed() / 60000.0
                 if g.sessionTotal + gameTimer.elapsed() / 60000.0 >= g.config.get_setting('Next Gen','session_length'):
                     g.sessionOver = True
                     break
@@ -1593,17 +1700,23 @@ def main():
                     g.log_world()
                 if g.ship.alive == False:
                     g.reset_position()
-                if gameTimer.elapsed() > g.config.get_setting('General','game_time'):
-                    g.sessionTotal = g.sessionTotal + gameTimer.elapsed() / 60000.0
-                    g.ingame = -1
-                    g.gameevents.add("game","end", type='EVENT_SYSTEM')
-                    g.fade()
-                    g.gameevents.add("scores","show", type='EVENT_SYSTEM')
-                    if g.config.get_setting('Score','new_scoring'):
-                        g.show_new_score()
-                    else:
-                        g.show_old_score()
-                    g.gameevents.add("scores","hide", type='EVENT_SYSTEM')
+                if g.config.get_setting('Next Gen','next_gen') and g.destroyedFortresses == g.targetFortresses:
+                    g.progress = g.progress + 1
+                    g.destroyedFortresses = 0
+                    if g.progress == g.targetFortresses:
+                        g.progress = 0
+                        g.targetFortresses = g.targetFortresses + 1
+                    time = (g.config.get_setting('General','game_time')-g.gametimer.elapsed()) / 1000.0
+                    g.doScores(time)
+                    break
+                elif gameTimer.elapsed() > g.config.get_setting('General','game_time'):
+                    g.progress = 0
+                    g.targetFortresses = g.targetFortresses - 1
+                    if g.targetFortresses < g.config.get_setting('Next Gen','starting_goal'):
+                        g.targetFortresses = g.config.get_setting('Next Gen','starting_goal')
+                    g.destroyedFortresses = 0
+                    g.progress = 0
+                    g.doScores()
                     break
             g.gameevents.add("game", "over", type='EVENT_SYSTEM')
             if not g.config.get_setting('Next Gen','next_gen') and g.current_game >= g.config.get_setting('General','games_per_session'):
