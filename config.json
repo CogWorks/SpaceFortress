@@ -1,0 +1,12 @@
+{
+    "General": {
+        "id": {
+            "value": "FirstLast"
+        }
+    },
+    "Logging": {
+        "logdir": {
+            "value": "data"
+        }
+    }
+}

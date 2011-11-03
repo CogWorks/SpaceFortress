@@ -74,7 +74,7 @@ def get_config():
     
     cfg.add_setting('General', 'player', 'Human', alias='Player', options=['Human','Model'], type=config.constants.CT_COMBO, about='Will this game be played by a human or a cognitive model? Set to f to disable human control, enabling ACT-R')
     cfg.add_setting('General', 'psf', False, alias='Classic Mode', type=config.constants.CT_CHECKBOX, about='Original PSF (SF4) settings? If t, *ALL* further values are ignored')
-    cfg.add_setting('General', 'id', 1234, alias='Subject ID#', about='Subject identifier used in log filename"')
+    cfg.add_setting('General', 'id', '1234', alias='Subject ID#', type=config.constants.CT_LINEEDIT, about='Subject identifier used in log filename"')
     cfg.add_setting('General', 'games_per_session', 8, alias='Max # of Games', about='Number of games per "session"')
     cfg.add_setting('General', 'bonus_system', "AX-CPT", alias="Bonus System", type=config.constants.CT_COMBO, options=['standard','AX-CPT'], about='Bonus system standard or AX-CPT?')
     cfg.add_setting('General', 'bonus_location', 'Fixed', alias='Bonus Location', type=config.constants.CT_COMBO, options=['Fixed','Random','Probabilistic'], about='Randomize bonus position?')
@@ -229,7 +229,7 @@ def get_config():
     cfg.add_setting('Score', 'ship_death_penalty', 100, 'Penalty for ship destruction')
     cfg.add_setting('Score', 'energize_friend', 20, 'Points for "energizing" a friendly mine')
     cfg.add_setting('Score', 'destroy_foe', 30, 'Points for destroying a "foe" mine.')
-    cfg.add_setting('Score', 'destroy_fortress', 100, 'Points for destroying the fortress')
+    cfg.add_setting('Score', 'destroy_fortress', 250, 'Points for destroying the fortress')
     cfg.add_setting('Score', 'bonus_points', 100, 'Points added for selecting points bonus')
     cfg.add_setting('Score', 'bonus_missiles', 50, 'Missiles added for selecting missile bonus')
     

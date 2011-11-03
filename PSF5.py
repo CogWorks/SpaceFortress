@@ -115,7 +115,7 @@ class Game(object):
         self.gameevents.add("game","version",githash, type='EVENT_SYSTEM')
                 
         self.config = defaults.get_config()
-        self.config.set_user_file(defaults.get_user_file())
+        self.config.set_user_file('config.json')
         self.gameevents.add("config", "load", "defaults", type='EVENT_SYSTEM')
         self.config.update_from_user_file()
         self.gameevents.add("config", "load", "user", type='EVENT_SYSTEM')
@@ -171,6 +171,8 @@ class Game(object):
         d = datetime.datetime.now().timetuple()
         base = "%s_%d-%d-%d_%d-%d-%d"%(self.config.get_setting('General','id'), d[0], d[1], d[2], d[3], d[4], d[5])
         logdir = self.config.get_setting('Logging','logdir')
+        if not os.path.exists(logdir):
+            os.makedirs(logdir)
         if len(logdir.strip()) == 0:
             logdir = get_default_logdir()
         self.log_basename = os.path.join(logdir, base)
@@ -578,12 +580,18 @@ class Game(object):
                             self.sounds.bonus_success.play()
                             self.gameevents.add("shots_bonus_capture")
                             self.gameevents.add("score+", "shots", self.config.get_setting('Score','bonus_missiles'))
-                            self.gameevents.add("score+", "bonus", self.config.get_setting('Score','bonus_points')/2)
+                            if self.config.get_setting('Next Gen','next_gen'):
+                                self.gameevents.add("score+", "pnts", self.config.get_setting('Score','bonus_points')/2)
+                            else:
+                                self.gameevents.add("score+", "bonus", self.config.get_setting('Score','bonus_points')/2)
                         elif self.bonus.axcpt_flag:
                             self.bonus.axcpt_flag = False
                             self.sounds.bonus_fail.play()
                             self.gameevents.add("shots_bonus_failure")
-                            self.gameevents.add("score-", "bonus", self.config.get_setting('Score','bonus_points')/2)
+                            if self.config.get_setting('Next Gen','next_gen'):
+                                self.gameevents.add("score-", "pnts", self.config.get_setting('Score','bonus_points')/2)
+                            else:
+                                self.gameevents.add("score-", "bonus", self.config.get_setting('Score','bonus_points')/2)
                 elif obj == "pnts":
                     if self.config.get_setting('General','bonus_system') == "standard":
                     #if current symbol is bonus but previous wasn't, set flag to deny bonus if next symbol happens to be the bonus symbol
@@ -603,13 +611,19 @@ class Game(object):
                         if self.bonus.axcpt_flag == True and (self.bonus.state == "iti" or self.bonus.state == "target") and self.bonus.current_pair == "ax":
                             self.sounds.bonus_success.play()
                             self.gameevents.add("pnts_bonus_capture")
-                            self.gameevents.add("score+", "bonus", self.config.get_setting('Score','bonus_points'))
-                            self.gameevents.add("score+", "pnts", self.config.get_setting('Score','bonus_points'))
+                            if self.config.get_setting('Next Gen','next_gen'):
+                                self.gameevents.add("score+", "pnts", self.config.get_setting('Score','bonus_points'))
+                            else:
+                                self.gameevents.add("score+", "pnts", self.config.get_setting('Score','bonus_points'))
+                                self.gameevents.add("score+", "bonus", self.config.get_setting('Score','bonus_points'))
                         elif self.bonus.axcpt_flag:
                             self.bonus.axcpt_flag = False
                             self.sounds.bonus_fail.play()
                             self.gameevents.add("pnts_bonus_failure")
-                            self.gameevents.add("score-", "bonus", self.config.get_setting('Score','bonus_points')/2)
+                            if self.config.get_setting('Next Gen','next_gen'):
+                                self.gameevents.add("score-", "pnts", self.config.get_setting('Score','bonus_points')/2)
+                            else:
+                                self.gameevents.add("score-", "bonus", self.config.get_setting('Score','bonus_points')/2)
             elif command == "first_tag":
                 if obj == "foe":
                     self.mine_list.iff_flag = True
@@ -662,6 +676,9 @@ class Game(object):
                 self.score.iff = ''
                 self.score.intrvl = 0
                 self.gameevents.add("score-", "mines", self.config.get_setting('Score','mine_timeout_penalty'))
+            elif command == "score++":
+                if obj == "bonus_points":
+                    self.gameevents.add("score+", "pnts", int(target))
             elif command == "score+":
                 self.score.__setattr__(obj, self.score.__getattribute__(obj) + float(target))
                 if self.score.shots > self.config.get_setting('Missile','missile_max'):
@@ -1269,33 +1286,36 @@ class Game(object):
         pntsnrect.right = self.SCREEN_WIDTH / 3 * 2
         pntsnrect.centery = self.SCREEN_HEIGHT / 16 * 4
         self.screen.blit(pntsnsurf, pntsnrect)
-        cntrlsurf = self.f24.render("Remaining time:", True, (255, 255,0))
-        cntrlrect = cntrlsurf.get_rect()
-        cntrlrect.left = self.SCREEN_WIDTH / 3 
-        cntrlrect.centery = self.SCREEN_HEIGHT / 16 * 6
-        self.screen.blit(cntrlsurf, cntrlrect)
-        cntrlnsurf = self.f24.render("%ss"%time, True, (255, 255,255))
-        cntrlnrect = cntrlnsurf.get_rect()
-        cntrlnrect.right = self.SCREEN_WIDTH / 3 * 2
-        cntrlnrect.centery = self.SCREEN_HEIGHT / 16 * 6
-        self.screen.blit(cntrlnsurf, cntrlnrect)
-        vlctysurf = self.f24.render("Time bonus modifier:", True, (255, 255,0))
-        vlctyrect = vlctysurf.get_rect()
-        vlctyrect.left = self.SCREEN_WIDTH / 3
-        vlctyrect.centery = self.SCREEN_HEIGHT / 16 * 8
-        self.screen.blit(vlctysurf, vlctyrect)
-        bonus = math.pow(float(self.config.get_setting('Next Gen','time_modifier')),time)
-        vlctynsurf = self.f24.render("%.2fx"%bonus, True, (255, 255,255))
-        vlctynrect = vlctynsurf.get_rect()
-        vlctynrect.right = self.SCREEN_WIDTH / 3 * 2
-        vlctynrect.centery = self.SCREEN_HEIGHT / 16 * 8
-        self.screen.blit(vlctynsurf, vlctynrect)
-        speedsurf = self.f24.render("Difficulty modifier:", True, (255, 255,0))
+        #cntrlsurf = self.f24.render("Remaining shots bonus points:", True, (255, 255,0))
+        #cntrlrect = cntrlsurf.get_rect()
+        #cntrlrect.left = self.SCREEN_WIDTH / 3 
+        #cntrlrect.centery = self.SCREEN_HEIGHT / 16 * 6
+        #self.screen.blit(cntrlsurf, cntrlrect)
+        #shotspoints = int(5*self.ship.missile_count)
+        #cntrlnsurf = self.f24.render("%d"%shotspoints, True, (255, 255,255))
+        #cntrlnrect = cntrlnsurf.get_rect()
+        #cntrlnrect.right = self.SCREEN_WIDTH / 3 * 2
+        #cntrlnrect.centery = self.SCREEN_HEIGHT / 16 * 6
+        #self.screen.blit(cntrlnsurf, cntrlnrect)
+        #vlctysurf = self.f24.render("Time bonus points:", True, (255, 255,0))
+        #vlctyrect = vlctysurf.get_rect()
+        #vlctyrect.left = self.SCREEN_WIDTH / 3
+        #vlctyrect.centery = self.SCREEN_HEIGHT / 16 * 8
+        #self.screen.blit(vlctysurf, vlctyrect)
+        #bonuspoints = int(math.pow(float(self.config.get_setting('Next Gen','time_modifier')),time)*time)
+        #bonuspoints = int(10*time)
+        #vlctynsurf = self.f24.render("%d"%bonuspoints, True, (255, 255,255))
+        #vlctynrect = vlctynsurf.get_rect()
+        #vlctynrect.right = self.SCREEN_WIDTH / 3 * 2
+        #vlctynrect.centery = self.SCREEN_HEIGHT / 16 * 8
+        #self.screen.blit(vlctynsurf, vlctynrect)
+        speedsurf = self.f24.render("Bonus points:", True, (255, 255,0))
         speedrect = speedsurf.get_rect()
         speedrect.left = self.SCREEN_WIDTH / 3
         speedrect.centery = self.SCREEN_HEIGHT / 16 * 10
         self.screen.blit(speedsurf, speedrect)
-        speednsurf = self.f24.render("%dx"%self.targetFortresses, True, (255, 255,255))
+        bonus = int(math.pow(self.destroyedFortresses,self.targetFortresses+1)/time * 3 + self.ship.missile_count*3)
+        speednsurf = self.f24.render("%d"%bonus, True, (255, 255,255))
         speednrect = speednsurf.get_rect()
         speednrect.right = self.SCREEN_WIDTH / 3 * 2
         speednrect.centery = self.SCREEN_HEIGHT / 16 * 10
@@ -1306,7 +1326,7 @@ class Game(object):
         totalrect.left = self.SCREEN_WIDTH / 3
         totalrect.centery = self.SCREEN_HEIGHT / 16 * 12
         self.screen.blit(totalsurf, totalrect)
-        totalnsurf = self.f24.render("%d"%(self.score.pnts * bonus * self.targetFortresses), True, (255, 255,255))
+        totalnsurf = self.f24.render("%d"%(self.score.pnts + bonus), True, (255, 255,255))
         totalnrect = totalnsurf.get_rect()
         totalnrect.right = self.SCREEN_WIDTH / 3 * 2
         totalnrect.centery = self.SCREEN_HEIGHT / 16 * 12
@@ -1320,6 +1340,7 @@ class Game(object):
         finalrect.centery = self.SCREEN_HEIGHT / 16 * 14
         self.screen.blit(finalsurf, finalrect)
         pygame.display.flip()
+        self.gameevents.add("score++", "bonus_pnts", bonus)
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
@@ -1702,12 +1723,12 @@ def main():
                     g.reset_position()
                 if g.config.get_setting('Next Gen','next_gen') and g.destroyedFortresses == g.targetFortresses:
                     g.progress = g.progress + 1
-                    g.destroyedFortresses = 0
                     if g.progress == g.targetFortresses:
                         g.progress = 0
                         g.targetFortresses = g.targetFortresses + 1
-                    time = (g.config.get_setting('General','game_time')-g.gametimer.elapsed()) / 1000.0
+                    time = g.gametimer.elapsed() / g.config.get_setting('General','game_time')
                     g.doScores(time)
+                    g.destroyedFortresses = 0
                     break
                 elif gameTimer.elapsed() > g.config.get_setting('General','game_time'):
                     g.progress = 0
