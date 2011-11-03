@@ -1,0 +1,9 @@
+* Only score shown is Points. Control, Flight, and Bonus are recorded
+  but hidden.
+
+* Remaining time in game is now shown.
+
+* The ship's initial and max shots has been reduced to 50 from 100.
+
+* Ship does not fire when it has no shots left. Player still looses 3 points
+  each time the fire button is pressed with 0 shots.

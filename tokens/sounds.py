@@ -27,3 +27,4 @@ class Sounds(object):
         self.vlner_reset = SFSound(app, os.path.join(app.approot,"sounds/VulnerZeroed.wav"))
         self.bonus_success = SFSound(app, os.path.join(app.approot,"sounds/bonus_success.wav"))
         self.bonus_fail = SFSound(app, os.path.join(app.approot,"sounds/bonus_fail.wav"))
+        self.empty = SFSound(app, os.path.join(app.approot,"sounds/emptychamber.wav"))

@@ -90,8 +90,12 @@ class Score(object):
         self.NEW_SCORE_Y_LR_BOTTOM = 545 * self.app.aspect_ratio
         self.NEW_SCORE_X_C_LEFT = half_width - 192 * self.app.aspect_ratio
         self.NEW_SCORE_X_C_RIGHT = half_width + 148 * self.app.aspect_ratio
-        self.NEW_SCORE_X_R_RIGHT = half_width + 428*self.app.aspect_ratio
-        self.NEW_SCORE_X_L_LEFT = half_width - 432 * self.app.aspect_ratio
+        if self.app.config.get_setting('Next Gen','next_gen'):
+            self.NEW_SCORE_X_R_RIGHT = half_width + 456*self.app.aspect_ratio
+            self.NEW_SCORE_X_L_LEFT = half_width - 460 * self.app.aspect_ratio
+        else:
+            self.NEW_SCORE_X_R_RIGHT = half_width + 428*self.app.aspect_ratio
+            self.NEW_SCORE_X_L_LEFT = half_width - 432 * self.app.aspect_ratio
         
         self.scores_locations = []
         if self.app.config.get_setting('Score','new_scoring_pos'):
@@ -115,26 +119,33 @@ class Score(object):
         
     def update_score(self):
         """updates positions list to reflect current scores"""
-        self.positions[self.position_map["SHOTS_pos"]] = self.shots
-        self.positions[self.position_map["VLNER_pos"]] = self.vlner
-        self.positions[self.position_map["IFF_pos"]] = self.iff
-        self.positions[self.position_map["INTRVL_pos"]] = self.intrvl
-        if self.app.config.get_setting('Score','new_scoring'):
-            #use Flight, Fortress, Mines, Bonus
-            self.positions[self.position_map["PNTS_pos"]] = self.flight
-            self.positions[self.position_map["VLCTY_pos"]] = self.mines
-            self.positions[self.position_map["CNTRL_pos"]] = self.fortress
-            self.positions[self.position_map["SPEED_pos"]] = self.bonus
+        if self.app.config.get_setting('Next Gen','next_gen'):
+            self.positions[1] = self.pnts
+            self.positions[3] = self.shots
+            self.positions[4] = self.intrvl
+            self.positions[7] = self.iff
+            self.positions[8] = self.vlner
         else:
-            #use PNTS, VLCTY, CNTRL, SPEED
-            self.positions[self.position_map["PNTS_pos"]] = self.pnts
-            self.positions[self.position_map["VLCTY_pos"]] = self.vlcty
-            self.positions[self.position_map["CNTRL_pos"]] = self.cntrl
-            self.positions[self.position_map["SPEED_pos"]] = self.speed
+            self.positions[self.position_map["SHOTS_pos"]] = self.shots
+            self.positions[self.position_map["VLNER_pos"]] = self.vlner
+            self.positions[self.position_map["IFF_pos"]] = self.iff
+            self.positions[self.position_map["INTRVL_pos"]] = self.intrvl
+            if self.app.config.get_setting('Score','new_scoring'):
+                #use Flight, Fortress, Mines, Bonus
+                self.positions[self.position_map["PNTS_pos"]] = self.flight
+                self.positions[self.position_map["VLCTY_pos"]] = self.mines
+                self.positions[self.position_map["CNTRL_pos"]] = self.fortress
+                self.positions[self.position_map["SPEED_pos"]] = self.bonus
+            else:
+                #use PNTS, VLCTY, CNTRL, SPEED
+                self.positions[self.position_map["PNTS_pos"]] = self.pnts
+                self.positions[self.position_map["VLCTY_pos"]] = self.vlcty
+                self.positions[self.position_map["CNTRL_pos"]] = self.cntrl
+                self.positions[self.position_map["SPEED_pos"]] = self.speed
         for item in range(1,9):
             if isinstance(self.positions[item], float):
                 self.positions[item] = int(self.positions[item])
-        
+                        
     def draw(self, scoresurf):
         """draws all score values to screen"""     
         #get some floats from adding fractions. Change to int for font rendering
@@ -143,9 +154,16 @@ class Score(object):
         self.p1_surf = self.f.render("%s"%str(self.positions[1]),0, (255,255,0))
         self.p1_rect = self.p1_surf.get_rect()
         self.p1_rect.center = self.scores_locations[0]
-        self.p2_surf = self.f.render("%s"%str(self.positions[2]),0, (255,255,0))
-        self.p2_rect = self.p2_surf.get_rect()
-        self.p2_rect.center = self.scores_locations[1]
+        if self.app.config.get_setting('Next Gen','next_gen'):
+            time = (self.app.config.get_setting('General','game_time')-self.app.gametimer.elapsed()) / 1000.0
+            if (time<0): time = 0
+            self.p2_surf = self.f.render("%.1f" % (time),0, (255,255,0))
+            self.p2_rect = self.p2_surf.get_rect()
+            self.p2_rect.center = self.scores_locations[1]
+        else:
+            self.p2_surf = self.f.render("%s"%str(self.positions[2]),0, (255,255,0))
+            self.p2_rect = self.p2_surf.get_rect()
+            self.p2_rect.center = self.scores_locations[1]
         self.p3_surf = self.f.render("%s"%str(self.positions[3]),0, (255,255,0))
         self.p3_rect = self.p3_surf.get_rect()
         self.p3_rect.center = self.scores_locations[2]
@@ -190,10 +208,11 @@ class Score(object):
             scoresurf.blit(self.p3_surf, self.p3_rect)
         if not(self.app.config.get_setting('Score','INTRVL_pos') == 4 and self.intrvl == 0):
             scoresurf.blit(self.p4_surf, self.p4_rect)
-        if not(self.app.config.get_setting('Score','INTRVL_pos') == 5 and self.intrvl == 0):
-            scoresurf.blit(self.p5_surf, self.p5_rect)
-        if not(self.app.config.get_setting('Score','INTRVL_pos') == 6 and self.intrvl == 0):
-            scoresurf.blit(self.p6_surf, self.p6_rect)
+        if not self.app.config.get_setting('Next Gen','next_gen'):
+            if not(self.app.config.get_setting('Score','INTRVL_pos') == 5 and self.intrvl == 0):
+                scoresurf.blit(self.p5_surf, self.p5_rect)
+            if not(self.app.config.get_setting('Score','INTRVL_pos') == 6 and self.intrvl == 0):
+                scoresurf.blit(self.p6_surf, self.p6_rect)
         if not(self.app.config.get_setting('Score','INTRVL_pos') == 7 and self.intrvl == 0):
             scoresurf.blit(self.p7_surf, self.p7_rect)
         if not(self.app.config.get_setting('Score','INTRVL_pos') == 8 and self.intrvl == 0):
