@@ -115,7 +115,7 @@ class Game(object):
         self.gameevents.add("game","version",githash, type='EVENT_SYSTEM')
                 
         self.config = defaults.get_config()
-        self.config.set_user_file('config.json')
+        self.config.set_user_file(defaults.get_user_file())
         self.gameevents.add("config", "load", "defaults", type='EVENT_SYSTEM')
         self.config.update_from_user_file()
         self.gameevents.add("config", "load", "user", type='EVENT_SYSTEM')
@@ -1721,12 +1721,12 @@ def main():
                     g.log_world()
                 if g.ship.alive == False:
                     g.reset_position()
+                time = g.gametimer.elapsed() / g.config.get_setting('General','game_time')
                 if g.config.get_setting('Next Gen','next_gen') and g.destroyedFortresses == g.targetFortresses:
                     g.progress = g.progress + 1
                     if g.progress == g.targetFortresses:
                         g.progress = 0
                         g.targetFortresses = g.targetFortresses + 1
-                    time = g.gametimer.elapsed() / g.config.get_setting('General','game_time')
                     g.doScores(time)
                     g.destroyedFortresses = 0
                     break
@@ -1737,7 +1737,7 @@ def main():
                         g.targetFortresses = g.config.get_setting('Next Gen','starting_goal')
                     g.destroyedFortresses = 0
                     g.progress = 0
-                    g.doScores()
+                    g.doScores(time)
                     break
             g.gameevents.add("game", "over", type='EVENT_SYSTEM')
             if not g.config.get_setting('Next Gen','next_gen') and g.current_game >= g.config.get_setting('General','games_per_session'):
