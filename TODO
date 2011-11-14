@@ -1,4 +1,6 @@
 
+* Fix bonus symbol logging and eye_motion_state
+
 * Velocities seems different on different resolutions
 
 * Center world on non wide-screen displays that are windowed

@@ -24,6 +24,8 @@
 * Fix bug where vlner reset sound would play when fortress was destroyed
 * Add playback support with Fastforward, Rewind, Pause, FPS Up/Down controls
 * Add video recording support to playback
+* Add mine speed score back
+* Add ship health and fortress location to log file
 
  v5.0.0_rc9
 ---------------------

@@ -120,7 +120,7 @@ class LineEdit(QLineEdit):
         QObject.connect(self, SIGNAL('textChanged(QString)'), self.stateChangeHandler)
         
     def updateValue(self, newVal):
-        self.setText(newVal)
+        self.setText(str(newVal))
             
     def stateChangeHandler(self, newVal):
         self.config.update_setting_value(self.category, self.setting, newVal)
