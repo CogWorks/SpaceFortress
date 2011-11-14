@@ -85,6 +85,7 @@ class Game(object):
         self.playback_logver = 0
         self.playback_pause = False
         self.header = {}
+        self.bonus_captured = False
 
         self.sessionTotal = 0
         self.sessionOver = False
@@ -565,69 +566,73 @@ class Game(object):
                         else:
                             self.gameevents.add("second_tag", "out_of_bounds")
                 elif obj == "shots":
-                    if self.config.get_setting('General','bonus_system') == "standard":
-                        #if current symbol is bonus but previous wasn't, set flag to deny bonus if next symbol happens to be the bonus symbol
-                        if (self.bonus.current_symbol == self.bonus.bonus_symbol) and (self.bonus.prior_symbol != self.bonus.bonus_symbol):
-                            self.bonus.flag = True
-                            self.gameevents.add("flagged_for_first_bonus")
-                        if (self.bonus.current_symbol == self.bonus.bonus_symbol) and (self.bonus.prior_symbol == self.bonus.bonus_symbol):
-                            #bonus available, check flag to award or deny bonus
-                            if self.bonus.flag:
-                                self.gameevents.add("attempt_to_capture_flagged_bonus")
-                            else:
+                    if not self.bonus_captured:
+                        self.bonus_captured = True
+                        if self.config.get_setting('General','bonus_system') == "standard":
+                            #if current symbol is bonus but previous wasn't, set flag to deny bonus if next symbol happens to be the bonus symbol
+                            if (self.bonus.current_symbol == self.bonus.bonus_symbol) and (self.bonus.prior_symbol != self.bonus.bonus_symbol):
+                                self.bonus.flag = True
+                                self.gameevents.add("flagged_for_first_bonus")
+                            if (self.bonus.current_symbol == self.bonus.bonus_symbol) and (self.bonus.prior_symbol == self.bonus.bonus_symbol):
+                                #bonus available, check flag to award or deny bonus
+                                if self.bonus.flag:
+                                    self.gameevents.add("attempt_to_capture_flagged_bonus")
+                                else:
+                                    self.gameevents.add("shots_bonus_capture")
+                                    self.gameevents.add("score+", "shots", self.config.get_setting('Score','bonus_missiles'))
+                                    self.gameevents.add("score+", "bonus", self.config.get_setting('Score','bonus_points')/2)
+                                    self.bonus.flag = True
+                        else: #AX-CPT
+                            if self.bonus.axcpt_flag == True and (self.bonus.state == "iti" or self.bonus.state == "target") and self.bonus.current_pair == "ax":
+                                self.sounds.bonus_success.play()
                                 self.gameevents.add("shots_bonus_capture")
                                 self.gameevents.add("score+", "shots", self.config.get_setting('Score','bonus_missiles'))
-                                self.gameevents.add("score+", "bonus", self.config.get_setting('Score','bonus_points')/2)
-                                self.bonus.flag = True
-                    else: #AX-CPT
-                        if self.bonus.axcpt_flag == True and (self.bonus.state == "iti" or self.bonus.state == "target") and self.bonus.current_pair == "ax":
-                            self.sounds.bonus_success.play()
-                            self.gameevents.add("shots_bonus_capture")
-                            self.gameevents.add("score+", "shots", self.config.get_setting('Score','bonus_missiles'))
-                            if self.config.get_setting('Next Gen','next_gen'):
-                                self.gameevents.add("score+", "pnts", self.config.get_setting('Score','bonus_points')/2)
-                            else:
-                                self.gameevents.add("score+", "bonus", self.config.get_setting('Score','bonus_points')/2)
-                        elif self.bonus.axcpt_flag:
-                            self.bonus.axcpt_flag = False
-                            self.sounds.bonus_fail.play()
-                            self.gameevents.add("shots_bonus_failure")
-                            if self.config.get_setting('Next Gen','next_gen'):
-                                self.gameevents.add("score-", "pnts", self.config.get_setting('Score','bonus_points')/2)
-                            else:
-                                self.gameevents.add("score-", "bonus", self.config.get_setting('Score','bonus_points')/2)
+                                if self.config.get_setting('Next Gen','next_gen'):
+                                    self.gameevents.add("score+", "pnts", self.config.get_setting('Score','bonus_points')/2)
+                                else:
+                                    self.gameevents.add("score+", "bonus", self.config.get_setting('Score','bonus_points')/2)
+                            elif self.bonus.axcpt_flag:
+                                self.bonus.axcpt_flag = False
+                                self.sounds.bonus_fail.play()
+                                self.gameevents.add("shots_bonus_failure")
+                                if self.config.get_setting('Next Gen','next_gen'):
+                                    self.gameevents.add("score-", "pnts", self.config.get_setting('Score','bonus_points')/2)
+                                else:
+                                    self.gameevents.add("score-", "bonus", self.config.get_setting('Score','bonus_points')/2)
                 elif obj == "pnts":
-                    if self.config.get_setting('General','bonus_system') == "standard":
-                    #if current symbol is bonus but previous wasn't, set flag to deny bonus if next symbol happens to be the bonus symbol
-                        if (self.bonus.current_symbol == self.bonus.bonus_symbol) and (self.bonus.prior_symbol != self.bonus.bonus_symbol):
-                            self.bonus.flag = True
-                            self.gameevents.add("flagged_for_first_bonus")
-                        if (self.bonus.current_symbol == self.bonus.bonus_symbol) and (self.bonus.prior_symbol == self.bonus.bonus_symbol):
-                            #bonus available, check flag to award or deny bonus
-                            if self.bonus.flag:
-                                self.gameevents.add("attempt_to_capture_flagged_bonus")
-                            else:
-                                self.gameevents.add("pnts_pnts_capture")
-                                self.gameevents.add("score+", "bonus", self.config.get_setting('Score','bonus_points'))
-                                self.gameevents.add("score+", "pnts", self.config.get_setting('Score','bonus_points'))
+                    if not self.bonus_captured:
+                        self.bonus_captured = True
+                        if self.config.get_setting('General','bonus_system') == "standard":
+                        #if current symbol is bonus but previous wasn't, set flag to deny bonus if next symbol happens to be the bonus symbol
+                            if (self.bonus.current_symbol == self.bonus.bonus_symbol) and (self.bonus.prior_symbol != self.bonus.bonus_symbol):
                                 self.bonus.flag = True
-                    else: #AX-CPT
-                        if self.bonus.axcpt_flag == True and (self.bonus.state == "iti" or self.bonus.state == "target") and self.bonus.current_pair == "ax":
-                            self.sounds.bonus_success.play()
-                            self.gameevents.add("pnts_bonus_capture")
-                            if self.config.get_setting('Next Gen','next_gen'):
-                                self.gameevents.add("score+", "pnts", self.config.get_setting('Score','bonus_points'))
-                            else:
-                                self.gameevents.add("score+", "pnts", self.config.get_setting('Score','bonus_points'))
-                                self.gameevents.add("score+", "bonus", self.config.get_setting('Score','bonus_points'))
-                        elif self.bonus.axcpt_flag:
-                            self.bonus.axcpt_flag = False
-                            self.sounds.bonus_fail.play()
-                            self.gameevents.add("pnts_bonus_failure")
-                            if self.config.get_setting('Next Gen','next_gen'):
-                                self.gameevents.add("score-", "pnts", self.config.get_setting('Score','bonus_points')/2)
-                            else:
-                                self.gameevents.add("score-", "bonus", self.config.get_setting('Score','bonus_points')/2)
+                                self.gameevents.add("flagged_for_first_bonus")
+                            if (self.bonus.current_symbol == self.bonus.bonus_symbol) and (self.bonus.prior_symbol == self.bonus.bonus_symbol):
+                                #bonus available, check flag to award or deny bonus
+                                if self.bonus.flag:
+                                    self.gameevents.add("attempt_to_capture_flagged_bonus")
+                                else:
+                                    self.gameevents.add("pnts_pnts_capture")
+                                    self.gameevents.add("score+", "bonus", self.config.get_setting('Score','bonus_points'))
+                                    self.gameevents.add("score+", "pnts", self.config.get_setting('Score','bonus_points'))
+                                    self.bonus.flag = True
+                        else: #AX-CPT
+                            if self.bonus.axcpt_flag == True and (self.bonus.state == "iti" or self.bonus.state == "target") and self.bonus.current_pair == "ax":
+                                self.sounds.bonus_success.play()
+                                self.gameevents.add("pnts_bonus_capture")
+                                if self.config.get_setting('Next Gen','next_gen'):
+                                    self.gameevents.add("score+", "pnts", self.config.get_setting('Score','bonus_points'))
+                                else:
+                                    self.gameevents.add("score+", "pnts", self.config.get_setting('Score','bonus_points'))
+                                    self.gameevents.add("score+", "bonus", self.config.get_setting('Score','bonus_points'))
+                            elif self.bonus.axcpt_flag:
+                                self.bonus.axcpt_flag = False
+                                self.sounds.bonus_fail.play()
+                                self.gameevents.add("pnts_bonus_failure")
+                                if self.config.get_setting('Next Gen','next_gen'):
+                                    self.gameevents.add("score-", "pnts", self.config.get_setting('Score','bonus_points')/2)
+                                else:
+                                    self.gameevents.add("score-", "bonus", self.config.get_setting('Score','bonus_points')/2)
             elif command == "first_tag":
                 if obj == "foe":
                     self.mine_list.iff_flag = True
@@ -650,6 +655,7 @@ class Game(object):
                 self.gameevents.add("score-", "flight", self.config.get_setting('Score','warp_penalty')) 
             elif command == "activate":
                 if obj == "bonus":
+                    self.bonus_captured = False
                     self.bonus.visible = True
                     self.bonus.timer.reset()
                     self.bonus.get_new_symbol()
