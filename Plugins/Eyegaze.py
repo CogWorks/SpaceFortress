@@ -80,7 +80,7 @@ class SF5Plugin(object):
                     self.calibrated = self.eg.calibrate(self.app.screen)
             
             if args[4] == 'preflip' and args[5] == 'main':
-                if self.app.playback:
+                if self.app.playback and self.app.config.get_setting('Eyegaze','drawfix'):
                     state = self.app.playback_data[self.app.playback_index]
                     try:
                         fix_x = state[self.app.header['fix_x']]

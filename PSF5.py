@@ -141,28 +141,29 @@ class Game(object):
             #logfile = '/Users/ryan/SFData/c83e3d50/c83e3d50_2011-5-19_14-12-44.txt'
             if logfile and os.path.exists(logfile):
                 self.logfile = open(logfile,'r')
-                header = self.logfile.readline()[:-1].split('\t')
+                lines = self.logfile.readlines()
+                header = lines[0].split('\t')
                 for i in range(0,len(header)):
                     self.header[header[i]] = i
-                line = self.logfile.readline()
-                while (line):
+                games = []
+                for line in lines[1:]:
                     line = line[:-1].split('\t')
-                    if line[5] == 'display' and line[6] == 'setmode':
-                        info = eval(line[7])
+                    if line[self.header['e1']] == 'display' and line[self.header['e2']] == 'setmode':
+                        info = eval(line[self.header['e3']])
                         self.playback_aspect_ratio = info[2]
                         self.playback_aspect_ratio2 = (self.SCREEN_WIDTH/info[0],self.SCREEN_HEIGHT/info[1])
-                    elif line[5] == 'log' and line[6] == 'version':
-                        self.playback_logver = int(line[7])
-                    if abs(int(line[3])) > self.playback_available_games:
-                        self.playback_available_games = abs(int(line[3]))
+                    elif line[self.header['e1']] == 'log' and line[self.header['e2']] == 'version':
+                        self.playback_logver = int(line[self.header['e3']])
+                    games.append(int(line[self.header['current_game']]))
                     self.playback_data.append(line)
                     line = self.logfile.readline()
+                self.playback_available_games = max(games)
                 if self.playback_available_games:
                     self.playback_game = playback.pickGame(self.playback_available_games)
                     if self.playback_game:
                         data = []
                         for d in self.playback_data:
-                            if int(d[3]) == self.playback_game:
+                            if int(d[self.header['current_game']]) == self.playback_game:
                                 data.append(d)
                         self.playback_data = data
                         self.playback = True
@@ -185,7 +186,7 @@ class Game(object):
             log_filename = "%s.txt" % (self.log_basename)
             self.log = open(log_filename, "w")
             self.log.write("event_type\tsystem_time\tclock\tgame_time\tcurrent_game\teid\te1\te2\te3\tfoes\tship_alive\tship_health\tship_x\t"+
-                           "ship_y\tsmod\tdmod\tship_vel_x\tship_vel_y\tship_orientation\tdistance\tmine_no\tmine_id\tmine_x\tmine_y\tfortress_alive\tfortress_x\tfortress_y\tfortress_orientation\t"+
+                           "ship_y\tsmod\tdmod\tship_vel_x\tship_vel_y\tship_orientation\tdistance\tmine_no\tmine_id\tmine\tfortress_alive\tfortress_x\tfortress_y\tfortress_orientation\t"+
                            "missile\tshell\tbonus_no\tbonus_prev\tbonus_cur\tbonus_cur_x\tbonus_cur_y\t")
             if self.config.get_setting('General','bonus_system') == "AX-CPT":
                 self.log.write('bonus_isi\t')
@@ -201,7 +202,7 @@ class Game(object):
                     pass
             self.log.write("\n")
             self.gameevents.add("log", "header", "ready", log=False, type='EVENT_SYSTEM')
-            self.gameevents.add("log", "version", "6", type='EVENT_SYSTEM')
+            self.gameevents.add("log", "version", "7", type='EVENT_SYSTEM')
         
         if not self.playback:
             self.gameevents.add("config","running",str(self.config), type='EVENT_SYSTEM')
@@ -989,13 +990,9 @@ class Game(object):
         if len(self.mine_list) > 0:
             mine_no = self.mine_list.mine_count
             mine_id = self.mine_list[0].iff
-            mine_x = "%.3f"%(self.mine_list[0].position.x)
-            mine_y = "%.3f"%(self.mine_list[0].position.y)
         else:
             mine_no = "NA"
             mine_id = "NA"
-            mine_x = "NA"
-            mine_y = "NA"
         if self.fortress_exists and self.fortress.alive:
             fortress_alive = "y"
             fortress_orientation = str(self.fortress.orientation)
@@ -1060,9 +1057,9 @@ class Game(object):
         else:
             pnts_key = "n"
         
-        self.log.write("STATE\t%f\t%f\t%d\t%d\tNA\tNA\tNA\tNA\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t" %
+        self.log.write("STATE\t%f\t%f\t%d\t%d\tNA\tNA\tNA\tNA\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t" %
                        (system_time, clock, game_time, self.current_game, " ".join(self.mine_list.foe_letters), ship_alive, ship_health, ship_x, ship_y, smod, dmod, ship_vel_x, ship_vel_y, ship_orientation,
-                        distance, mine_no, mine_id, mine_x, mine_y, fortress_alive, fortress_x, fortress_y, fortress_orientation, self.missile_list, self.shell_list))
+                        distance, mine_no, mine_id, self.mine_list, fortress_alive, fortress_x, fortress_y, fortress_orientation, self.missile_list, self.shell_list))
         if self.config.get_setting('General','bonus_system') == "AX-CPT":
             self.log.write("%s\t%s\t%s\t%s\t%s\t%s\t" %
                            (bonus_no, bonus_prev, bonus_cur, bonus_cur_x, bonus_cur_y, bonus_isi))
@@ -1442,7 +1439,7 @@ class Game(object):
     def process_state(self, state):
         
         if self.playback_start == 0:
-            self.playback_start = int(state[2])
+            self.playback_start = float(state[self.header['clock']])
         
         ship_x = state[self.header['ship_x']]
         ship_y = state[self.header['ship_y']]
@@ -1482,40 +1479,41 @@ class Game(object):
             self.ship.alive = False
         
         self.missile_list = []
-        missiles = state[self.header['missile']][1:-1].strip()
-        if missiles != "":
-            missiles = map(float,missiles.split(' ')[::-1])
-            n_missiles = int(len(missiles)/2)
-            for i in range(0,n_missiles):
-                self.missile_list.append(tokens.missile.Missile(self))
-                self.missile_list[i].position.x = missiles.pop() / self.playback_aspect_ratio * self.aspect_ratio
-                self.missile_list[i].position.y = missiles.pop() / self.playback_aspect_ratio * self.aspect_ratio
+        missiles = eval(state[self.header['missile']])
+        for i, missile in enumerate(missiles):
+            self.missile_list.append(tokens.missile.Missile(self, missile[2]))
+            self.missile_list[i].position.x = missile[0] / self.playback_aspect_ratio * self.aspect_ratio
+            self.missile_list[i].position.y = missile[1] / self.playback_aspect_ratio * self.aspect_ratio
                 
         self.shell_list = []
-        shells = state[self.header['shell']][1:-1].strip()
-        if shells != "":
-            shells = map(float,shells.split(' ')[::-1])
-            n_shells = int(len(shells)/2)
-            for i in range(0,n_shells):
-                self.shell_list.append(tokens.shell.Shell(self, self.fortress.orientation))
-                self.shell_list[i].position.x = shells.pop() / self.playback_aspect_ratio * self.aspect_ratio
-                self.shell_list[i].position.y = shells.pop() / self.playback_aspect_ratio * self.aspect_ratio
+        shells = eval(state[self.header['shell']])
+        for i, shell in enumerate(shells):
+            self.shell_list.append(tokens.shell.Shell(self, shell[2]))
+            self.shell_list[i].position.x = shell[0] / self.playback_aspect_ratio * self.aspect_ratio
+            self.shell_list[i].position.y = shell[1] / self.playback_aspect_ratio * self.aspect_ratio
             
+        self.score.iff = ''
         self.mine_list = tokens.mine.MineList(self)
-        mine_x = state[self.header['mine_x']]
-        mine_y = state[self.header['mine_y']]
-        if mine_x != 'NA' and mine_y != 'NA':
-            mine_x = float(mine_x) / self.playback_aspect_ratio * self.aspect_ratio
-            mine_y = float(mine_y) / self.playback_aspect_ratio * self.aspect_ratio
-            if self.playback_logver <= 4:
-                self.mine_list.append(tokens.mine.Mine(self, type=0, orientation=0))
-            else:
-                self.mine_list.append(tokens.mine.Mine(self))
-            self.mine_list[0].position.x = mine_x
-            self.mine_list[0].position.y = mine_y
-            self.score.iff = state[self.header['mine_id']]
+        if self.playback_logver < 7:
+            mine_x = state[self.header['mine_x']]
+            mine_y = state[self.header['mine_y']]
+            if mine_x != 'NA' and mine_y != 'NA':
+                mine_x = float(mine_x) / self.playback_aspect_ratio * self.aspect_ratio
+                mine_y = float(mine_y) / self.playback_aspect_ratio * self.aspect_ratio
+                if self.playback_logver <= 4:
+                    self.mine_list.append(tokens.mine.Mine(self, type=0, orientation=0))
+                else:
+                    self.mine_list.append(tokens.mine.Mine(self))
+                self.mine_list[0].position.x = mine_x
+                self.mine_list[0].position.y = mine_y
+                self.score.iff = state[self.header['mine_id']]
         else:
-            self.score.iff = ''
+            mines = eval(state[self.header['mine']])
+            for i, mine in enumerate(mines):
+                self.mine_list.append(tokens.mine.Mine(self, type=mine[2], orientation=mine[3]))
+                self.mine_list[i].position.x = mine[0] / self.playback_aspect_ratio * self.aspect_ratio
+                self.mine_list[i].position.y = mine[1] / self.playback_aspect_ratio * self.aspect_ratio
+            self.score.iff = state[self.header['mine_id']]
             
         self.score.pnts = int(state[self.header['score_pnts']])
         self.score.cntrl = int(state[self.header['score_cntrl']])
@@ -1620,7 +1618,7 @@ class Game(object):
     
     def draw_et(self):
         if self.playback:
-            et = int(self.playback_data[self.playback_index][2]) - self.playback_start
+            et = float(self.playback_data[self.playback_index][self.header['clock']]) - self.playback_start
             etsurf = self.f6.render("%.2f" % (et / 1000), True, (255,0,0))
             etrect = etsurf.get_rect()
             etrect.bottom = self.SCREEN_HEIGHT -8

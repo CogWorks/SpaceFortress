@@ -20,7 +20,7 @@ mine_types = ['gfx/clust1.png','gfx/clust2.png','gfx/clust3.png','gfx/clust4.png
 
 class Mine(token.Token):
     """represents the friend or foe mine object"""
-    def __init__(self, app, type=-1, orientation=random.randint(0,359)):
+    def __init__(self, app, type=-1, orientation=-1):
         super(Mine, self).__init__()
         self.position.x = 0 #600
         self.position.y = 0 #400
@@ -34,12 +34,17 @@ class Mine(token.Token):
         self.iff = None
         self.tagged = "untagged"
         self.color = (0, 255, 255)
+        if orientation > -1 and orientation < 360:
+            self.orientation = orientation
+        else:
+            self.orientation = random.randint(0,359)
+        if type > -1 and type < len(mine_types):
+            self.type = type
+        else:
+            self.type = random.choice(range(0,len(mine_types)))
         if self.app.config.get_setting('Graphics','fancy'):
-            if type > -1 and type < len(mine_types):
-                img = mine_types[type]
-            else:
-                img = random.choice(mine_types)
-            self.mine = picture.Picture(os.path.join(self.app.approot, img), 64*self.app.aspect_ratio/128, orientation)
+            img = mine_types[self.type]
+            self.mine = picture.Picture(os.path.join(self.app.approot, img), 64*self.app.aspect_ratio/128, self.orientation)
                 
     def generate_new_position(self):
         """chooses random location to place mine"""
@@ -64,7 +69,10 @@ class Mine(token.Token):
             pygame.draw.line(worldsurf, self.color, (self.position.x, self.position.y - 24*self.app.aspect_ratio), (self.position.x + 16*self.app.aspect_ratio, self.position.y), self.app.linewidth)
             pygame.draw.line(worldsurf, self.color, (self.position.x + 16*self.app.aspect_ratio, self.position.y), (self.position.x, self.position.y + 24*self.app.aspect_ratio), self.app.linewidth)
             pygame.draw.line(worldsurf, self.color, (self.position.x, self.position.y + 24*self.app.aspect_ratio), (self.position.x - 16*self.app.aspect_ratio, self.position.y), self.app.linewidth)
-        
+
+    def __str__(self):
+        return '(%.2f,%.2f,%d,%.2f)' % (self.position.x,self.position.y,self.type,self.orientation)
+
 class MineList(list):
     """extension of list to contain properties for mine subsystem"""
     def __init__(self, app):
@@ -191,6 +199,12 @@ class MineList(list):
                 tag_rect.centerx = mine.position.x
                 tag_rect.centery = mine.position.y
                 self.app.worldsurf.blit(tag, tag_rect)
+                
+    def __str__(self):
+        s = ''
+        for i in range(0,len(self)):
+            s = '%s,%s' % (s,self[i])
+        return '[%s]' % (s[1:])
 
 class MOTMine(Mine):
     """A mine that moves in a MOT paradigm"""

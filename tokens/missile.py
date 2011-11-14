@@ -14,10 +14,13 @@ import picture
 
 class Missile(token.Token):
     """represents the weapon fired by the ship"""
-    def __init__(self, app):
+    def __init__(self, app, orientation=None):
         super(Missile, self).__init__()
         self.app = app
-        self.orientation = self.app.ship.orientation
+        if orientation:
+            self.orientation = orientation
+        else:
+            self.orientation = self.app.ship.orientation
         self.position.x = self.app.ship.nose[0]
         self.position.y = self.app.ship.nose[1]
         self.collision_radius = self.app.config.get_setting('Missile','missile_radius')*self.app.aspect_ratio
