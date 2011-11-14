@@ -1514,6 +1514,8 @@ class Game(object):
                 self.mine_list[i].position.x = mine[0] / self.playback_aspect_ratio * self.aspect_ratio
                 self.mine_list[i].position.y = mine[1] / self.playback_aspect_ratio * self.aspect_ratio
             self.score.iff = state[self.header['mine_id']]
+        if self.score.iff == 'NA':
+            self.score.iff = ''
             
         self.score.pnts = int(state[self.header['score_pnts']])
         self.score.cntrl = int(state[self.header['score_cntrl']])
