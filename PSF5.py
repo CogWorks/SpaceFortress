@@ -1626,36 +1626,36 @@ class Game(object):
             self.screen.blit(etsurf, etrect)
             
     def process_playback_event(self, event):
-        if event[0] == 'EVENT_USER':
-            if event[5] == 'press':
-                if event[6] == 'fire':
+        if event[self.header['event_type']] == 'EVENT_USER':
+            if event[self.header['e1']] == 'press':
+                if event[self.header['e2']] == 'fire':
                     self.kp_space = 0
-                elif event[6] == 'right':
+                elif event[self.header['e2']] == 'right':
                     self.kp_right = 0
-                elif event[6] == 'left':
+                elif event[self.header['e2']] == 'left':
                     self.kp_left = 0
-                elif event[6] == 'thrust':
+                elif event[self.header['e2']] == 'thrust':
                     self.kp_thrust = 0
-                elif event[6] == 'iff':
+                elif event[self.header['e2']] == 'iff':
                     self.kp_iff = 0
-                elif event[6] == 'shots':
+                elif event[self.header['e2']] == 'shots':
                     self.kp_shots = 0
-                elif event[6] == 'points':
+                elif event[self.header['e2']] == 'points':
                     self.kp_points = 0
-            elif event[5] == 'release':
-                if event[6] == 'fire':
+            elif event[self.header['e1']] == 'release':
+                if event[self.header['e2']] == 'fire':
                     self.kp_space = self.linewidth
-                elif event[6] == 'right':
+                elif event[self.header['e2']] == 'right':
                     self.kp_right = self.linewidth
-                elif event[6] == 'left':
+                elif event[self.header['e2']] == 'left':
                     self.kp_left = self.linewidth
-                elif event[6] == 'thrust':
+                elif event[self.header['e2']] == 'thrust':
                     self.kp_thrust = self.linewidth
-                elif event[6] == 'iff':
+                elif event[self.header['e2']] == 'iff':
                     self.kp_iff = self.linewidth
-                elif event[6] == 'shots':
+                elif event[self.header['e2']] == 'shots':
                     self.kp_shots = self.linewidth
-                elif event[6] == 'points':
+                elif event[self.header['e2']] == 'points':
                     self.kp_points = self.linewidth
                         
     def quit(self, ret=0):
