@@ -115,7 +115,10 @@ class Game(object):
         self.gameevents.add("game","version",githash, type='EVENT_SYSTEM')
                 
         self.config = defaults.get_config()
-        self.config.set_user_file('config.json')
+        if os.path.isfile('config.json'):
+            self.config.set_user_file('config.json')
+        else:
+            self.config.set_user_file(defaults.get_user_file())
         self.gameevents.add("config", "load", "defaults", type='EVENT_SYSTEM')
         self.config.update_from_user_file()
         self.gameevents.add("config", "load", "user", type='EVENT_SYSTEM')
