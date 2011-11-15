@@ -550,6 +550,8 @@ class Game(object):
                         pass
                     elif self.mine_list[0].tagged == "fail":
                         self.gameevents.add("tag", "already_failed")
+                    elif self.mine_list[0].tagged == "disable":
+                        self.gameevents.add("tag", "already_disabled")
                     elif self.mine_list[0].tagged == "tagged":
                         self.gameevents.add("tag", "already_tagged")
                     #if the mine is untagged and this is the first tap
@@ -762,8 +764,11 @@ class Game(object):
                 if len(self.mine_list) > 0:
                     if self.mine_list[0].tagged == "fail":
                         self.gameevents.add("collide", "fail_tagged_mine")
+                    elif self.mine_list[0].tagged == "disabled":
+                        self.gameevents.add("collide", "disable_tagged_mine")
                     elif self.mine_list[0].tagged == "untagged":
                         if self.score.iff in self.mine_list.foe_letters:
+                            self.mine_list[0].tagged = "disable"
                             self.gameevents.add("collide", "untagged_foe_mine")
                         else:
                             self.gameevents.add("collide", "friend_mine")
