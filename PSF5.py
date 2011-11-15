@@ -193,7 +193,7 @@ class Game(object):
                 self.log.write('bonus_isi\t')
             self.log.write("score_pnts\tscore_cntrl\tscore_vlcty\tscore_vlner\t"+
                            "score_iff\tscore_intrvl\tscore_speed\tscore_shots\tscore_flight\tscore_flight2\tscore_fortress\tscore_mine\tscore_mine2\tscore_bonus\tthrust_key\tleft_key\t"+
-                           "right_key\tfire_key\tiff_key\tshots_key\tpnts_key")
+                           "right_key\tfire_key\tiff_key\tshots_key\tpnts_key\tfortress_target\tdestroyed_fortresses")
             for name in self.plugins:
                 try:
                     header = self.plugins[name].logHeader()
@@ -655,7 +655,6 @@ class Game(object):
                 self.gameevents.add("score-", "flight", self.config.get_setting('Score','warp_penalty')) 
             elif command == "activate":
                 if obj == "bonus":
-                    self.bonus_captured = False
                     self.bonus.visible = True
                     self.bonus.timer.reset()
                     self.bonus.get_new_symbol()
@@ -1072,9 +1071,9 @@ class Game(object):
         else:
             self.log.write("%s\t%s\t%s\t%s\t%s\t" %
                            (bonus_no, bonus_prev, bonus_cur, bonus_cur_x, bonus_cur_y))
-        self.log.write("%d\t%d\t%d\t%d\t%s\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s" %
+        self.log.write("%d\t%d\t%d\t%d\t%s\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%d\t%d" %
                        (self.score.pnts, self.score.cntrl, self.score.vlcty, self.score.vlner, iff_score, self.score.intrvl, self.score.speed, self.score.shots, self.score.flight, self.flight2, self.score.fortress, 
-                        self.score.mines, self.mine2, self.score.bonus, thrust_key, left_key, right_key, fire_key, iff_key, shots_key, pnts_key))
+                        self.score.mines, self.mine2, self.score.bonus, thrust_key, left_key, right_key, fire_key, iff_key, shots_key, pnts_key, self.targetFortresses, self.destroyedFortresses))
         for name in self.plugins:
             try:
                 data = self.plugins[name].logCallback()

@@ -108,6 +108,7 @@ class Bonus(object):
         if self.state == "iti" and self.timer.elapsed() > self.iti_time: #time for a new pair, make cue visible
             self.timer.reset()
             self.state = "cue"
+            self.app.bonus_captured = False
             self.current_symbols = self.pick_next_pair()
             # idk if this is the best place for this ~rmh
             self.set_bonus_location()
@@ -132,6 +133,7 @@ class Bonus(object):
             else:
                 self.isi_time = 800
             self.state = "target"
+            self.app.bonus_captured = False
             self.current_symbol = self.current_symbols[1]
             self.visible = True
             if self.current_symbol in self.x_symbols:
