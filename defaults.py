@@ -38,7 +38,7 @@ def load_plugins(app, dir, plugins):
         for f in os.listdir(dir):
             module_name, ext = os.path.splitext(f)
             if ext == '.py':
-                module = __import__(module_name)            
+                module = __import__(module_name)
                 if not plugins.has_key(module_name):
                     try:
                         plugins[module_name] = module.SF5Plugin(app)
@@ -51,7 +51,7 @@ def validate_string_len(info):
         return True
     else:
         return False
-    
+
 def validate_flight_bias(info):
     if -1 <= info['value'] <= 1:
         return True
@@ -69,11 +69,11 @@ def validate_quadrant_probs(info):
         return False
 
 def get_config():
-    
+
     cfg = Config()
-    
+
     cfg.add_setting('General', 'player', 'Human', alias='Player', options=['Human','Model'], type=config.constants.CT_COMBO, about='Will this game be played by a human or a cognitive model? Set to f to disable human control, enabling ACT-R')
-    cfg.add_setting('General', 'psf', False, alias='Classic Mode', type=config.constants.CT_CHECKBOX, about='Original PSF (SF4) settings? If t, *ALL* further values are ignored')
+    cfg.add_setting('General', 'next_gen', True, type=2, alias='Next Gen Mode')
     cfg.add_setting('General', 'id', '1234', alias='Subject ID#', type=config.constants.CT_LINEEDIT, about='Subject identifier used in log filename"')
     cfg.add_setting('General', 'games_per_session', 8, alias='Max # of Games', about='Number of games per "session"')
     cfg.add_setting('General', 'bonus_system', "AX-CPT", alias="Bonus System", type=config.constants.CT_COMBO, options=['standard','AX-CPT'], about='Bonus system standard or AX-CPT?')
@@ -81,31 +81,23 @@ def get_config():
     cfg.add_setting('General', 'game_time', 300000, alias='Game Duration (ms)', about='Time in milliseconds for a game. NOTE! If you escape in the middle of a game, the log will have "short" prepended to the name')
     cfg.add_setting('General', 'sound', True, alias='Sound', type=config.constants.CT_CHECKBOX, about='Enable/disable sound')
     cfg.add_setting('General', 'allow_pause', True, alias='Allow Pausing', type=config.constants.CT_CHECKBOX, about='Enable/disable whether or not pausing is allowed.')
-    
-    cfg.add_setting('Next Gen', 'next_gen', True, type=2, alias='Next Gen Mode')
-    cfg.add_setting('Next Gen', 'empty_penalty', True, type=2, alias='Fire when empty penalty')
-    cfg.add_setting('Next Gen', 'session_length', 50, alias="Session Duration (min)")
-    cfg.add_setting('Next Gen', 'starting_goal', 3, alias="Initial Fortress Goal")
-    cfg.add_setting('Next Gen', 'forward', 3)
-    cfg.add_setting('Next Gen', 'back', 1)
-    cfg.add_setting('Next Gen', 'time_modifier', 1.0075, type=config.constants.CT_LINEEDIT)
-    
+
     cfg.add_setting('Display', 'display_mode', 'Fullscreen', alias='Display Mode', options=['Fullscreen','Windowed','Fake Fullscreen'], type=config.constants.CT_COMBO, about='Run at full screen? Set to f to run in a window')
     cfg.add_setting('Display', 'linewidth', 1, alias='Linewidth', about='Width of lines drawn on screen. Increase for a more "projector-friendly" game')
     cfg.add_setting('Display', 'pause_overlay', True, alias='Pause Overlay', type=config.constants.CT_CHECKBOX, about='Blank screen and show "Paused!" when game is paused.')
     cfg.add_setting('Display', 'show_fps', False, type=config.constants.CT_CHECKBOX)
     cfg.add_setting('Display', 'show_et', False, type=config.constants.CT_CHECKBOX)
     cfg.add_setting('Display', 'show_kp', False, type=config.constants.CT_CHECKBOX)
-    
+
     cfg.add_setting('Graphics', 'show_starfield', True, type=2)
     cfg.add_setting('Graphics', 'max_stars', 250)
     cfg.add_setting('Graphics', 'star_speed', .5, type=config.constants.CT_DBLSPINBOX)
     cfg.add_setting('Graphics', 'fancy', True, type=config.constants.CT_CHECKBOX)
     cfg.add_setting('Graphics', 'parallax_mode', 'Random', type=config.constants.CT_COMBO, options=['Random','Fortress'])
-    
+
     cfg.add_setting('Logging', 'logging', True, alias='Logging', type=config.constants.CT_CHECKBOX, about='Enable/disable logging')
     cfg.add_setting('Logging', 'logdir', 'data', alias='Log Directory', type=config.constants.CT_LINEEDIT, about='Directory for log files, leave blank for default.')
-        
+
     cfg.add_setting('Keybindings', 'fire_key', 'SPACE', alias='Fire', type=config.constants.CT_COMBO, options=PYGAME_KEYS)
     cfg.add_setting('Keybindings', 'thrust_key', 'w', alias='Thrust', type=config.constants.CT_COMBO, options=PYGAME_KEYS)
     cfg.add_setting('Keybindings', 'left_turn_key', 'a', alias='Turn Left', type=config.constants.CT_COMBO, options=PYGAME_KEYS)
@@ -115,7 +107,7 @@ def get_config():
     cfg.add_setting('Keybindings', 'IFF_key', 'j', alias='Identify Friend or Foe', type=config.constants.CT_COMBO, options=PYGAME_KEYS)
     cfg.add_setting('Keybindings', 'pause_key', 'p', alias='Pause', type=config.constants.CT_COMBO, options=PYGAME_KEYS)
     cfg.add_setting('Keybindings', 'screenshot_key', 'RETURN', alias='Screenshot', type=config.constants.CT_COMBO, options=PYGAME_KEYS)
-    
+
     cfg.add_setting('Ship', 'ship_acceleration', 0.3, 'Ship acceleration factor', type=config.constants.CT_DBLSPINBOX)
     cfg.add_setting('Ship', 'ship_hit_points', 4, 'Number of hits ship takes before it is destroyed')
     cfg.add_setting('Ship', 'ship_max_vel', 6, "Ship's maximum velocity")
@@ -127,13 +119,14 @@ def get_config():
     cfg.add_setting('Ship', 'ship_vel_x', 0, 'Initial ship velocity in x direction')
     cfg.add_setting('Ship', 'ship_vel_y', 0, 'Initial ship velocity in y direction.')
     cfg.add_setting('Ship', 'colored_damage', True, type=config.constants.CT_CHECKBOX)
-    
+
     cfg.add_setting('Missile', 'missile_max', 50, 'Maximum number of missiles possible')
     cfg.add_setting('Missile', 'missile_num', 50, 'Number of missiles at start of game')
     cfg.add_setting('Missile', 'missile_penalty', 3, 'Points lost when you fire a missile when none remain')
     cfg.add_setting('Missile', 'missile_radius', 5, 'Missile collision radius')
     cfg.add_setting('Missile', 'missile_speed', 20, 'Speed of missile fired from ship')
-    
+    cfg.add_setting('Missile', 'empty_penalty', True, type=2, alias='Fire when empty penalty')
+
     cfg.add_setting('Hexagon', 'hex_pos_x', 355, 'Hex x position')
     cfg.add_setting('Hexagon', 'hex_pos_y', 315, 'Hex y position')
     cfg.add_setting('Hexagon', 'big_hex', 200, '"Radius" of large hexagon')
@@ -142,7 +135,7 @@ def get_config():
     cfg.add_setting('Hexagon', 'hex_shrink_radius', 150, 'If hex shrinks, to what minimum radius?')
     cfg.add_setting('Hexagon', 'hide_big_hex', True, type=config.constants.CT_CHECKBOX)
     cfg.add_setting('Hexagon', 'hide_small_hex', False, type=config.constants.CT_CHECKBOX)
-    
+
     cfg.add_setting('Fortress', 'fortress_exists', True, type=config.constants.CT_CHECKBOX, about='Does the fortress exist?')
     cfg.add_setting('Fortress', 'fortress_lock_time', 800, 'Time in milliseconds it takes the fortress to lock on to the ship before firing')
     cfg.add_setting('Fortress', 'fortress_pos_x', 355, 'Fortress x position')
@@ -155,7 +148,7 @@ def get_config():
 
     cfg.add_setting('Shell', 'shell_speed', 6, 'Speed of shell fired from fortress')
     cfg.add_setting('Shell', 'shell_radius', 3, 'Shell collision radius')
-    
+
     cfg.add_setting('Bonus', 'bonus_exists', True, type=config.constants.CT_CHECKBOX, about='Do bonuses exist?')
     cfg.add_setting('Bonus', 'bonus_pos_x', 355, 'Bonus x position')
     cfg.add_setting('Bonus', 'bonus_pos_y', 390, 'Bonus y position')
@@ -165,7 +158,7 @@ def get_config():
     cfg.add_setting('Bonus', 'symbol_down_time', 833, '"Blank time" between symbol appearances in milliseconds**. (Seems like a weird number, but it\'s to sync with the frame-based original)')
     cfg.add_setting('Bonus', 'symbol_up_time', 2500, 'Time in milliseconds each symbol is visible**')
     cfg.add_setting('Bonus', 'quadrant_probs', '.2,.2,.2,.4', type=config.constants.CT_LINEEDIT, validate=validate_quadrant_probs)
-    
+
     cfg.add_setting('AX-CPT', 'cue_visibility', 1250, 'The time cue is visible in ms')
     cfg.add_setting('AX-CPT', 'target_visibility', 1250, 'The time cue is visible in ms')
     cfg.add_setting('AX-CPT', 'isi_time', 800, 'time between cue and target (variable)')
@@ -193,7 +186,7 @@ def get_config():
     cfg.add_setting('Mine', 'mine_timeout', 10000, 'Time in milliseconds for a mine to timeout and disappear')
     cfg.add_setting('Mine', 'mine_spawn', 5000, 'Time in milliseconds for a mine to spawn')
     cfg.add_setting('Mine', 'fortress_resets_mine', False, type=config.constants.CT_CHECKBOX, about='Does destroying the fortress reset the mine timer?')
-    
+
     cfg.add_setting('MOT', 'MOT_count', 5, 'Number of mines')
     cfg.add_setting('MOT', 'MOT_identification_time', 5000, 'Time to allow for MOT identification')
     cfg.add_setting('MOT', 'MOT_identification_type', 'shots', type=config.constants.CT_LINEEDIT, about='MOT identification through shots or ship? (i.e., fly into the mine)')
@@ -232,7 +225,7 @@ def get_config():
     cfg.add_setting('Score', 'destroy_fortress', 250, 'Points for destroying the fortress')
     cfg.add_setting('Score', 'bonus_points', 100, 'Points added for selecting points bonus')
     cfg.add_setting('Score', 'bonus_missiles', 50, 'Missiles added for selecting missile bonus')
-    
+
     cfg.add_setting('Joystick', 'use_joystick', False, type=config.constants.CT_CHECKBOX)
     cfg.add_setting('Joystick', 'joystick_id', 0)
     cfg.add_setting('Joystick', 'invert_x', False, type=config.constants.CT_CHECKBOX)
@@ -241,8 +234,8 @@ def get_config():
     cfg.add_setting('Joystick', 'iff_button', 3)
     cfg.add_setting('Joystick', 'shots_button', 1)
     cfg.add_setting('Joystick', 'pnts_button', 2)
-    
+
     cfg.add_setting('Playback', 'playback', False, type=2)
     cfg.add_setting('Playback', 'makevideo', False, type=2)
-    
+
     return cfg

@@ -57,8 +57,8 @@ class Ship(token.Token):
                 self.shields.append(picture.Picture(os.path.join(self.app.approot, 'gfx/shield.png'),
                                                     70*self.app.aspect_ratio/400,
                                                     alpha=int(255.0 / (self.start_health-1) * i)))
-                
-        
+
+
     def compute(self):
         """updates ship"""
         if self.app.joystick:
@@ -70,7 +70,7 @@ class Ship(token.Token):
                 self.orientation = (self.orientation + self.turn_speed) % 360
         #thrust is only changed if joystick is engaged. Thrust is calculated while processing joystick input
         #self.acceleration = self.thrust * -0.3
-        
+
         if self.app.joystick:
             if self.joy_thrust * self.invert_y > 0:
                 self.acceleration = self.acceleration_factor * self.joy_thrust * self.invert_y
@@ -81,15 +81,15 @@ class Ship(token.Token):
                 self.acceleration = self.acceleration_factor
             else:
                 self.acceleration = 0
-                
+
         self.velocity.x += self.acceleration * math.cos(math.radians(self.orientation))
         self.velocity.y += self.acceleration * math.sin(math.radians(self.orientation))
-        
+
         if self.velocity.x > self.max_vel:
             self.velocity.x = self.max_vel
         elif self.velocity.x < -self.max_vel:
             self.velocity.x = -self.max_vel
-        
+
         if self.velocity.y > self.max_vel:
             self.velocity.y = self.max_vel
         elif self.velocity.y < -self.max_vel:
@@ -108,17 +108,17 @@ class Ship(token.Token):
         if self.position.y < 0:
             self.position.y = self.app.WORLD_HEIGHT
             self.app.gameevents.add("warp", "up")
-            
+
     def fire(self):
         """fires missile"""
-        if self.app.config.get_setting('Next Gen','next_gen'):
+        if self.app.config.get_setting('General','next_gen'):
             if self.app.score.shots > 0:
                 self.app.missile_list.append(missile.Missile(self.app))
                 self.app.sounds.missile_fired.play()
                 self.app.score.shots -= 1
             else:
                 self.app.sounds.empty.play()
-                if self.app.config.get_setting('Next Gen','empty_penalty'):
+                if self.app.config.get_setting('General','empty_penalty'):
                     self.app.score.pnts -= self.app.config.get_setting('Missile','missile_penalty')
                     self.app.score.bonus -= self.app.config.get_setting('Missile','missile_penalty')
         else:
@@ -130,7 +130,7 @@ class Ship(token.Token):
                 self.app.sounds.empty.play()
                 self.app.score.pnts -= self.app.config.get_setting('Missile','missile_penalty')
                 self.app.score.bonus -= self.app.config.get_setting('Missile','missile_penalty')
-            
+
     def draw(self, worldsurf):
         """draw ship to worldsurf"""
         #ship's nose is x+18 to x-18, wings are 18 back and 18 to the side of 0,0
@@ -146,7 +146,7 @@ class Ship(token.Token):
         x2 = 18 * self.cosphi * self.app.aspect_ratio + self.position.x
         y2 = -(18 * self.sinphi) * self.app.aspect_ratio + self.position.y
         # nose
-        self.nose = (x2,y2)        
+        self.nose = (x2,y2)
         #x3 will be center point
         x3 = self.position.x
         y3 = self.position.y
@@ -156,7 +156,7 @@ class Ship(token.Token):
         #x5, y5 = -18, -18
         x5 = (-18 * self.cosphi - -18 * self.sinphi)*self.app.aspect_ratio + self.position.x
         y5 = (-((-18 * self.cosphi) + (-18 * self.sinphi)))*self.app.aspect_ratio + self.position.y
-        
+
         if self.app.config.get_setting('Graphics','fancy'):
             if not self.thrust_flag:
                 ship = pygame.transform.rotate(self.ship.image, self.orientation-90)
