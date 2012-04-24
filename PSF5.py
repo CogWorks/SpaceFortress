@@ -89,13 +89,6 @@ class Game(object):
         self.header = {}
         self.bonus_captured = False
 
-        self.destroyedFortresses = 0
-        self.totalMines = 0
-        self.destroyedMines = 0
-        self.totalBonuses = 0
-        self.capturedBonuses = 0
-        self.deaths = 0
-
         self.stars = []
         self.starfield_orientation = randrange(0,359)
 
@@ -352,12 +345,14 @@ class Game(object):
             self.fortress_exists = True
         else:
             self.fortress_exists = False
+
         self.destroyedFortresses = 0
         self.totalMines = 0
         self.destroyedMines = 0
         self.totalBonuses = 0
         self.capturedBonuses = 0
         self.deaths = 0
+
         self.score.pnts = 0
         self.score.cntrl = 0
         self.score.vlcty = 0
@@ -591,6 +586,7 @@ class Game(object):
                                 if self.bonus.flag:
                                     self.gameevents.add("attempt_to_capture_flagged_bonus")
                                 else:
+                                    self.capturedBonuses += 1
                                     self.gameevents.add("shots_bonus_capture")
                                     self.gameevents.add("score+", "shots", self.config.get_setting('Score','bonus_missiles'))
                                     self.gameevents.add("score+", "bonus", self.config.get_setting('Score','bonus_points')/2)
@@ -598,6 +594,7 @@ class Game(object):
                         else: #AX-CPT
                             if self.bonus.axcpt_flag == True and (self.bonus.state == "iti" or self.bonus.state == "target") and self.bonus.current_pair == "ax":
                                 self.sounds.bonus_success.play()
+                                self.capturedBonuses += 1
                                 self.gameevents.add("shots_bonus_capture")
                                 self.gameevents.add("score+", "shots", self.config.get_setting('Score','bonus_missiles'))
                                 if self.config.get_setting('General','next_gen'):
@@ -625,6 +622,7 @@ class Game(object):
                                 if self.bonus.flag:
                                     self.gameevents.add("attempt_to_capture_flagged_bonus")
                                 else:
+                                    self.capturedBonuses += 1
                                     self.gameevents.add("pnts_pnts_capture")
                                     self.gameevents.add("score+", "bonus", self.config.get_setting('Score','bonus_points'))
                                     self.gameevents.add("score+", "pnts", self.config.get_setting('Score','bonus_points'))
@@ -632,6 +630,7 @@ class Game(object):
                         else: #AX-CPT
                             if self.bonus.axcpt_flag == True and (self.bonus.state == "iti" or self.bonus.state == "target") and self.bonus.current_pair == "ax":
                                 self.sounds.bonus_success.play()
+                                self.capturedBonuses += 1
                                 self.gameevents.add("pnts_bonus_capture")
                                 if self.config.get_setting('General','next_gen'):
                                     self.gameevents.add("score+", "pnts", self.config.get_setting('Score','bonus_points'))
@@ -1297,25 +1296,35 @@ class Game(object):
         pntsnrect.right = self.SCREEN_WIDTH / 3 * 2
         pntsnrect.centery = self.SCREEN_HEIGHT / 16 * 4
         self.screen.blit(pntsnsurf, pntsnrect)
+        deathsurf = self.f24.render("Deaths:", True, (255, 255,0))
+        deathrect = deathsurf.get_rect()
+        deathrect.left = self.SCREEN_WIDTH / 3
+        deathrect.centery = self.SCREEN_HEIGHT / 16 * 5.5
+        self.screen.blit(deathsurf, deathrect)
+        deathnsurf = self.f24.render("%d" % (self.deaths), True, (255, 255,255))
+        deathnrect = deathnsurf.get_rect()
+        deathnrect.right = self.SCREEN_WIDTH / 3 * 2
+        deathnrect.centery = self.SCREEN_HEIGHT / 16 * 5.5
+        self.screen.blit(deathnsurf, deathnrect)
         cntrlsurf = self.f24.render("Destroyed fortresses:", True, (255, 255,0))
         cntrlrect = cntrlsurf.get_rect()
         cntrlrect.left = self.SCREEN_WIDTH / 3
-        cntrlrect.centery = self.SCREEN_HEIGHT / 16 * 6
+        cntrlrect.centery = self.SCREEN_HEIGHT / 16 * 7
         self.screen.blit(cntrlsurf, cntrlrect)
         cntrlnsurf = self.f24.render("%d" % (self.destroyedFortresses), True, (255, 255,255))
         cntrlnrect = cntrlnsurf.get_rect()
         cntrlnrect.right = self.SCREEN_WIDTH / 3 * 2
-        cntrlnrect.centery = self.SCREEN_HEIGHT / 16 * 6
+        cntrlnrect.centery = self.SCREEN_HEIGHT / 16 * 7
         self.screen.blit(cntrlnsurf, cntrlnrect)
         vlctysurf = self.f24.render("Destroyed mines:", True, (255, 255,0))
         vlctyrect = vlctysurf.get_rect()
         vlctyrect.left = self.SCREEN_WIDTH / 3
-        vlctyrect.centery = self.SCREEN_HEIGHT / 16 * 8
+        vlctyrect.centery = self.SCREEN_HEIGHT / 16 * 8.5
         self.screen.blit(vlctysurf, vlctyrect)
         vlctynsurf = self.f24.render("%d of %d" % (self.destroyedMines, self.totalMines), True, (255, 255,255))
         vlctynrect = vlctynsurf.get_rect()
         vlctynrect.right = self.SCREEN_WIDTH / 3 * 2
-        vlctynrect.centery = self.SCREEN_HEIGHT / 16 * 8
+        vlctynrect.centery = self.SCREEN_HEIGHT / 16 * 8.5
         self.screen.blit(vlctynsurf, vlctynrect)
         speedsurf = self.f24.render("Captured bonuses:", True, (255, 255,0))
         speedrect = speedsurf.get_rect()
