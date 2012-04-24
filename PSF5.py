@@ -96,8 +96,6 @@ class Game(object):
         self.capturedBonuses = 0
         self.deaths = 0
 
-        self.sessionOver = False
-
         self.stars = []
         self.starfield_orientation = randrange(0,359)
 
@@ -1265,7 +1263,6 @@ class Game(object):
         self.screen.blit(totalnsurf, totalnrect)
         if self.current_game == self.config.get_setting('General','games_per_session'):
             finalsurf = self.f24.render("You're done! Press any key to exit", True, (0,255,0))
-            self.sessionOver = True
         else:
             finalsurf = self.f24.render("Press any key for next game", True, (0,255,0))
         finalrect = finalsurf.get_rect()
@@ -1683,7 +1680,7 @@ def main():
     g = Game()
     if not g.playback:
         g.display_intro()
-        while not g.sessionOver:
+        while g.current_game < g.config.get_setting('General','games_per_session'):
             gc.collect()
             g.current_game += 1
             g.gameevents.add("game", "ready", type='EVENT_SYSTEM')
@@ -1694,7 +1691,6 @@ def main():
             gameTimer = tokens.timer.Timer()
             g.gameevents.add("game","start", type='EVENT_SYSTEM')
             g.ingame = 1
-            g.gameStart = pygame.time.get_ticks()
             while True:
                 g.clock.tick(g.fps)
                 g.process_input()
@@ -1709,7 +1705,7 @@ def main():
                     g.doScores(time)
                     break
             g.gameevents.add("game", "over", type='EVENT_SYSTEM')
-            g.quit(1)
+        g.quit(1)
     else:
         g.display_intro()
         if g.config.get_setting('Playback','makevideo'):
