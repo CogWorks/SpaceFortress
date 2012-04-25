@@ -115,6 +115,10 @@ class Game( object ):
         self.stars = []
         self.starfield_orientation = randrange( 0, 359 )
 
+        self.modifier = pygame.KMOD_CTRL
+        if platform.system() == 'Darwin':
+            self.modifier = pygame.KMOD_META
+
         i = sys.argv[0].rfind( '/' )
         if i != -1:
             self.approot = sys.argv[0][:sys.argv[0].rfind( '/' )]
@@ -446,8 +450,9 @@ class Game( object ):
 
                 if event.type == pygame.KEYDOWN:
 
-                    if event.key == pygame.K_ESCAPE:
-                        self.gameevents.add( "press", "quit", type = 'EVENT_USER' )
+                    if ( pygame.key.get_mods() & self.modifier ):
+                        if event.key == pygame.K_q:
+                            self.gameevents.add( "press", "quit", type = 'EVENT_USER' )
 
                     if event.key == pygame.K_RETURN:
 
