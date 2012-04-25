@@ -66,8 +66,28 @@ class Game(object):
     """Main game application"""
     def __init__(self):
         super(Game, self).__init__()
+
+        self.STATE_UNKNOWN = -1
+        self.STATE_CALIBRATE = 0
+        self.STATE_INTRO = 1
+        self.STATE_SETUP = 2
+        self.STATE_GAMENO = 3
+        self.STATE_IFF = 4
+        self.STATE_PREPARE = 5
+        self.STATE_PLAY = 6
+        self.STATE_SCORES = 7
+        self.STATE_DONE = 8
+
+        self.state = self.STATE_INTRO
+
+        self.ship = None
+        self.bonus = None
+        self.score = None
+        self.fortress = None
+        self.missile_list = None
+        self.shell_list = None
+
         self.current_game = 0
-        self.ingame = -1
         self.flight2 = 0
         self.mine2 = 0
         self.fps = 30
@@ -203,7 +223,7 @@ class Game(object):
                     pass
             self.log.write("\n")
             self.gameevents.add("log", "header", "ready", log=False, type='EVENT_SYSTEM')
-            self.gameevents.add("log", "version", "7", type='EVENT_SYSTEM')
+            self.gameevents.add("log", "version", "8", type='EVENT_SYSTEM')
 
         if not self.playback:
             self.gameevents.add("config","running",str(self.config), type='EVENT_SYSTEM')
@@ -323,6 +343,8 @@ class Game(object):
         if self.config.get_setting('Graphics','show_starfield'):
             self.init_stars()
 
+        self.gameevents.add("session","ready", type='EVENT_SYSTEM')
+
     def set_aspect_ratio(self):
         self.aspect_ratio = self.SCREEN_HEIGHT/768
         xover = self.SCREEN_WIDTH + 2 * (495 * self.aspect_ratio - self.SCREEN_WIDTH / 2)
@@ -393,7 +415,9 @@ class Game(object):
     def process_input(self):
         """creates game events based on pygame events"""
         for event in pygame.event.get():
-            if self.joystick:
+
+            if self.joystick and self.state == self.STATE_PLAY:
+
                 if event.type == pygame.JOYAXISMOTION:
                     self.gameevents.add("joyaxismotion", event.axis, event.value, type='EVENT_USER')
                 elif event.type == pygame.JOYBUTTONDOWN:
@@ -414,49 +438,95 @@ class Game(object):
                         self.gameevents.add("release", "shots", type='EVENT_USER')
                     elif event.button == self.pnts_button:
                         self.gameevents.add("release", "pnts", type='EVENT_USER')
+
             else:
+
                 if event.type == pygame.KEYDOWN:
-                    if event.key == self.thrust_key:
-                        self.gameevents.add("press", "thrust", type='EVENT_USER')
-                    elif event.key == self.left_turn_key:
-                        self.gameevents.add("press", "left", type='EVENT_USER')
-                    elif event.key == self.right_turn_key:
-                        self.gameevents.add("press", "right", type='EVENT_USER')
-                    elif event.key == self.fire_key:
-                        self.gameevents.add("press", "fire", type='EVENT_USER')
-                    elif event.key == self.IFF_key:
-                        self.gameevents.add("press", "iff", type='EVENT_USER')
-                    elif event.key == self.shots_key:
-                        self.gameevents.add("press", "shots", type='EVENT_USER')
-                    elif event.key == self.pnts_key:
-                        self.gameevents.add("press", "pnts", type='EVENT_USER')
-                    elif event.key == self.screenshot_key:
-                        pygame.image.save(self.screen, "screenshot.jpeg")
+
+                    if self.state == self.STATE_INTRO:
+                        self.state = self.STATE_SETUP
+
+                    elif self.state == self.STATE_SETUP:
+                        self.state = self.STATE_GAMENO
+
+                    elif self.state == self.STATE_GAMENO:
+                        if self.mine_exists:
+                            self.state = self.STATE_IFF
+                        else:
+                            self.state = self.STATE_PREPARE
+
+                    elif self.state == self.STATE_IFF:
+                        self.state = self.STATE_PREPARE
+
+                    elif self.state == self.STATE_SCORES:
+                        self.state = self.STATE_SETUP
+
+                    elif self.state == self.STATE_PLAY:
+
+                        if event.key == self.thrust_key:
+                            self.gameevents.add("press", "thrust", type='EVENT_USER')
+                        elif event.key == self.left_turn_key:
+                            self.gameevents.add("press", "left", type='EVENT_USER')
+                        elif event.key == self.right_turn_key:
+                            self.gameevents.add("press", "right", type='EVENT_USER')
+                        elif event.key == self.fire_key:
+                            self.gameevents.add("press", "fire", type='EVENT_USER')
+                        elif event.key == self.IFF_key:
+                            self.gameevents.add("press", "iff", type='EVENT_USER')
+                        elif event.key == self.shots_key:
+                            self.gameevents.add("press", "shots", type='EVENT_USER')
+                        elif event.key == self.pnts_key:
+                            self.gameevents.add("press", "pnts", type='EVENT_USER')
+                        elif event.key == self.screenshot_key:
+                            pygame.image.save(self.screen, "screenshot.jpeg")
+
+                        elif event.key == self.pause_key and self.config.get_setting('General','allow_pause'):
+                            self.gameevents.add("press", "pause", type='EVENT_USER')
+
+                    if event.key == pygame.K_ESCAPE:
+                        self.gameevents.add("press", "quit", type='EVENT_USER')
+
+
                 elif event.type == pygame.KEYUP:
-                    if event.key == self.thrust_key:
-                        self.gameevents.add("release", "thrust", type='EVENT_USER')
-                    elif event.key == self.left_turn_key:
-                        self.gameevents.add("release", "left", type='EVENT_USER')
-                    elif event.key == self.right_turn_key:
-                        self.gameevents.add("release", "right", type='EVENT_USER')
-                    elif event.key == self.fire_key:
-                        self.gameevents.add("release", "fire", type='EVENT_USER')
-                    elif event.key == self.IFF_key:
-                        self.gameevents.add("release", "iff", type='EVENT_USER')
-                    elif event.key == self.shots_key:
-                        self.gameevents.add("release", "shots", type='EVENT_USER')
-                    elif event.key == self.pnts_key:
-                        self.gameevents.add("release", "pnts", type='EVENT_USER')
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    self.gameevents.add("press", "quit", type='EVENT_USER')
-                elif event.key == self.pause_key and self.config.get_setting('General','allow_pause'):
-                    self.gameevents.add("press", "pause", type='EVENT_USER')
+
+                    if self.state == self.STATE_PLAY:
+
+                        if event.key == self.thrust_key:
+                            self.gameevents.add("release", "thrust", type='EVENT_USER')
+                        elif event.key == self.left_turn_key:
+                            self.gameevents.add("release", "left", type='EVENT_USER')
+                        elif event.key == self.right_turn_key:
+                            self.gameevents.add("release", "right", type='EVENT_USER')
+                        elif event.key == self.fire_key:
+                            self.gameevents.add("release", "fire", type='EVENT_USER')
+                        elif event.key == self.IFF_key:
+                            self.gameevents.add("release", "iff", type='EVENT_USER')
+                        elif event.key == self.shots_key:
+                            self.gameevents.add("release", "shots", type='EVENT_USER')
+                        elif event.key == self.pnts_key:
+                            self.gameevents.add("release", "pnts", type='EVENT_USER')
 
     def process_game_logic(self):
         """processes game logic to produce game events"""
-        self.ship.compute()
-        if self.ingame:
+        self.dmod = -1
+        self.smod = -1
+        if self.state == self.STATE_SETUP:
+            if self.current_game < self.config.get_setting('General','games_per_session'):
+                gc.collect()
+                self.current_game += 1
+                self.state += 1
+                self.mine_list.generate_foes()
+            else:
+                self.state = self.STATE_DONE
+                self.quit(0)
+        elif self.state == self.STATE_PREPARE:
+            self.gameevents.add("game", "ready", type='EVENT_SYSTEM')
+            self.setup_world()
+            gameTimer = tokens.timer.Timer()
+            self.state = self.STATE_PLAY
+            self.gameevents.add("game","start", type='EVENT_SYSTEM')
+        elif self.state == self.STATE_PLAY:
+            self.ship.compute()
             distance = self.ship.get_distance_to_point(self.WORLD_WIDTH/2,self.WORLD_HEIGHT/2)
             flight_max_inc = self.config.get_setting('Score', 'flight_max_increment')
             dmod = 1 - (distance-self.smallhex.radius*1.125)/(self.WORLD_WIDTH/2)
@@ -465,61 +535,62 @@ class Game(object):
             smod = max([abs(self.ship.velocity.x),abs(self.ship.velocity.y)]) / self.ship.max_vel
             self.dmod = dmod
             self.smod = smod
-        else:
-            self.dmod = -1
-            self.smod = -1
-        for missile in self.missile_list:
-            missile.compute()
-        if self.fortress_exists == True:
-            self.fortress.compute()
-        for shell in self.shell_list:
-            shell.compute()
-        if self.config.get_setting('Hexagon','hex_shrink'):
-            self.bighex.compute()
-        if self.mine_exists:
-            if self.mine_list.flag == False and self.mine_list.timer.elapsed() > self.mine_list.spawn_time:
-                self.gameevents.add("spawn", "mine")
-            elif self.mine_list.flag and self.mine_list.timer.elapsed() > self.mine_list.timeout:
-                self.gameevents.add("timeout", "mine")
-        self.mine_list.compute()
-        self.check_bounds()
-        #test collisions to generate game events
-        self.test_collisions()
-        if self.flighttimer.elapsed() > self.config.get_setting('Score','update_timer'):
-            self.flighttimer.reset()
-            def pointspace (a0,a1,a2,b0,b1,b2): return math.exp(a1**(a0*a2)) * math.exp(b1**(b0*b2))
-            points = flight_max_inc * pointspace(self.dmod,2,1,self.smod,2,1.75) / pointspace(1,2,1,1,2,1.75)
-            self.gameevents.add("score+", "flight", points)
-            self.flight2 += flight_max_inc * pointspace(self.dmod,2,.45,self.smod,2,1) / pointspace(1,2,.45,1,2,1)
-            if (self.ship.velocity.x **2 + self.ship.velocity.y **2)**0.5 < self.config.get_setting('Score','speed_threshold'):
-                self.gameevents.add("score+", "vlcty", self.config.get_setting('Score','VLCTY_increment'))
-                #self.gameevents.add("score+", "flight", self.config.get_setting('Score','VLCTY_increment'))
-            else:
-                self.gameevents.add("score-", "vlcty", self.config.get_setting('Score','VLCTY_increment'))
-                #self.gameevents.add("score-", "flight", self.config.get_setting('Score','VLCTY_increment'))
-            if self.bighex.collide(self.ship):
-                self.gameevents.add("score+", "cntrl", self.config.get_setting('Score','CNTRL_increment'))
-                #self.gameevents.add("score+", "flight", self.config.get_setting('Score','CNTRL_increment'))
-            else:
-                self.gameevents.add("score+", "cntrl", self.config.get_setting('Score','CNTRL_increment')/2)
-                #self.gameevents.add("score+", "flight", self.config.get_setting('Score','CNTRL_increment')/2)
-        if self.bonus_exists:
-            if self.config.get_setting('General','bonus_system') == "AX-CPT":
-                self.bonus.axcpt_update()
-            else:
-                if self.bonus.visible == False and self.bonus.timer.elapsed() > self.config.get_setting('Bonus','symbol_down_time'):
-                    self.gameevents.add("activate", "bonus")
-                elif self.bonus.visible == True and self.bonus.timer.elapsed() >= self.config.get_setting('Bonus','symbol_up_time'):
-                    self.gameevents.add("deactivate", "bonus", self.bonus.current_symbol)
-        #update scores
-        self.score.pnts = self.score.__getattribute__("pnts")
-        self.score.vlcty = self.score.__getattribute__("vlcty")
-        self.score.cntrl = self.score.__getattribute__("cntrl")
-        self.score.speed = self.score.__getattribute__("speed")
-        self.score.flight = self.score.__getattribute__("flight")
-        self.score.fortress = self.score.__getattribute__("fortress")
-        self.score.mines = self.score.__getattribute__("mines")
-        self.score.bonus = self.score.__getattribute__("bonus")
+            for missile in self.missile_list:
+                missile.compute()
+            if self.fortress_exists == True:
+                self.fortress.compute()
+            for shell in self.shell_list:
+                shell.compute()
+            if self.config.get_setting('Hexagon','hex_shrink'):
+                self.bighex.compute()
+            if self.mine_exists:
+                if self.mine_list.flag == False and self.mine_list.timer.elapsed() > self.mine_list.spawn_time:
+                    self.gameevents.add("spawn", "mine")
+                elif self.mine_list.flag and self.mine_list.timer.elapsed() > self.mine_list.timeout:
+                    self.gameevents.add("timeout", "mine")
+            self.mine_list.compute()
+            self.check_bounds()
+            #test collisions to generate game events
+            self.test_collisions()
+            if self.flighttimer.elapsed() > self.config.get_setting('Score','update_timer'):
+                self.flighttimer.reset()
+                def pointspace (a0,a1,a2,b0,b1,b2): return math.exp(a1**(a0*a2)) * math.exp(b1**(b0*b2))
+                points = flight_max_inc * pointspace(self.dmod,2,1,self.smod,2,1.75) / pointspace(1,2,1,1,2,1.75)
+                self.gameevents.add("score+", "flight", points)
+                self.flight2 += flight_max_inc * pointspace(self.dmod,2,.45,self.smod,2,1) / pointspace(1,2,.45,1,2,1)
+                if (self.ship.velocity.x **2 + self.ship.velocity.y **2)**0.5 < self.config.get_setting('Score','speed_threshold'):
+                    self.gameevents.add("score+", "vlcty", self.config.get_setting('Score','VLCTY_increment'))
+                    #self.gameevents.add("score+", "flight", self.config.get_setting('Score','VLCTY_increment'))
+                else:
+                    self.gameevents.add("score-", "vlcty", self.config.get_setting('Score','VLCTY_increment'))
+                    #self.gameevents.add("score-", "flight", self.config.get_setting('Score','VLCTY_increment'))
+                if self.bighex.collide(self.ship):
+                    self.gameevents.add("score+", "cntrl", self.config.get_setting('Score','CNTRL_increment'))
+                    #self.gameevents.add("score+", "flight", self.config.get_setting('Score','CNTRL_increment'))
+                else:
+                    self.gameevents.add("score+", "cntrl", self.config.get_setting('Score','CNTRL_increment')/2)
+                    #self.gameevents.add("score+", "flight", self.config.get_setting('Score','CNTRL_increment')/2)
+            if self.bonus_exists:
+                if self.config.get_setting('General','bonus_system') == "AX-CPT":
+                    self.bonus.axcpt_update()
+                else:
+                    if self.bonus.visible == False and self.bonus.timer.elapsed() > self.config.get_setting('Bonus','symbol_down_time'):
+                        self.gameevents.add("activate", "bonus")
+                    elif self.bonus.visible == True and self.bonus.timer.elapsed() >= self.config.get_setting('Bonus','symbol_up_time'):
+                        self.gameevents.add("deactivate", "bonus", self.bonus.current_symbol)
+            #update scores
+            self.score.pnts = self.score.__getattribute__("pnts")
+            self.score.vlcty = self.score.__getattribute__("vlcty")
+            self.score.cntrl = self.score.__getattribute__("cntrl")
+            self.score.speed = self.score.__getattribute__("speed")
+            self.score.flight = self.score.__getattribute__("flight")
+            self.score.fortress = self.score.__getattribute__("fortress")
+            self.score.mines = self.score.__getattribute__("mines")
+            self.score.bonus = self.score.__getattribute__("bonus")
+
+            if self.gametimer.elapsed() > self.config.get_setting('General','game_time'):
+                self.gameevents.add("game", "over", type='EVENT_SYSTEM')
+                self.state = self.STATE_SCORES
 
     def process_events(self):
         """processes internal list of game events for this frame"""
@@ -645,6 +716,10 @@ class Game(object):
                                     self.gameevents.add("score-", "pnts", self.config.get_setting('Score','bonus_points')/2)
                                 else:
                                     self.gameevents.add("score-", "bonus", self.config.get_setting('Score','bonus_points')/2)
+            elif command == "destroyed":
+                if target == "ship":
+                    self.deaths += 1
+                    self.reset_position()
             elif command == "bonus_available":
                 self.totalBonuses += 1
             elif command == "first_tag":
@@ -733,7 +808,6 @@ class Game(object):
             self.gameevents.add("score-", "fortress", self.config.get_setting('Score','shell_hit_penalty'))
             self.ship.take_damage()
             if not self.ship.alive:
-                self.deaths += 1
                 self.gameevents.add("destroyed", "ship", "shell")
                 self.gameevents.add("score-", "pnts", self.config.get_setting('Score','ship_death_penalty'))
                 self.gameevents.add("score-", "fortress", self.config.get_setting('Score','ship_death_penalty'))
@@ -799,8 +873,7 @@ class Game(object):
             self.mine2 -= self.config.get_setting('Score','mine_hit_penalty')
             self.ship.take_damage()
             if not self.ship.alive:
-                self.deaths += 1
-                self.gameevents.add("destroyed", "ship", "shell")
+                self.gameevents.add("destroyed", "ship", "mine")
                 self.gameevents.add("score-", "pnts", self.config.get_setting('Score','ship_death_penalty'))
                 self.gameevents.add("score-", "mines", self.config.get_setting('Score','ship_death_penalty'))
                 self.mine2 -= self.config.get_setting('Score','ship_death_penalty')
@@ -843,7 +916,6 @@ class Game(object):
                 del self.mine_list[0]
             self.score.iff = ''
             self.score.intrvl = 0
-
 
     def test_collisions(self):
         """test collisions between relevant game entities"""
@@ -940,41 +1012,57 @@ class Game(object):
     def draw(self):
         """draws the world"""
         self.screen.fill((0,0,0))
-        self.frame.draw(self.worldsurf, self.scoresurf)
-        self.score.draw(self.scoresurf)
 
-        if self.stars:
-            self.draw_stars()
+        if self.state == self.STATE_INTRO:
+            self.draw_intro()
 
-        self.bighex.draw(self.worldsurf)
-        self.smallhex.draw(self.worldsurf)
-        if self.playback and self.config.get_setting('Display','show_kp'):
-            self.draw_kp()
-        for shell in self.shell_list:
-            shell.draw(self.worldsurf)
-        if self.fortress_exists:
-            if self.fortress.alive:
-                self.fortress.draw(self.worldsurf)
+        elif self.state == self.STATE_GAMENO:
+            self.draw_game_number()
+
+        elif self.state == self.STATE_IFF:
+            self.draw_foe_mines()
+
+        elif self.state == self.STATE_PLAY:
+
+            self.frame.draw(self.worldsurf, self.scoresurf)
+            self.score.draw(self.scoresurf)
+
+            if self.stars:
+                self.draw_stars()
+
+            self.bighex.draw(self.worldsurf)
+            self.smallhex.draw(self.worldsurf)
+            if self.playback and self.config.get_setting('Display','show_kp'):
+                self.draw_kp()
+            for shell in self.shell_list:
+                shell.draw(self.worldsurf)
+            if self.fortress_exists:
+                if self.fortress.alive:
+                    self.fortress.draw(self.worldsurf)
+                else:
+                    self.explosion.rect.center = (self.fortress.position.x, self.fortress.position.y)
+                    self.worldsurf.blit(self.explosion.image, self.explosion.rect)
+            for missile in self.missile_list:
+                missile.draw(self.worldsurf)
+            if self.ship.alive:
+                self.ship.draw(self.worldsurf)
             else:
-                self.explosion.rect.center = (self.fortress.position.x, self.fortress.position.y)
-                self.worldsurf.blit(self.explosion.image, self.explosion.rect)
-        for missile in self.missile_list:
-            missile.draw(self.worldsurf)
-        if self.ship.alive:
-            self.ship.draw(self.worldsurf)
-        else:
-            self.explosion_small.rect.center = (self.ship.position.x, self.ship.position.y)
-            self.worldsurf.blit(self.explosion_small.image, self.explosion_small.rect)
-        self.mine_list.draw()
-        if self.bonus_exists:
-            if self.bonus.visible:
-                self.bonus.draw(self.worldsurf)
-        self.screen.blit(self.scoresurf, self.scorerect)
-        self.screen.blit(self.worldsurf, self.worldrect)
-        if self.config.get_setting('Display','show_fps') and not self.config.get_setting('Playback','makevideo'):
-            self.draw_fps()
-        if self.config.get_setting('Display','show_et') and not self.config.get_setting('Playback','makevideo'):
-            self.draw_et()
+                self.explosion_small.rect.center = (self.ship.position.x, self.ship.position.y)
+                self.worldsurf.blit(self.explosion_small.image, self.explosion_small.rect)
+            self.mine_list.draw()
+            if self.bonus_exists:
+                if self.bonus.visible:
+                    self.bonus.draw(self.worldsurf)
+            self.screen.blit(self.scoresurf, self.scorerect)
+            self.screen.blit(self.worldsurf, self.worldrect)
+            if self.config.get_setting('Display','show_fps') and not self.config.get_setting('Playback','makevideo'):
+                self.draw_fps()
+            if self.config.get_setting('Display','show_et') and not self.config.get_setting('Playback','makevideo'):
+                self.draw_et()
+
+        elif self.state == self.STATE_SCORES:
+            self.draw_scores()
+
         self.gameevents.add("display", 'preflip', 'main', False, type='EVENT_SYSTEM')
         pygame.display.flip()
 
@@ -983,13 +1071,13 @@ class Game(object):
         system_time = time.time()
         clock = time.clock()
         game_time = pygame.time.get_ticks()
-        if self.ingame:
+        if self.state == 2:
             smod = self.smod
             dmod = self.dmod
         else:
             smod = "NA"
             dmod = "NA"
-        if self.ship.alive:
+        if self.ship and self.ship.alive:
             ship_alive = "y"
             ship_x = "%.3f"%(self.ship.position.x)
             ship_y = "%.3f"%(self.ship.position.y)
@@ -1013,7 +1101,7 @@ class Game(object):
         else:
             mine_no = "NA"
             mine_id = "NA"
-        if self.fortress_exists and self.fortress.alive:
+        if self.fortress and self.fortress_exists and self.fortress.alive:
             fortress_alive = "y"
             fortress_orientation = str(self.fortress.orientation)
             fortress_x = str(self.fortress.position.x)
@@ -1023,11 +1111,11 @@ class Game(object):
             fortress_orientation = "NA"
             fortress_x = "NA"
             fortress_y = "NA"
-        if self.config.get_setting('General','bonus_system') == "AX-CPT":
+        if self.bonus and self.config.get_setting('General','bonus_system') == "AX-CPT":
             bonus_isi = str(self.bonus.isi_time)
         else:
             bonus_isi = 'NA'
-        if self.bonus.visible:
+        if self.bonus and self.bonus.visible:
             bonus_no = self.bonus.bonus_count
             bonus_cur_x = self.bonus.x
             bonus_cur_y = self.bonus.y
@@ -1035,15 +1123,15 @@ class Game(object):
             bonus_no = "NA"
             bonus_cur_x = "NA"
             bonus_cur_y =  "NA"
-        if self.bonus.current_symbol == '':
+        if not self.bonus or self.bonus.current_symbol == '':
             bonus_cur = "NA"
         else:
             bonus_cur = self.bonus.current_symbol
-        if self.bonus.prior_symbol == '':
+        if not self.bonus or self.bonus.prior_symbol == '':
             bonus_prev = "NA"
         else:
             bonus_prev = self.bonus.prior_symbol
-        if self.score.iff == '':
+        if not self.score and self.score.iff == '':
             iff_score = 'NA'
         else:
             iff_score = self.score.iff
@@ -1098,7 +1186,7 @@ class Game(object):
                 pass
         self.log.write("\n")
 
-    def display_intro(self):
+    def draw_intro(self):
         """display intro scene"""
         font1 = pygame.font.Font(self.fp, int(self.SCREEN_HEIGHT/10))
         title = font1.render(get_psf_version_string(), True, (255,200,100))
@@ -1120,14 +1208,8 @@ class Game(object):
         self.screen.blit(vers, vers_rect)
         self.screen.blit(copy, copy_rect)
         self.screen.blit(logo.image, logo.rect)
-        pygame.display.flip()
-        if not self.playback:
-			while True:
-				for event in pygame.event.get():
-					if event.type == pygame.KEYDOWN:
-						return
 
-    def display_game_number(self):
+    def draw_game_number(self):
         """before game begins, present the game number"""
         self.gameevents.add("display_game", self.current_game)
         self.mine_list.generate_foes()
@@ -1152,16 +1234,9 @@ class Game(object):
 			bottom_rect.centerx = self.SCREEN_WIDTH/2
 			bottom_rect.centery = 600*self.aspect_ratio
 			self.screen.blit(bottom, bottom_rect)
-        pygame.display.flip()
-        if not self.playback:
-			while True:
-				for event in pygame.event.get():
-					if event.type == pygame.KEYDOWN:
-						return
 
-    def display_foe_mines(self):
+    def draw_foe_mines(self):
         """before game begins, present the list of IFF letters to target"""
-        self.mine_list.generate_foes()
         self.screen.fill((0,0,0))
         top = self.f24.render("The Type-2 mines for this session are:", True, (255,255,0))
         top_rect = top.get_rect()
@@ -1183,22 +1258,9 @@ class Game(object):
         self.screen.blit(middle, middle_rect)
         self.screen.blit(midbot, midbot_rect)
         self.screen.blit(bottom, bottom_rect)
-        pygame.display.flip()
         self.gameevents.add("display_foes", " ".join(self.mine_list.foe_letters), "player")
-        while True:
-            for event in pygame.event.get():
-                if event.type == pygame.KEYDOWN:
-                    return
 
-    def fade(self):
-        """fade screen to show score"""
-        fadesurf = pygame.Surface((self.SCREEN_WIDTH, self.SCREEN_HEIGHT)).convert_alpha()
-        fadesurf.fill((0,0,0,12))
-        for i in range(50):
-            self.screen.blit(fadesurf, pygame.Rect(0,0, self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
-            pygame.display.flip()
-
-    def show_old_score(self):
+    def draw_old_score(self):
         """shows score for last game and waits to continue"""
         pygame.event.get() #clear event list? Otherwise it skips
         self.screen.fill((0, 0, 0))
@@ -1268,16 +1330,8 @@ class Game(object):
         finalrect.centerx = self.SCREEN_WIDTH /2
         finalrect.centery = self.SCREEN_HEIGHT / 16 * 14
         self.screen.blit(finalsurf, finalrect)
-        pygame.display.flip()
-        while True:
-            for event in pygame.event.get():
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_ESCAPE:
-                        self.quit(1)
-                    else:
-                        return
 
-    def show_ng_score(self, time):
+    def draw_ng_score(self, time):
         pygame.event.get() #clear event list? Otherwise it skips
         self.screen.fill((0, 0, 0))
         gamesurf = self.f36.render("Game %d Stats" % (self.current_game), True, (255,255,0))
@@ -1345,16 +1399,8 @@ class Game(object):
         finalrect.centerx = self.SCREEN_WIDTH /2
         finalrect.centery = self.SCREEN_HEIGHT / 16 * 14
         self.screen.blit(finalsurf, finalrect)
-        pygame.display.flip()
-        while True:
-            for event in pygame.event.get():
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_ESCAPE:
-                        self.quit(1)
-                    else:
-                        return
 
-    def show_new_score(self):
+    def draw_new_score(self):
         """shows score for last game and waits to continue"""
         pygame.event.get() #clear event list? Otherwise it skips
         self.screen.fill((0, 0, 0))
@@ -1429,14 +1475,6 @@ class Game(object):
         finalrect.centerx = self.SCREEN_WIDTH /2
         finalrect.centery = self.SCREEN_HEIGHT / 16 * 14
         self.screen.blit(finalsurf, finalrect)
-        pygame.display.flip()
-        while True:
-            for event in pygame.event.get():
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_ESCAPE:
-                        self.quit(1)
-                    else:
-                        return
 
     def process_state(self, state):
 
@@ -1665,57 +1703,43 @@ class Game(object):
     def quit(self, ret=0):
         if not self.playback:
             self.gameevents.add("game", "quit", ret, type='EVENT_USER')
+            if ret == 0:
+                self.gameevents.add("session","complete", type='EVENT_SYSTEM')
+            else:
+                self.gameevents.add("session","incomplete", type='EVENT_SYSTEM')
             self.process_events()
             if self.config.get_setting('Logging','logging'):
                 self.log.close()
         pygame.quit()
         sys.exit(ret)
 
-    def doScores(self, time=0):
-        self.ingame = -1
+    def draw_scores(self, time=0):
         self.gameevents.add("game","end", type='EVENT_SYSTEM')
-        self.fade()
         self.gameevents.add("scores","show", type='EVENT_SYSTEM')
         if self.config.get_setting('General','next_gen'):
-            self.show_ng_score(time)
+            self.draw_ng_score(time)
         elif self.config.get_setting('Score','new_scoring'):
-            self.show_new_score()
+            self.draw_new_score()
         else:
-            self.show_old_score()
+            self.draw_old_score()
         self.gameevents.add("scores","hide", type='EVENT_SYSTEM')
+
+    def refresh(self):
+        self.draw()
+        if self.config.get_setting('Logging','logging'):
+            self.log_world()
+        self.process_input()
+        self.process_events()
+        self.process_game_logic()
 
 def main():
 
     g = Game()
-    if not g.playback:
-        g.display_intro()
-        while g.current_game < g.config.get_setting('General','games_per_session'):
-            gc.collect()
-            g.current_game += 1
-            g.gameevents.add("game", "ready", type='EVENT_SYSTEM')
-            g.display_game_number()
-            if g.mine_exists:
-                g.display_foe_mines()
-            g.setup_world()
-            gameTimer = tokens.timer.Timer()
-            g.gameevents.add("game","start", type='EVENT_SYSTEM')
-            g.ingame = 1
-            while True:
-                g.clock.tick(g.fps)
-                g.process_input()
-                g.process_game_logic()
-                g.process_events()
-                g.draw()
-                if g.config.get_setting('Logging','logging'):
-                    g.log_world()
-                if g.ship.alive == False:
-                    g.reset_position()
-                if gameTimer.elapsed() > g.config.get_setting('General','game_time'):
-                    g.doScores(time)
-                    break
-            g.gameevents.add("game", "over", type='EVENT_SYSTEM')
-        g.quit(1)
-    else:
+    while True:
+        g.clock.tick(g.fps)
+        g.refresh()
+
+    """else:
         g.display_intro()
         if g.config.get_setting('Playback','makevideo'):
             for i in range(0,60):
@@ -1759,7 +1783,7 @@ def main():
                     g.playback_index += 1
             if g.config.get_setting('Playback','makevideo') and g.playback_index == len(g.playback_data) - 1:
                 break
-    g.quit()
+    g.quit()"""
 
 if __name__ == '__main__':
     gc.disable()

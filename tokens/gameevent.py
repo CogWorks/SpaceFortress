@@ -9,7 +9,7 @@ import pygame, time
 
 class GameEvent(object):
     """an event that happens during gameplay"""
-    def __init__(self, time, ticks, eid, command, obj=None, target=None, log=True, game=0, type='EVENT_GAME', clock=0):
+    def __init__(self, time, ticks, eid, command, obj=None, target=None, log=True, game=0, state=-1, type='EVENT_GAME', clock=0):
         super(GameEvent, self).__init__()
         self.time = time
         self.ticks = ticks
@@ -19,9 +19,10 @@ class GameEvent(object):
         self.target = target
         self.log = log
         self.game = game
+        self.state = state
         self.type = type
         self.clock = clock
-                
+
 class GameEventList(list):
     """a list that holds the game events"""
     def __init__(self, app):
@@ -29,20 +30,20 @@ class GameEventList(list):
         self.app = app
         self.callbacks = []
         self.nevents = 0
-        
+
     def addCallback(self, callback):
         self.callbacks.append(callback)
-        
+
     def deleteCallback(self, callback):
         self.callbacks.remove(callback)
-        
+
     def deleteCallbacks(self):
         self.observers[:] = []
-    
+
     def notify(self, *args, **kwargs):
         for callback in self.callbacks:
             callback(*args, **kwargs)
-        
+
     def add(self, command, target=None, obj=None, log=True, type='EVENT_GAME'):
         """adds an event to the list"""
         eclock = time.clock()
@@ -53,5 +54,5 @@ class GameEventList(list):
             eid = self.nevents
         else:
             eid = None
-        self.append(GameEvent(etime, eticks, eid, command, target, obj, log, self.app.current_game*self.app.ingame, type, clock=eclock))
-        self.notify(etime, eticks, eid, command, target, obj, log=log, game=self.app.current_game*self.app.ingame, type=type, clock=eclock)
+        self.append(GameEvent(etime, eticks, eid, command, target, obj, log, self.app.current_game, self.app.state, type, clock=eclock))
+        self.notify(etime, eticks, eid, command, target, obj, log=log, game=self.app.current_game, state=self.app.state, type=type, clock=eclock)
