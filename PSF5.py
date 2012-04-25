@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from __future__ import division
-import subprocess, os, sys, platform, math
+import subprocess, os, sys, platform, math, copy
 from random import randrange, choice
 import gc
 try:
@@ -599,8 +599,10 @@ class Game( object ):
 
     def process_events( self ):
         """processes internal list of game events for this frame"""
-        while len( self.gameevents ) > 0:
-            currentevent = self.gameevents.pop( 0 )
+        gameevents = copy.copy( self.gameevents )
+        del self.gameevents[:]
+        while len( gameevents ) > 0:
+            currentevent = gameevents.pop( 0 )
             time = currentevent.time
             ticks = currentevent.ticks
             clock = currentevent.clock
