@@ -9,6 +9,9 @@ try:
 except ImportError:
     pass
 
+from twisted.internet import reactor
+from twisted.internet.task import LoopingCall
+
 os.environ['SDL_VIDEO_WINDOW_POS'] = 'center'
 
 githash = None
@@ -1727,6 +1730,7 @@ class Game( object ):
             if self.config.get_setting( 'Logging', 'logging' ):
                 self.log.close()
         pygame.quit()
+        reactor.stop()
         sys.exit( ret )
 
     def draw_scores( self, time = 0 ):
@@ -1748,61 +1752,24 @@ class Game( object ):
         if self.config.get_setting( 'Logging', 'logging' ):
             self.log_world()
 
-def main():
 
-    g = Game()
-    while True:
-        g.clock.tick( g.fps )
-        g.refresh()
+    def start( self, lc ):
+        self.state = self.STATE_INTRO
+        self.lc = LoopingCall( self.refresh )
+        d = self.lc.start( 1.0 / self.fps )
+        self.cleanupD = d.addCallbacks( self.quit )
 
-    """else:
-        g.display_intro()
-        if g.config.get_setting('Playback','makevideo'):
-            for i in range(0,60):
-                cvImage = video_utils.surf2CV(g.screen)
-                cv.WriteFrame(g.video_writer, cvImage)
-                pygame.time.wait(33)
-        else:
-            pygame.time.wait(2000)
-        for state in g.playback_data:
-            if state[0] == 'STATE':
-                g.current_game = int(state[g.header['current_game']])
-                break
-        g.display_game_number()
-        if g.config.get_setting('Playback','makevideo'):
-            for i in range(0,60):
-                cvImage = video_utils.surf2CV(g.screen)
-                cv.WriteFrame(g.video_writer, cvImage)
-                pygame.time.wait(33)
-        else:
-            pygame.time.wait(2000)
-        g.setup_world()
-        pygame.key.set_repeat(50,10)
-        while True:
-            g.playback_index_prev = g.playback_index
-            g.clock.tick(g.fps)
-            while g.playback_data[g.playback_index][0][:5] == 'EVENT':
-                g.process_playback_event(g.playback_data[g.playback_index])
-                if g.playback_index < len(g.playback_data) - 1 and g.playback_index > -1:
-                    if g.playback_keyheld[1]:
-                        g.playback_index -= 1
-                    else:
-                        g.playback_index += 1
-            g.process_state(g.playback_data[g.playback_index])
-            g.process_playback_input()
-            g.draw()
-            if g.config.get_setting('Playback','makevideo'):
-                cvImage = video_utils.surf2CV(g.screen)
-                cv.WriteFrame(g.video_writer, cvImage)
-            if sum(g.playback_keyheld) == 0 and not g.playback_pause:
-                if g.playback_index < len(g.playback_data) - 1:
-                    g.playback_index += 1
-            if g.config.get_setting('Playback','makevideo') and g.playback_index == len(g.playback_data) - 1:
-                break
-    g.quit()"""
+    def run( self ):
+        #if self.args.eyetracker:
+        #    reactor.listenUDP( 5555, self.client )
+        #    self.calibrator.start( self.start )
+        #else:
+        self.start( None )
+        reactor.run()
 
 if __name__ == '__main__':
     gc.disable()
-    main()
+    g = Game()
+    g.run()
 
 
