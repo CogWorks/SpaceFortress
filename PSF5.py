@@ -446,23 +446,25 @@ class Game( object ):
                     if event.key == pygame.K_ESCAPE:
                         self.gameevents.add( "press", "quit", type = 'EVENT_USER' )
 
-                    elif self.state == self.STATE_INTRO:
-                        self.state = self.STATE_SETUP
+                    if event.key == pygame.K_RETURN:
 
-                    elif self.state == self.STATE_SETUP:
-                        self.state = self.STATE_GAMENO
+                        if self.state == self.STATE_INTRO:
+                            self.state = self.STATE_SETUP
 
-                    elif self.state == self.STATE_GAMENO:
-                        if self.mine_exists:
-                            self.state = self.STATE_IFF
-                        else:
+                        elif self.state == self.STATE_SETUP:
+                            self.state = self.STATE_GAMENO
+
+                        elif self.state == self.STATE_GAMENO:
+                            if self.mine_exists:
+                                self.state = self.STATE_IFF
+                            else:
+                                self.state = self.STATE_PREPARE
+
+                        elif self.state == self.STATE_IFF:
                             self.state = self.STATE_PREPARE
 
-                    elif self.state == self.STATE_IFF:
-                        self.state = self.STATE_PREPARE
-
-                    elif self.state == self.STATE_SCORES:
-                        self.state = self.STATE_SETUP
+                        elif self.state == self.STATE_SCORES:
+                            self.state = self.STATE_SETUP
 
                     elif self.state == self.STATE_PLAY:
 
@@ -918,7 +920,7 @@ class Game( object ):
             self.score.iff = ''
             self.score.intrvl = 0
 
-    def reset_mines(self):
+    def reset_mines( self ):
         del self.mine_list[:]
         self.mine_list.flag = False
         self.mine_list.iff_flag = False
@@ -1236,7 +1238,7 @@ class Game( object ):
         pygame.draw.line( self.screen, ( 255, 255, 255 ), ( self.SCREEN_WIDTH / 4 , self.SCREEN_HEIGHT / 16 * 8.5 ), ( self.SCREEN_WIDTH / 4 * 3, self.SCREEN_HEIGHT / 16 * 8.5 ) )
         pygame.draw.line( self.screen, ( 255, 255, 255 ), ( self.SCREEN_WIDTH / 4 , self.SCREEN_HEIGHT / 16 * 5.5 ), ( self.SCREEN_WIDTH / 4 * 3, self.SCREEN_HEIGHT / 16 * 5.5 ) )
         if not self.playback:
-			bottom = self.f24.render( "Press any key to continue", True, ( 255, 255, 0 ) )
+			bottom = self.f24.render( "Press return to continue", True, ( 255, 255, 0 ) )
 			bottom_rect = bottom.get_rect()
 			bottom_rect.centerx = self.SCREEN_WIDTH / 2
 			bottom_rect.centery = 600 * self.aspect_ratio
@@ -1257,7 +1259,7 @@ class Game( object ):
         midbot_rect = midbot.get_rect()
         midbot_rect.centerx = self.SCREEN_WIDTH / 2
         midbot_rect.centery = 500 * self.aspect_ratio
-        bottom = self.f24.render( "Press any key to begin", True, ( 255, 255, 0 ) )
+        bottom = self.f24.render( "Press return to begin", True, ( 255, 255, 0 ) )
         bottom_rect = bottom.get_rect()
         bottom_rect.centerx = self.SCREEN_WIDTH / 2
         bottom_rect.centery = 600 * self.aspect_ratio
@@ -1330,9 +1332,9 @@ class Game( object ):
         totalnrect.centery = self.SCREEN_HEIGHT / 16 * 12
         self.screen.blit( totalnsurf, totalnrect )
         if self.current_game == self.config.get_setting( 'General', 'games_per_session' ):
-            finalsurf = self.f24.render( "You're done! Press any key to exit", True, ( 0, 255, 0 ) )
+            finalsurf = self.f24.render( "You're done! Press return to exit", True, ( 0, 255, 0 ) )
         else:
-            finalsurf = self.f24.render( "Press any key for next game", True, ( 0, 255, 0 ) )
+            finalsurf = self.f24.render( "Press return for next game", True, ( 0, 255, 0 ) )
         finalrect = finalsurf.get_rect()
         finalrect.centerx = self.SCREEN_WIDTH / 2
         finalrect.centery = self.SCREEN_HEIGHT / 16 * 14
@@ -1399,9 +1401,9 @@ class Game( object ):
         self.screen.blit( speednsurf, speednrect )
         pygame.draw.line( self.screen, ( 255, 255, 255 ), ( self.SCREEN_WIDTH / 4 , self.SCREEN_HEIGHT / 16 * 11 ), ( self.SCREEN_WIDTH / 4 * 3, self.SCREEN_HEIGHT / 16 * 11 ) )
         if self.current_game == self.config.get_setting( 'General', 'games_per_session' ):
-            finalsurf = self.f24.render( "You're done! Press any key to exit", True, ( 0, 255, 0 ) )
+            finalsurf = self.f24.render( "You're done! Press return to exit", True, ( 0, 255, 0 ) )
         else:
-            finalsurf = self.f24.render( "Press any key for next game", True, ( 0, 255, 0 ) )
+            finalsurf = self.f24.render( "Press return for next game", True, ( 0, 255, 0 ) )
         finalrect = finalsurf.get_rect()
         finalrect.centerx = self.SCREEN_WIDTH / 2
         finalrect.centery = self.SCREEN_HEIGHT / 16 * 14
@@ -1475,9 +1477,9 @@ class Game( object ):
         totalnrect.centery = self.SCREEN_HEIGHT / 16 * 12
         self.screen.blit( totalnsurf, totalnrect )
         if self.current_game == self.config.get_setting( 'General', 'games_per_session' ):
-            finalsurf = self.f24.render( "You're done! Press any key to exit", True, ( 0, 255, 0 ) )
+            finalsurf = self.f24.render( "You're done! Press return to exit", True, ( 0, 255, 0 ) )
         else:
-            finalsurf = self.f24.render( "Press any key for next game", True, ( 0, 255, 0 ) )
+            finalsurf = self.f24.render( "Press return for next game", True, ( 0, 255, 0 ) )
         finalrect = finalsurf.get_rect()
         finalrect.centerx = self.SCREEN_WIDTH / 2
         finalrect.centery = self.SCREEN_HEIGHT / 16 * 14
