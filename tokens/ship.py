@@ -118,7 +118,7 @@ class Ship(token.Token):
                 self.app.score.shots -= 1
             else:
                 self.app.sounds.empty.play()
-                if self.app.config.get_setting('General','empty_penalty'):
+                if self.app.config.get_setting('Missile','empty_penalty'):
                     self.app.score.pnts -= self.app.config.get_setting('Missile','missile_penalty')
                     self.app.score.bonus -= self.app.config.get_setting('Missile','missile_penalty')
         else:

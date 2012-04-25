@@ -443,7 +443,10 @@ class Game( object ):
 
                 if event.type == pygame.KEYDOWN:
 
-                    if self.state == self.STATE_INTRO:
+                    if event.key == pygame.K_ESCAPE:
+                        self.gameevents.add( "press", "quit", type = 'EVENT_USER' )
+
+                    elif self.state == self.STATE_INTRO:
                         self.state = self.STATE_SETUP
 
                     elif self.state == self.STATE_SETUP:
@@ -482,9 +485,6 @@ class Game( object ):
 
                         elif event.key == self.pause_key and self.config.get_setting( 'General', 'allow_pause' ):
                             self.gameevents.add( "press", "pause", type = 'EVENT_USER' )
-
-                    if event.key == pygame.K_ESCAPE:
-                        self.gameevents.add( "press", "quit", type = 'EVENT_USER' )
 
 
                 elif event.type == pygame.KEYUP:
@@ -717,9 +717,10 @@ class Game( object ):
                                 else:
                                     self.gameevents.add( "score-", "bonus", self.config.get_setting( 'Score', 'bonus_points' ) / 2 )
             elif command == "destroyed":
-                if target == "ship":
+                if obj == "ship":
                     self.deaths += 1
                     self.reset_position()
+                    self.reset_mines()
             elif command == "bonus_available":
                 self.totalBonuses += 1
             elif command == "first_tag":
@@ -916,6 +917,12 @@ class Game( object ):
                 del self.mine_list[0]
             self.score.iff = ''
             self.score.intrvl = 0
+
+    def reset_mines(self):
+        del self.mine_list[:]
+        self.mine_list.flag = False
+        self.mine_list.iff_flag = False
+        self.mine_list.timer.reset()
 
     def test_collisions( self ):
         """test collisions between relevant game entities"""
@@ -1658,6 +1665,13 @@ class Game( object ):
         fpsrect.right = self.SCREEN_WIDTH - 8
         self.screen.blit( fpssurf, fpsrect )
 
+    def draw_complete( self ):
+        fpssurf = self.f96.render( "Session Complete", True, ( 255, 0, 0 ) )
+        fpsrect = fpssurf.get_rect()
+        fpsrect.centerx = self.SCREEN_WIDTH / 2
+        fpsrect.centery = self.SCREEN_HEIGHT / 2
+        self.screen.blit( fpssurf, fpsrect )
+
     def draw_et( self ):
         if self.playback:
             et = float( self.playback_data[self.playback_index][self.header['clock']] ) - self.playback_start
@@ -1725,12 +1739,12 @@ class Game( object ):
         self.gameevents.add( "scores", "hide", type = 'EVENT_SYSTEM' )
 
     def refresh( self ):
-        self.draw()
-        if self.config.get_setting( 'Logging', 'logging' ):
-            self.log_world()
         self.process_input()
         self.process_events()
         self.process_game_logic()
+        self.draw()
+        if self.config.get_setting( 'Logging', 'logging' ):
+            self.log_world()
 
 def main():
 
