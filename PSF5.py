@@ -69,6 +69,8 @@ class Game( object ):
     """Main game application"""
     def __init__( self ):
         super( Game, self ).__init__()
+        
+        self.ret = 1
 
         self.reactor = reactor
 
@@ -534,7 +536,8 @@ class Game( object ):
                 self.mine_list.generate_foes()
             else:
                 self.state = self.STATE_DONE
-                self.quit( 0 )
+                self.ret = 0
+                self.lc.stop()
         elif self.state == self.STATE_PREPARE:
             self.gameevents.add( "game", "ready", type = 'EVENT_SYSTEM' )
             self.setup_world()
@@ -629,7 +632,7 @@ class Game( object ):
                 if obj == "pause":
                     self.pause_game()
                 elif obj == "quit":
-                    self.quit( 1 )
+                    self.lc.stop()
                 elif obj == "left":
                     self.ship.turn_left_flag = True
                 elif obj == "right":
@@ -1602,7 +1605,7 @@ class Game( object ):
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
-                    self.quit( 1 )
+                    self.lc.stop()
             if not self.config.get_setting( 'Playback', 'makevideo' ):
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_UP:
@@ -1732,10 +1735,10 @@ class Game( object ):
                 elif event[self.header['e2']] == 'points':
                     self.kp_points = self.linewidth
 
-    def quit( self, ret = 0 ):
+    def quit( self, lc ):
         if not self.playback:
-            self.gameevents.add( "game", "quit", ret, type = 'EVENT_USER' )
-            if ret == 0:
+            self.gameevents.add( "game", "quit", self.ret, type = 'EVENT_USER' )
+            if self.ret == 0:
                 self.gameevents.add( "session", "complete", type = 'EVENT_SYSTEM' )
             else:
                 self.gameevents.add( "session", "incomplete", type = 'EVENT_SYSTEM' )
@@ -1744,7 +1747,6 @@ class Game( object ):
                 self.log.close()
         pygame.quit()
         self.reactor.stop()
-        sys.exit( ret )
 
     def draw_scores( self, time = 0 ):
         self.gameevents.add( "game", "end", type = 'EVENT_SYSTEM' )
@@ -1769,13 +1771,15 @@ class Game( object ):
 
     def start( self ):
         self.lc = LoopingCall( self.refresh )
-        d = self.lc.start( 1.0 / self.fps )
-        #self.cleanupD = d.addCallbacks( self.quit )
+        cleanupD = self.lc.start( 1.0 / self.fps )
+        cleanupD.addCallbacks( self.quit )
 
 def main():
-    Game().start()
+    gc.disable()
+    g = Game()
+    reactor.callLater( 0, g.start )
+    reactor.run()
+    return g.ret
 
 if __name__ == '__main__':
-    gc.disable()
-    reactor.callLater( 0, main )
-    reactor.run()
+    main()
