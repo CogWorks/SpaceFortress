@@ -70,6 +70,8 @@ class Game( object ):
     def __init__( self ):
         super( Game, self ).__init__()
 
+        self.reactor = reactor
+
         self.STATE_UNKNOWN = -1
         self.STATE_CALIBRATE = 0
         self.STATE_INTRO = 1
@@ -145,6 +147,10 @@ class Game( object ):
         self.gameevents.add( "config", "load", "defaults", type = 'EVENT_SYSTEM' )
         self.config.update_from_user_file()
         self.gameevents.add( "config", "load", "user", type = 'EVENT_SYSTEM' )
+
+        for name in self.plugins:
+            if hasattr( self.plugins[name], "ready" ):
+                self.plugins[name].ready()
 
         pygame.display.init()
         pygame.font.init()
@@ -1737,7 +1743,7 @@ class Game( object ):
             if self.config.get_setting( 'Logging', 'logging' ):
                 self.log.close()
         pygame.quit()
-        reactor.stop()
+        self.reactor.stop()
         sys.exit( ret )
 
     def draw_scores( self, time = 0 ):
@@ -1752,31 +1758,24 @@ class Game( object ):
         self.gameevents.add( "scores", "hide", type = 'EVENT_SYSTEM' )
 
     def refresh( self ):
-        self.process_input()
-        self.process_events()
-        self.process_game_logic()
-        self.draw()
-        if self.config.get_setting( 'Logging', 'logging' ):
-            self.log_world()
+        if self.state != self.STATE_CALIBRATE:
+            self.process_input()
+            self.process_events()
+            self.process_game_logic()
+            self.draw()
+            if self.config.get_setting( 'Logging', 'logging' ):
+                self.log_world()
 
 
-    def start( self, lc ):
-        self.state = self.STATE_INTRO
+    def start( self ):
         self.lc = LoopingCall( self.refresh )
         d = self.lc.start( 1.0 / self.fps )
-        self.cleanupD = d.addCallbacks( self.quit )
+        #self.cleanupD = d.addCallbacks( self.quit )
 
-    def run( self ):
-        #if self.args.eyetracker:
-        #    reactor.listenUDP( 5555, self.client )
-        #    self.calibrator.start( self.start )
-        #else:
-        self.start( None )
-        reactor.run()
+def main():
+    Game().start()
 
 if __name__ == '__main__':
     gc.disable()
-    g = Game()
-    g.run()
-
-
+    reactor.callLater( 0, main )
+    reactor.run()
