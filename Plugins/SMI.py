@@ -72,7 +72,7 @@ class SF5Plugin( object ):
                 if self.client:
                     self.calibrator = Calibrator( self.client, self.app.screen, reactor = self.app.reactor )
                     if self.app.config.get_setting( 'PyViewX', 'calmode' ) == 'Once':
-                        self.calibrate( False )
+                        self.app.reactor.callLater(1, self.calibrate, False)
 
         elif args[3] == 'game':
 
