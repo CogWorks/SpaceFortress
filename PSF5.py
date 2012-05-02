@@ -209,7 +209,7 @@ class Game( object ):
                 sys.exit()
 
         d = datetime.datetime.now().timetuple()
-        base = "%s_%d-%d-%d_%d-%d-%d" % ( self.config.get_setting( 'General', 'id' ), d[0], d[1], d[2], d[3], d[4], d[5] )
+        base = "SpaceFortress-%s_%s_%d-%d-%d_%d-%d-%d" % ( githash, self.config.get_setting( 'General', 'id' ), d[0], d[1], d[2], d[3], d[4], d[5] )
         logdir = self.config.get_setting( 'Logging', 'logdir' )
         if not os.path.exists( logdir ):
             os.makedirs( logdir )
