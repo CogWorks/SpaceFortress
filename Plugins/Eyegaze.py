@@ -18,7 +18,7 @@ class SF5Plugin(object):
             
     def logHeader(self):
         if self.eg:
-            return 'egtime\tgaze_x\tgaze_y\tfixation_number\teye_motion_state\tfix_x\tfix_y\tsamples'
+            return '\tegtime\tgaze_x\tgaze_y\tfixation_number\teye_motion_state\tfix_x\tfix_y\tsamples'
         else:
             return None
             

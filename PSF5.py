@@ -230,12 +230,10 @@ class Game( object ):
                            "score_iff\tscore_intrvl\tscore_speed\tscore_shots\tscore_flight\tscore_flight2\tscore_fortress\tscore_mine\tscore_mine2\tscore_bonus\tthrust_key\tleft_key\t" +
                            "right_key\tfire_key\tiff_key\tshots_key\tpnts_key\tfortress_target\tdestroyed_fortresses" )
             for name in self.plugins:
-                try:
+                if hasattr(self.plugins[name], "logHeader"):
                     header = self.plugins[name].logHeader()
                     if header:
                         self.log.write( header )
-                except AttributeError:
-                    pass
             self.log.write( "\n" )
             self.gameevents.add( "log", "header", "ready", log = False, type = 'EVENT_SYSTEM' )
             self.gameevents.add( "log", "version", "8", type = 'EVENT_SYSTEM' )

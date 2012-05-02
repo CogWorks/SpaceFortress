@@ -10,11 +10,17 @@ class SF5Plugin( object ):
 
     d = Dispatcher()
 
+    header = ["gazetime","gaze_type","left_gaze_x","right_gaze_x","left_gaze_y","right_gaze_y",
+              "left_pupil_x","right_pupil_x","left_pupil_y","right_pupil_y",
+              "left_eye_x","right_eye_x","left_eye_y","right_eye_y","left_eye_z","right_eye_z"]
+
     def __init__( self, app ):
         super( SF5Plugin, self ).__init__()
         self.app = app
         self.client = None
         self.post_calibrate_mode = -1
+        self.eye_data = None
+        self.null_data = "\t" + "\t".join( ["NA"] * len( self.header ) )
 
     def ready( self ):
         if self.app.config.get_setting( 'PyViewX', 'enabled' ):
@@ -26,16 +32,21 @@ class SF5Plugin( object ):
             self.post_calibrate_mode = self.app.state
             self.app.state = self.app.STATE_CALIBRATE
 
+    def logHeader(self):
+        if self.client:
+            return '\t' + '\t'.join(self.header)
+        else:
+            return None
+
+    def logCallback(self):
+        if self.eye_data:
+            return self.eye_data
+        else:
+            return self.null_data
+
     @d.listen( 'ET_SPL' )
     def iViewXEvent( self, inSender, inEvent, inResponse ):
-        t = int( inResponse[0] )
-        x = float( inResponse[2] )
-        y = float( inResponse[4] )
-        ex = np.mean( ( float( inResponse[10] ), float( inResponse[11] ) ) )
-        ey = np.mean( ( float( inResponse[12] ), float( inResponse[13] ) ) )
-        ez = np.mean( ( float( inResponse[14] ), float( inResponse[15] ) ) )
-        dia = int( inResponse[6] ) > 0 and int( inResponse[7] ) > 0 and int( inResponse[8] ) > 0 and int( inResponse[9] ) > 0
-        #print t, dia, x, y, ex, ey, ez
+        self.eye_data = inResponse
 
     def startDataStreaming( self ):
         self.client.setDataFormat( '%TS %ET %SX %SY %DX %DY %EX %EY %EZ' )
