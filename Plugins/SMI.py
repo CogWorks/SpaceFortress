@@ -20,7 +20,7 @@ class SF5Plugin( object ):
         self.client = None
         self.post_calibrate_mode = -1
         self.eye_data = None
-        self.null_data = "\t" + "\t".join( ["NA"] * len( self.header ) )
+        self.null_data = ["NA"] * len( self.header )
 
     def ready( self ):
         if self.app.config.get_setting( 'PyViewX', 'enabled' ):
@@ -35,9 +35,9 @@ class SF5Plugin( object ):
 
     def logHeader(self):
         if self.client:
-            return '\t' + '\t'.join(self.header)
+            return self.header
         else:
-            return None
+            return []
 
     def logCallback(self):
         if self.eye_data:

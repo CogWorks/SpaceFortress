@@ -69,7 +69,7 @@ class Game( object ):
     """Main game application"""
     def __init__( self ):
         super( Game, self ).__init__()
-        
+
         self.ret = 1
 
         self.reactor = reactor
@@ -219,22 +219,27 @@ class Game( object ):
         self.gameevents.add( "log", "basename", "ready", type = 'EVENT_SYSTEM' )
 
         if not self.playback and self.config.get_setting( 'Logging', 'logging' ):
-            log_filename = "%s.txt" % ( self.log_basename )
-            self.log = open( log_filename, "w" )
-            self.log.write( "event_type\tsystem_time\tclock\tgame_time\tcurrent_game\teid\te1\te2\te3\tfoes\tship_alive\tship_health\tship_x\t" +
-                           "ship_y\tsmod\tdmod\tship_vel_x\tship_vel_y\tship_orientation\tdistance\tmine_no\tmine_id\tmine\tfortress_alive\tfortress_x\tfortress_y\tfortress_orientation\t" +
-                           "missile\tshell\tbonus_no\tbonus_prev\tbonus_cur\tbonus_cur_x\tbonus_cur_y\t" )
+            self.log_filename = "%s.txt.incomplete" % ( self.log_basename )
+            self.log = open( self.log_filename, "w" )
+            self.log_header = ["event_type", "clock", "game_time",
+                               "current_game", "eid", "e1", "e2", "e3", "foes", "ship_alive",
+                               "ship_health", "ship_x", "ship_y", "smod", "dmod", "ship_vel_x",
+                               "ship_vel_y", "ship_orientation", "distance", "mine_no", "mine_id",
+                               "mine", "fortress_alive", "fortress_x", "fortress_y",
+                               "fortress_orientation", "missile", "shell", "bonus_no",
+                               "bonus_prev", "bonus_cur", "bonus_cur_x", "bonus_cur_y"]
             if self.config.get_setting( 'General', 'bonus_system' ) == "AX-CPT":
-                self.log.write( 'bonus_isi\t' )
-            self.log.write( "score_pnts\tscore_cntrl\tscore_vlcty\tscore_vlner\t" +
-                           "score_iff\tscore_intrvl\tscore_speed\tscore_shots\tscore_flight\tscore_flight2\tscore_fortress\tscore_mine\tscore_mine2\tscore_bonus\tthrust_key\tleft_key\t" +
-                           "right_key\tfire_key\tiff_key\tshots_key\tpnts_key\tfortress_target\tdestroyed_fortresses" )
+                self.log_header.append( 'bonus_isi' )
+            self.log_header = self.log_header + ["score_pnts", "score_cntrl", "score_vlcty", "score_vlner", "score_iff",
+                                                 "score_intrvl", "score_speed", "score_shots", "score_flight", "score_flight2",
+                                                 "score_fortress", "score_mine", "score_mine2", "score_bonus", "thrust_key",
+                                                 "left_key", "right_key", "fire_key", "iff_key", "shots_key", "pnts_key"]
             for name in self.plugins:
-                if hasattr(self.plugins[name], "logHeader"):
-                    header = self.plugins[name].logHeader()
-                    if header:
-                        self.log.write( header )
-            self.log.write( "\n" )
+                if hasattr( self.plugins[name], "logHeader" ):
+                    self.log_header = self.log_header + self.plugins[name].logHeader()
+
+            self.log.write( "\t".join( self.log_header ) + "\n" )
+
             self.gameevents.add( "log", "header", "ready", log = False, type = 'EVENT_SYSTEM' )
             self.gameevents.add( "log", "version", "8", type = 'EVENT_SYSTEM' )
 
@@ -615,7 +620,6 @@ class Game( object ):
         del self.gameevents[:]
         while len( gameevents ) > 0:
             currentevent = gameevents.pop( 0 )
-            time = currentevent.time
             ticks = currentevent.ticks
             clock = currentevent.clock
             eid = currentevent.eid
@@ -625,7 +629,7 @@ class Game( object ):
             target = currentevent.target
             type = currentevent.type
             if not self.playback  and self.config.get_setting( 'Logging', 'logging' ) and currentevent.log:
-                self.log.write( "%s\t%f\t%f\t%d\t%d\t%d\t%s\t%s\t%s\n" % ( type, time, clock, ticks, game, eid, command, obj, target ) )
+                self.log.write( "%s\t%f\t%d\t%d\t%d\t%s\t%s\t%s\n" % ( type, clock, ticks, game, eid, command, obj, target ) )
             if command == "press":
                 if obj == "pause":
                     self.pause_game()
@@ -1191,26 +1195,28 @@ class Game( object ):
         else:
             pnts_key = "n"
 
-        self.log.write( "STATE\t%f\t%f\t%d\t%d\tNA\tNA\tNA\tNA\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t" %
-                       ( system_time, clock, game_time, self.current_game, " ".join( self.mine_list.foe_letters ), ship_alive, ship_health, ship_x, ship_y, smod, dmod, ship_vel_x, ship_vel_y, ship_orientation,
-                        distance, mine_no, mine_id, self.mine_list, fortress_alive, fortress_x, fortress_y, fortress_orientation, self.missile_list, self.shell_list ) )
+        data = ["STATE", clock, game_time, self.current_game, "NA", "NA", "NA", "NA", 
+                " ".join( self.mine_list.foe_letters ), ship_alive, ship_health, ship_x, ship_y,
+                smod, dmod, ship_vel_x, ship_vel_y, ship_orientation, distance, mine_no, mine_id, 
+                self.mine_list, fortress_alive, fortress_x, fortress_y, fortress_orientation, 
+                self.missile_list, self.shell_list]
+
         if self.config.get_setting( 'General', 'bonus_system' ) == "AX-CPT":
-            self.log.write( "%s\t%s\t%s\t%s\t%s\t%s\t" %
-                           ( bonus_no, bonus_prev, bonus_cur, bonus_cur_x, bonus_cur_y, bonus_isi ) )
+            data = data + [ bonus_no, bonus_prev, bonus_cur, bonus_cur_x, bonus_cur_y, bonus_isi ]
         else:
-            self.log.write( "%s\t%s\t%s\t%s\t%s\t" %
-                           ( bonus_no, bonus_prev, bonus_cur, bonus_cur_x, bonus_cur_y ) )
-        self.log.write( "%d\t%d\t%d\t%d\t%s\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s" %
-                       ( self.score.pnts, self.score.cntrl, self.score.vlcty, self.score.vlner, iff_score, self.score.intrvl, self.score.speed, self.score.shots, self.score.flight, self.flight2, self.score.fortress,
-                        self.score.mines, self.mine2, self.score.bonus, thrust_key, left_key, right_key, fire_key, iff_key, shots_key, pnts_key ) )
+            data = data + [ bonus_no, bonus_prev, bonus_cur, bonus_cur_x, bonus_cur_y ]
+
+        data = data + [self.score.pnts, self.score.cntrl, self.score.vlcty,
+                       self.score.vlner, iff_score, self.score.intrvl, self.score.speed,
+                       self.score.shots, self.score.flight, self.flight2, self.score.fortress,
+                       self.score.mines, self.mine2, self.score.bonus, thrust_key, left_key,
+                       right_key, fire_key, iff_key, shots_key, pnts_key]
+
         for name in self.plugins:
-            try:
-                data = self.plugins[name].logCallback()
-                if data:
-                    self.log.write( data )
-            except AttributeError:
-                pass
-        self.log.write( "\n" )
+            if hasattr( self.plugins[name], "logCallback" ):
+                data = data + self.plugins[name].logCallback()
+
+        self.log.write( "\t".join( map( str, data ) ) + "\n" )
 
     def draw_intro( self ):
         """display intro scene"""
@@ -1743,6 +1749,8 @@ class Game( object ):
             self.process_events()
             if self.config.get_setting( 'Logging', 'logging' ):
                 self.log.close()
+                if self.ret == 0:
+                    os.rename( self.log_filename, self.log_filename[:-11] )
         pygame.quit()
         self.reactor.stop()
 
