@@ -26,11 +26,12 @@ class SF5Plugin( object ):
         if self.app.config.get_setting( 'PyViewX', 'enabled' ):
             self.client = iViewXClient( self.app.config.get_setting( 'PyViewX', 'server_address' ), int( self.app.config.get_setting( 'PyViewX', 'server_outport' ) ) )
             self.client.addDispatcher( self.d )
-            self.app.reactor.listenUDP( int( self.app.config.get_setting( 'PyViewX', 'server_inport' ) ), self.client )
-            self.startDataStreaming()
-        if self.app.config.get_setting( 'PyViewX', 'calmode' ) == 'Once':
-            self.post_calibrate_mode = self.app.state
-            self.app.state = self.app.STATE_CALIBRATE
+            if self.client:
+                if self.app.config.get_setting( 'PyViewX', 'calmode' ) == 'Once':
+                    self.post_calibrate_mode = self.app.state
+                    self.app.state = self.app.STATE_CALIBRATE
+                self.app.reactor.listenUDP( int( self.app.config.get_setting( 'PyViewX', 'server_inport' ) ), self.client )
+                self.startDataStreaming()
 
     def logHeader(self):
         if self.client:
