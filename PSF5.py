@@ -134,10 +134,8 @@ class Game( object ):
         self.plugins = defaults.load_plugins( self, os.path.join( self.approot, 'Plugins' ), self.plugins )
         self.plugins = defaults.load_plugins( self, defaults.get_plugin_home(), self.plugins )
         for name in self.plugins:
-            try:
+            if hasattr( self.plugins[name], 'eventCallback' ):
                 self.gameevents.addCallback( self.plugins[name].eventCallback )
-            except AttributeError:
-                pass
 
         self.gameevents.add( "game", "version", githash, type = 'EVENT_SYSTEM' )
 
@@ -890,25 +888,28 @@ class Game( object ):
         elif obj.startswith( "mine_" ):
             #mine hit the ship
             index = int( obj[-1] )
-            del self.mine_list[index]
-            self.score.iff = ''
-            self.score.intrvl = 0
-            self.mine_list.flag = False
-            self.mine_list.iff_flag = False
-            self.mine_list.timer.reset()
-            self.gameevents.add( "score-", "pnts", self.config.get_setting( 'Score', 'mine_hit_penalty' ) )
-            self.gameevents.add( "score-", "mines", self.config.get_setting( 'Score', 'mine_hit_penalty' ) )
-            self.mine2 -= self.config.get_setting( 'Score', 'mine_hit_penalty' )
-            self.ship.take_damage()
-            if not self.ship.alive:
-                self.gameevents.add( "destroyed", "ship", "mine" )
-                self.gameevents.add( "score-", "pnts", self.config.get_setting( 'Score', 'ship_death_penalty' ) )
-                self.gameevents.add( "score-", "mines", self.config.get_setting( 'Score', 'ship_death_penalty' ) )
-                self.mine2 -= self.config.get_setting( 'Score', 'ship_death_penalty' )
-                self.ship.color = ( 255, 255, 0 )
-            elif self.config.get_setting( 'Ship', 'colored_damage' ):
-                g = 255 / self.ship.start_health * ( self.ship.health - 1 )
-                self.ship.color = ( 255, g, 0 )
+            #check to see if mine is still alive, it is possible to shot and
+            #collide with a mine at the same time, ties go to ship
+            if index < len(self.mine_list):
+                del self.mine_list[index]
+                self.score.iff = ''
+                self.score.intrvl = 0
+                self.mine_list.flag = False
+                self.mine_list.iff_flag = False
+                self.mine_list.timer.reset()
+                self.gameevents.add( "score-", "pnts", self.config.get_setting( 'Score', 'mine_hit_penalty' ) )
+                self.gameevents.add( "score-", "mines", self.config.get_setting( 'Score', 'mine_hit_penalty' ) )
+                self.mine2 -= self.config.get_setting( 'Score', 'mine_hit_penalty' )
+                self.ship.take_damage()
+                if not self.ship.alive:
+                    self.gameevents.add( "destroyed", "ship", "mine" )
+                    self.gameevents.add( "score-", "pnts", self.config.get_setting( 'Score', 'ship_death_penalty' ) )
+                    self.gameevents.add( "score-", "mines", self.config.get_setting( 'Score', 'ship_death_penalty' ) )
+                    self.mine2 -= self.config.get_setting( 'Score', 'ship_death_penalty' )
+                    self.ship.color = ( 255, 255, 0 )
+                elif self.config.get_setting( 'Ship', 'colored_damage' ):
+                    g = 255 / self.ship.start_health * ( self.ship.health - 1 )
+                    self.ship.color = ( 255, g, 0 )
         elif obj == "friend_mine":
             #get rid of mine
             self.destroyedMines += 1
@@ -1775,7 +1776,7 @@ class Game( object ):
             self.process_events()
             self.process_game_logic()
             self.draw()
-            if self.config.get_setting( 'Logging', 'logging' ):
+            if self.config.get_setting( 'Logging', 'logging' ) and self.config.get_setting( 'Logging', 'logDriver' ) == 'Default':
                 self.log_world()
 
 

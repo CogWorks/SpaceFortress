@@ -33,7 +33,6 @@ class SF5Plugin(object):
 
                     self.subjectInfo = getSubjectInfo(minimal=True)
                     if self.subjectInfo:
-                        print self.subjectInfo
                         self.app.config.update_setting_value("General","id",rin2id(self.subjectInfo['rin'])[:8])
                     else:
                         sys.exit()
