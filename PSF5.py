@@ -134,10 +134,8 @@ class Game( object ):
         self.plugins = defaults.load_plugins( self, os.path.join( self.approot, 'Plugins' ), self.plugins )
         self.plugins = defaults.load_plugins( self, defaults.get_plugin_home(), self.plugins )
         for name in self.plugins:
-            try:
+            if hasattr( self.plugins[name], 'eventCallback' ):
                 self.gameevents.addCallback( self.plugins[name].eventCallback )
-            except AttributeError:
-                pass
 
         self.gameevents.add( "game", "version", githash, type = 'EVENT_SYSTEM' )
 
@@ -1774,7 +1772,7 @@ class Game( object ):
             self.process_events()
             self.process_game_logic()
             self.draw()
-            if self.config.get_setting( 'Logging', 'logging' ):
+            if self.config.get_setting( 'Logging', 'logging' ) and self.config.get_setting( 'Logging', 'logDriver' ) == 'Default':
                 self.log_world()
 
 
