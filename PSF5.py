@@ -166,7 +166,11 @@ class Game( object ):
 						break
 			best_mode = mode_list[1]
         else:
-            best_mode = mode_list[0]
+            if self.config.get_setting( 'Display', 'display_mode' ) == 'Current':
+                info = pygame.display.Info()
+                best_mode = (info.current_w, info.current_h)
+            else:
+                best_mode = mode_list[0]
         self.SCREEN_WIDTH = best_mode[0]
         self.SCREEN_HEIGHT = best_mode[1]
 
@@ -308,7 +312,7 @@ class Game( object ):
         self.screenshot_key = eval( "pygame.K_%s" % self.config.get_setting( 'Keybindings', 'screenshot_key' ) )
 
         self.sounds = tokens.sounds.Sounds( self )
-        if self.config.get_setting( 'Display', 'display_mode' ) == 'Fullscreen':
+        if self.config.get_setting( 'Display', 'display_mode' ) == 'Fullscreen' or self.config.get_setting( 'Display', 'display_mode' ) == 'Current':
             self.screen = pygame.display.set_mode( ( self.SCREEN_WIDTH, self.SCREEN_HEIGHT ), pygame.FULLSCREEN )
         elif self.config.get_setting( 'Display', 'display_mode' ) == 'Fake Fullscreen':
             self.screen = pygame.display.set_mode( ( self.SCREEN_WIDTH, self.SCREEN_HEIGHT ), pygame.NOFRAME )
