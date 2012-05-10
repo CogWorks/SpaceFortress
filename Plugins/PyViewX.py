@@ -1,6 +1,7 @@
 """
 PyViewX Integration
 """
+import json
 import pygame
 import numpy as np
 from pyviewx import iViewXClient, Dispatcher
@@ -62,7 +63,9 @@ class SF5Plugin( object ):
     def stopDataStreaming( self ):
         self.client.stopDataStreaming()
 
-    def calibrationDone( self, lc, post_calibrate_mode ):
+    def calibrationDone( self, lc, results, post_calibrate_mode ):
+        self.app.gameevents.add( "calibration", "results", "'%s'" % json.dumps(results, encoding="cp1252"), type = 'EVENT_SYSTEM' )
+        self.app.gameevents.add( "calibration", "stop", "", type = 'EVENT_SYSTEM' )
         self.app.state = post_calibrate_mode
 
     def calibrate( self, changeState ):
@@ -70,6 +73,7 @@ class SF5Plugin( object ):
         if changeState:
             self.post_calibrate_mode = self.app.state
             self.app.state = self.app.STATE_CALIBRATE
+        self.app.gameevents.add( "calibration", "start", "", type = 'EVENT_SYSTEM' )
         self.calibrator.start( self.calibrationDone, self.post_calibrate_mode )
 
     def eventCallback( self, *args, **kwargs ):
