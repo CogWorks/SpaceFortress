@@ -48,6 +48,10 @@ import time
 import datetime
 import defaults
 
+get_time = time.time
+if platform.system() == 'Windows':
+    get_time = time.clock
+
 def get_psf_version_string():
     return "Space Fortress 5"
 
@@ -223,7 +227,7 @@ class Game( object ):
         if not self.playback and self.config.get_setting( 'Logging', 'logging' ):
             self.log_filename = "%s.txt.incomplete" % ( self.log_basename )
             self.log = open( self.log_filename, "w" )
-            self.log_header = ["event_type", "clock", "game_time",
+            self.log_header = ["event_type", "system_time", "game_time",
                                "current_game", "eid", "e1", "e2", "e3", "foes", "ship_alive",
                                "ship_health", "ship_x", "ship_y", "smod", "dmod", "ship_vel_x",
                                "ship_vel_y", "ship_orientation", "distance", "mine_no", "mine_id",
@@ -623,7 +627,7 @@ class Game( object ):
         while len( gameevents ) > 0:
             currentevent = gameevents.pop( 0 )
             ticks = currentevent.ticks
-            clock = currentevent.clock
+            time = currentevent.time
             eid = currentevent.eid
             game = currentevent.game
             command = currentevent.command
@@ -631,7 +635,7 @@ class Game( object ):
             target = currentevent.target
             type = currentevent.type
             if not self.playback  and self.config.get_setting( 'Logging', 'logging' ) and currentevent.log:
-                self.log.write( "%s\t%f\t%d\t%d\t%d\t%s\t%s\t%s\n" % ( type, clock, ticks, game, eid, command, obj, target ) )
+                self.log.write( "%s\t%f\t%d\t%d\t%d\t%s\t%s\t%s\n" % ( type, time, ticks, game, eid, command, obj, target ) )
             if command == "press":
                 if obj == "pause":
                     self.pause_game()
@@ -1103,8 +1107,7 @@ class Game( object ):
 
     def log_world( self ):
         """logs current state of world to logfile"""
-        system_time = time.time()
-        clock = time.clock()
+        system_time = get_time()
         game_time = pygame.time.get_ticks()
         if self.state == 2:
             smod = self.smod
@@ -1200,7 +1203,7 @@ class Game( object ):
         else:
             pnts_key = "n"
 
-        data = ["STATE", clock, game_time, self.current_game, "NA", "NA", "NA", "NA", 
+        data = ["STATE", system_time, game_time, self.current_game, "NA", "NA", "NA", "NA", 
                 " ".join( self.mine_list.foe_letters ), ship_alive, ship_health, ship_x, ship_y,
                 smod, dmod, ship_vel_x, ship_vel_y, ship_orientation, distance, mine_no, mine_id, 
                 self.mine_list, fortress_alive, fortress_x, fortress_y, fortress_orientation, 
