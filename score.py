@@ -56,7 +56,6 @@ class Score(object):
         self.shots_rect = self.shots_surf.get_rect()
         self.shots_rect.centery = 48
         self.shots_rect.centerx = 668
-
         
         scoresurf.blit(self.pnts_surf, self.pnts_rect)
         scoresurf.blit(self.cntrl_surf, self.cntrl_rect)

@@ -14,7 +14,6 @@ class Ship(sf_object.object.Object):
     """represents the fortress object that typically appears in the center of the worldsurf"""
     def __init__(self, app):
         super(Ship, self).__init__()
-        self.ship_color_change = app.config["ship-color"]
         self.app = app
         self.collision_radius = 10
         self.position.x = 245
@@ -126,17 +125,10 @@ class Ship(sf_object.object.Object):
         #x5, y5 = -18, -18
         x5 = -18 * self.cosphi - -18 * self.sinphi + self.position.x
         y5 = -((-18 * self.cosphi) + (-18 * self.sinphi)) + self.position.y
-
-        if self.ship_color_change == "t" and self.health == 4:
-            color = (255,255,0)
-        elif self.ship_color_change == "t" and self.health == 3:
-            color = (255,128,0)
-        else:
-            color = (255,0,0)
         
-        pygame.draw.line(worldsurf, color, (x1,y1), (x2,y2))
-        pygame.draw.line(worldsurf, color, (x3,y3), (x4,y4))
-        pygame.draw.line(worldsurf, color, (x3,y3), (x5,y5))
+        pygame.draw.line(worldsurf, (255,255,0), (x1,y1), (x2,y2))
+        pygame.draw.line(worldsurf, (255,255,0), (x3,y3), (x4,y4))
+        pygame.draw.line(worldsurf, (255,255,0), (x3,y3), (x5,y5))
         
     def draw2(self,worldsurf):
         """old function to draw ship to worldsurf"""

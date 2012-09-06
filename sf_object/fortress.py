@@ -16,7 +16,6 @@ class Fortress(sf_object.object.Object):
     """represents the fortress object that typically appears in the center of the worldsurf"""
     def __init__(self, app):
         super(Fortress, self).__init__()
-        self.fortress_color_change = app.config["fortress-color"]
         self.app = app
         self.position.x = 355
         self.position.y = 315
@@ -91,16 +90,11 @@ class Fortress(sf_object.object.Object):
         #x6, y6 = 0, 18
         x6 = - (18 * self.sinphi) + self.position.x
         y6 = -(18 * self.cosphi) + self.position.y
-
-        if self.fortress_color_change == "t" and self.app.score.vlner >= 10:
-            color = (255,0,0)
-        else:
-            color = (255,255,0)
         
-        pygame.draw.line(worldsurf, color, (x1,y1), (x2, y2))
-        pygame.draw.line(worldsurf, color, (x3,y3), (x5, y5))
-        pygame.draw.line(worldsurf, color, (x3,y3), (x4, y4))
-        pygame.draw.line(worldsurf, color, (x5,y5), (x6, y6))
+        pygame.draw.line(worldsurf, (255,255,0), (x1,y1), (x2, y2))
+        pygame.draw.line(worldsurf, (255,255,0), (x3,y3), (x5, y5))
+        pygame.draw.line(worldsurf, (255,255,0), (x3,y3), (x4, y4))
+        pygame.draw.line(worldsurf, (255,255,0), (x5,y5), (x6, y6))
         
        
     def draw2(self, worldsurf):

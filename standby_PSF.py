@@ -1,5 +1,4 @@
 #PSF.py
-#Version 1.4.2 - Automatic resetting for model runs
 #Version 1.4.1 - Log mine onsets, records first or second bonus symbol
 #Version 1.4 - Model hooks
 #Version 1.3 - config file, os dependent pathing (py2app nests the CWD three levels in)
@@ -142,8 +141,6 @@ class World(object):
         self.intervalflag = False
         self.updatetimer = Timer(self)
         self.bonustimer = Timer(self)
-	self.ship_death_timer = Timer(self)
-        self.ship_death_flag = False
         self.bonus.flag = True
     
     def display_foe_mines(self):
@@ -176,7 +173,7 @@ class World(object):
     def process_input_events(self):
         """chief function to process keyboard events"""
         for event in pygame.event.get():
-            if event.type == pygame.KEYDOWN and self.ship.alive: #don't accept key during second while ship is dead
+            if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     self.log.write("# Escaped prematurely\n")
                     self.log.close()
@@ -378,33 +375,24 @@ class World(object):
                 self.log.write("# first appearance of bonus symbol\n")
         elif (self.bonus.visible == True) and (self.bonustimer.elapsed() >= int(self.config["symbol_up_time"])): #keep symbol visible for 75 frames
             self.bonus.visible = False
-            #self.bonus.current_symbol = ''
+            self.bonus.current_symbol = ''
             self.log.write("# symbol disappeared\n")
             self.bonustimer.reset()
     
     def reset_position(self):
         """pauses the game and resets"""
-       	self.ship.velocity.x = 0
+        self.sounds.explosion.play()
+        pygame.time.delay(1000)
+        self.minetimer.reset()
+        self.mine.alive = False
+        self.score.iff = ""
+        self.ship.alive = True
+        self.fortress.alive = True
+        self.ship.position.x = 245
+        self.ship.position.y = 315
+        self.ship.velocity.x = 0
         self.ship.velocity.y = 0
-        if self.ship_death_flag == False:
-            self.sounds.explosion.play()
-            self.ship_death_flag = True
-            self.ship_death_timer.reset()
-            self.score.pnts -= int(w.config["ship_death_penalty"])
-        #    print "resetting death timer"
-        if self.ship_death_flag and self.ship_death_timer.elapsed() > 1000:
-            #print "reset position"
-            self.ship_death_flag = False
-            self.minetimer.reset()
-            self.mine.alive = False
-            self.score.iff = ""
-            self.ship.alive = True
-            self.fortress.alive = True
-            self.ship.position.x = 245
-            self.ship.position.y = 315
-            self.ship.velocity.x = 0
-            self.ship.velocity.y = 0
-            self.ship.orientation = 90
+        self.ship.orientation = 90
     
     
     def draw_world(self):
@@ -692,7 +680,7 @@ class DBus_obj(dbus.service.Object):
     
     @dbus.service.method("edu.rpi.cogsci.destem.Interface", in_signature='s', out_signature='s')
     def begin(self, input_string):
-        self.w.find_session()
+        self.w.log = open("testing.dat", "w")
         self.w.setup_world()
         self.w.display_foe_mines()
         return "(%s %s %s)"%(self.w.mine.foe_letters[0], self.w.mine.foe_letters[1], self.w.mine.foe_letters[2])
@@ -756,19 +744,11 @@ class DBus_obj(dbus.service.Object):
         else:
             iff = w.score.iff
             
-        self.w.log_world()
-
-        #print  "(%s %f %f %f %f %d %s %d %s %f %f %s %f %f %s %s %d %d %d %d %s %s %s %s)"\
-        #%(s_e, w.ship.position.x + 157, w.ship.position.y + 5, w.ship.velocity.x, w.ship.velocity.y, w.ship.orientation, f_e, w.fortress.orientation, \
-        #m_e, w.mine.position.x + 157, w.mine.position.y + 5, sh_e, sh_x, sh_y, b_e, b_cs, \
-        #w.score.pnts, w.score.cntrl, w.score.vlcty, w.score.vlner, iff, w.score.intrvl, w.score.speed, w.score.shots)
-            
         return "(%s %f %f %f %f %d %s %d %s %f %f %s %f %f %s %s %d %d %d %d %s %s %s %s)"\
         %(s_e, w.ship.position.x + 157, w.ship.position.y + 5, w.ship.velocity.x, w.ship.velocity.y, w.ship.orientation, f_e, w.fortress.orientation, \
         m_e, w.mine.position.x + 157, w.mine.position.y + 5, sh_e, sh_x, sh_y, b_e, b_cs, \
         w.score.pnts, w.score.cntrl, w.score.vlcty, w.score.vlner, iff, w.score.intrvl, w.score.speed, w.score.shots)
         #sending positions in screen coordinates because model needs to look outside "world" view
-        
     
     @dbus.service.method("edu.rpi.cogsci.destem.Interface", in_signature='s', out_signature='s')
     def press_key(self, key):
@@ -833,18 +813,10 @@ class DBus_obj(dbus.service.Object):
         pygame.display.flip()
         if self.w.ship.alive == False:
             self.w.reset_position()
+            self.w.score.pnts -= int(w.config["ship_death_penalty"])
         return "World Drawn"
-		
-    @dbus.service.method("edu.rpi.cogsci.destem.Interface", in_signature='s', out_signature='s')
-    def end_game(self, input_string):
-        self.w.log.write("# pnts score %d\n"%self.w.score.pnts)
-        self.w.log.write("# cntrl score %d\n"%self.w.score.cntrl)
-        self.w.log.write("# vlcty score %d\n"%self.w.score.vlcty)
-        self.w.log.write("# speed score %d\n"%self.w.score.speed)
-        self.w.log.write("# total score %d"%(self.w.score.pnts + self.w.score.cntrl + self.w.score.vlcty + self.w.score.speed))
-        self.w.log.close()
-        return "Game ended"
-		
+    
+
 if __name__ == '__main__':
     w = World()
     if w.config["act-r"] == 't':
@@ -884,6 +856,7 @@ if __name__ == '__main__':
             pygame.display.flip()
             if w.ship.alive == False:
                 w.reset_position()
+                w.score.pnts -= int(w.config["ship_death_penalty"])
             if gameTimer.elapsed() >= int(w.config["game_time"]): #300000 milliseconds = five minutes per game
                 w.fade()
                 w.show_score()

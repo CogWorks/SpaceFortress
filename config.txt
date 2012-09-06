@@ -7,25 +7,13 @@
 
 #Will this game be played by a cognitive model instead of a human?
 #Set to t to disable human control
-act-r f
+act-r t
 
 #Run at full screen? Set to f to run in a window
 fullscreen f
 
 #Subject ID
 id 1234
-
-#Set to t to have fortress change color (to red) when it is vulnerable
-fortress-color t
-
-#Set to t to have ship change color (yellow - full health, orange - hit once, red - hit twice)
-ship-color t
-
-#Set to t to fill mine with color
-fill-mine f
-
-#Set to t to put mine letter inside mine
-letter-in-mine t
 
 #Time in milliseconds for a game. Default is 300000 (5 minutes)
 #NOTE! If you escape in the middle of a game, the log will have

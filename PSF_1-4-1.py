@@ -1,5 +1,4 @@
 #PSF.py
-#Version 1.4.2 - Automatic resetting for model runs
 #Version 1.4.1 - Log mine onsets, records first or second bonus symbol
 #Version 1.4 - Model hooks
 #Version 1.3 - config file, os dependent pathing (py2app nests the CWD three levels in)
@@ -692,7 +691,7 @@ class DBus_obj(dbus.service.Object):
     
     @dbus.service.method("edu.rpi.cogsci.destem.Interface", in_signature='s', out_signature='s')
     def begin(self, input_string):
-        self.w.find_session()
+        self.w.log = open("testing.dat", "w")
         self.w.setup_world()
         self.w.display_foe_mines()
         return "(%s %s %s)"%(self.w.mine.foe_letters[0], self.w.mine.foe_letters[1], self.w.mine.foe_letters[2])
@@ -755,8 +754,6 @@ class DBus_obj(dbus.service.Object):
             iff = "-"
         else:
             iff = w.score.iff
-            
-        self.w.log_world()
 
         #print  "(%s %f %f %f %f %d %s %d %s %f %f %s %f %f %s %s %d %d %d %d %s %s %s %s)"\
         #%(s_e, w.ship.position.x + 157, w.ship.position.y + 5, w.ship.velocity.x, w.ship.velocity.y, w.ship.orientation, f_e, w.fortress.orientation, \
@@ -768,7 +765,6 @@ class DBus_obj(dbus.service.Object):
         m_e, w.mine.position.x + 157, w.mine.position.y + 5, sh_e, sh_x, sh_y, b_e, b_cs, \
         w.score.pnts, w.score.cntrl, w.score.vlcty, w.score.vlner, iff, w.score.intrvl, w.score.speed, w.score.shots)
         #sending positions in screen coordinates because model needs to look outside "world" view
-        
     
     @dbus.service.method("edu.rpi.cogsci.destem.Interface", in_signature='s', out_signature='s')
     def press_key(self, key):
@@ -834,17 +830,8 @@ class DBus_obj(dbus.service.Object):
         if self.w.ship.alive == False:
             self.w.reset_position()
         return "World Drawn"
-		
-    @dbus.service.method("edu.rpi.cogsci.destem.Interface", in_signature='s', out_signature='s')
-    def end_game(self, input_string):
-        self.w.log.write("# pnts score %d\n"%self.w.score.pnts)
-        self.w.log.write("# cntrl score %d\n"%self.w.score.cntrl)
-        self.w.log.write("# vlcty score %d\n"%self.w.score.vlcty)
-        self.w.log.write("# speed score %d\n"%self.w.score.speed)
-        self.w.log.write("# total score %d"%(self.w.score.pnts + self.w.score.cntrl + self.w.score.vlcty + self.w.score.speed))
-        self.w.log.close()
-        return "Game ended"
-		
+    
+
 if __name__ == '__main__':
     w = World()
     if w.config["act-r"] == 't':

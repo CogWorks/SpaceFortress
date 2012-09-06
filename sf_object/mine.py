@@ -17,9 +17,6 @@ class Mine(sf_object.object.Object):
     """represents the friend or foe mine object"""
     def __init__(self, app):
         super(Mine, self).__init__()
-        self.fill_mine = app.config["fill-mine"]
-        self.letter_in_mine = app.config["letter-in-mine"]
-        self.f = pygame.font.Font("fonts/freesansbold.ttf", 14)
         self.position.x = 600
         self.position.y = 400
         self.app = app
@@ -41,9 +38,6 @@ class Mine(sf_object.object.Object):
         self.letters = list(string.letters[26:]) #list of uppercase letters
         self.letters.remove("T") #Screws up Lisp's read-from-string
         self.exists = True
-        self.shot_delay = 1000
-        self.key_delay = -1 #Time between pressing J key to identify enemy mines
-        self.friendly = False #Is this mine a friend or an enemy mine
     
     def generate_foes(self, num):
         """determine which mine designations are 'foes'"""
@@ -77,34 +71,7 @@ class Mine(sf_object.object.Object):
         
     def draw(self, worldsurf):
         """draws mine to worldsurf"""
-        if self.friendly == True and self.key_delay != -1:
-            color = (255,0,0)
-        elif self.key_delay == -1: #Mine has spawned but has not been identified
-            color = (0,0,255)
-        elif self.key_delay <= 250:
-            color = (255,255,0)
-        elif self.key_delay > 250 and self.key_delay <= 400:
-            color = (0,255,0)
-        elif self.key_delay > 400:
-            color = (255,0,0)
-
-        if self.fill_mine == "f":
-            pygame.draw.line(worldsurf, color, (self.position.x - 16, self.position.y), (self.position.x, self.position.y - 24))
-            pygame.draw.line(worldsurf, color, (self.position.x, self.position.y - 24), (self.position.x + 16, self.position.y))
-            pygame.draw.line(worldsurf, color, (self.position.x + 16, self.position.y), (self.position.x, self.position.y + 24))
-            pygame.draw.line(worldsurf, color, (self.position.x, self.position.y + 24), (self.position.x - 16, self.position.y))
-
-        elif self.fill_mine == "t":
-            pointlist = [[self.position.x - 16, self.position.y], [self.position.x, self.position.y - 24],[self.position.x, self.position.y - 24], [self.position.x + 16, self.position.y],[self.position.x + 16, self.position.y], [self.position.x, self.position.y + 24],[self.position.x, self.position.y + 24], [self.position.x - 16, self.position.y]]
-            pygame.draw.polygon(worldsurf, color, pointlist)  
-
-        if self.letter_in_mine == "t":
-            self.mine_letter = self.f.render("%s"%self.app.score.iff,0, (255,255,0))
-            self.letter_rect = self.mine_letter.get_rect()
-            self.letter_rect.centery = self.position.y+1.5
-            self.letter_rect.centerx = self.position.x+1.5
-            worldsurf.blit(self.mine_letter, self.letter_rect)     
-
-
-
-
+        pygame.draw.line(worldsurf, (0,255,255), (self.position.x - 16, self.position.y), (self.position.x, self.position.y - 24))
+        pygame.draw.line(worldsurf, (0,255,255), (self.position.x, self.position.y - 24), (self.position.x + 16, self.position.y))
+        pygame.draw.line(worldsurf, (0,255,255), (self.position.x + 16, self.position.y), (self.position.x, self.position.y + 24))
+        pygame.draw.line(worldsurf, (0,255,255), (self.position.x, self.position.y + 24), (self.position.x - 16, self.position.y))
