@@ -1,0 +1,184 @@
+#config.txt
+#Space Fortress configuration file for PSF Version 1.4
+#Marc Destefano
+#Rensselaer Polytechnic Institute
+
+#All lines that begin with '#' are comments
+
+#Will this game be played by a cognitive model instead of a human?
+#Set to t to disable human control
+act-r f
+
+#Run at full screen? Set to f to run in a window
+fullscreen f
+
+#Subject ID
+id 1234
+
+#Set to t to have fortress change color (to red) when it is vulnerable
+fortress-color t
+
+#Set to t to have ship change color (yellow - full health, orange - hit once, red - hit twice)
+ship-color t
+
+#Set to t to fill mine with color
+fill-mine f
+
+#Set to t to put mine letter inside mine
+letter-in-mine t
+
+#Time in milliseconds for a game. Default is 300000 (5 minutes)
+#NOTE! If you escape in the middle of a game, the log will have
+#"short" prepended to the name
+game_time 300000
+
+#Number of games per "session." Default is 8
+games_per_session 8
+
+#Key bindings - use digits, lowercase letters, or caps for special keys
+#(e.g., ESCAPE, RETURN, UP)
+thrust_key w
+left_turn_key a
+right_turn_key d
+fire_key SPACE
+IFF_key j
+shots_key k
+pnts_key l
+
+### SHIP CONSTANTS ###
+
+#Number of hits ship takes before it is destroyed. Default is 4
+ship_hit_points 4
+
+#Ship acceleration factor. Default is 0.3
+ship_acceleration 0.3
+
+#Ship's turning speed. Default is 6
+ship_turn_speed 6
+
+#Ship's maximum velocity. Default is 6
+ship_max_vel 6
+
+### MISSILE CONSTANTS ###
+
+#Speed of missile fired from ship. Default is 20
+missile_speed 20
+
+#Points lost when you fire a missile when none remain. Default is 3
+missile_penalty 3
+
+### MINE CONSTANTS ###
+
+#Do mines exists? Set to f to turn mines off
+mine_exists t
+
+#Mine speed. Default is 5
+mine_speed 5
+
+#Probability that next mine will be a foe. Default is 0.3
+mine_probability 0.3
+
+#Time in milliseconds for a mine to timeout and disappear. Default is 10000 (10 sec)
+mine_timeout 10000
+
+#Time in milliseconds for a mine to spawn. Default is 5000 (5 sec)
+mine_spawn 5000
+
+#Number of foe mines to memorize at the beginning of each game. Default is 3
+num_foes 3
+
+#Minimum time between double-clicks to identify foe mine. Default is 250
+intrvl_min 250
+
+#Maximum time between double-clicks to identify foe mine. Default is 400
+intrvl_max 400
+
+### FORTRESS CONSTANTS ###
+
+#Fortress "sector size." Angle of tolerance before fortress turns to face ship.
+#Bigger means fortress fires more often. Default is 10
+fortress_sector_size 10
+
+#Time in milliseconds it takes the fortress to lock on to the ship before firing.
+#Default is 1000
+fortress_lock_time 1000
+
+#Time in milliseconds that must pass between shots to avoid the fortress'
+#vulnerability to reset
+vlner_time 250
+
+#Minimum vulnerability before you can destroy the fortress with a double shot.
+#Default is 10
+vlner_threshold 10
+
+### SHELL CONSTANTS ###
+
+#Speed of shell fired from fortress. Default is 6
+shell_speed 6
+
+### HEXAGON CONSTANTS ###
+
+#"Radius" of large hexagon. Default is 200
+big_hex 200
+
+#"Radius" of small hexagon. Default is 40
+small_hex 40
+
+### BONUS SYMBOL CONSTANTS ###
+
+#Bonus symbol. Default is $
+bonus_symbol $
+
+#Non-bonus symbols. Defaults are # & * % @. Don't use '-', because that's used
+#in the log file to represent no symbol present
+non_bonus_symbols ! & * % @
+
+#Probability that next symbol will be the bonus symbol. Default is 0.3
+bonus_probability 0.3
+
+#"Blank time" between symbol appearances in milliseconds. Default is 833
+#(Seems like a weird number, but it's to sync with the frame-based original)
+symbol_down_time 833
+
+#Time in milliseconds each symbol is visible. Default is 2500
+symbol_up_time 2500
+
+### SCORE CONSTANTS ###
+
+#How often (in milliseconds) the VLCTY and CNTRL scores update. Default is 1000
+update_timer 1000
+
+#Speed at which you're considered to be going "too fast", resulting in a VLCTY
+#point penalty. Default is 4
+speed_threshold 4
+
+#VLCTY bonus/penalty for going either slow enough or too fast. Default is 7
+VLCTY_increment 7
+
+#Number of points added to CNTRL score for staying with the hexagons. Default is 6.
+#Note that half this number is added when outside the hexagons, so even is recommended.
+CNTRL_increment 6
+
+#Penalty for colliding with the small hexagon. Default is 5
+small_hex_penalty 5
+
+#Penalty for mine timing out. Default is 50
+mine_timeout_penalty 50
+
+#Penalty for mine hitting ship. Default is 50
+mine_hit_penalty 50
+
+#Penalty for shell hitting ship. Default is 50
+shell_hit_penalty 50
+
+#Penalty for ship destruction. Default is 100
+ship_death_penalty 100
+
+#Points for "energizing" a friendly mine. Default is 20
+energize_friend 20
+
+#Points for destroying a "foe" mine. Default is 30
+destroy_foe 30
+
+#Points for destroying the fortress. Default is 100
+destroy_fortress 100
