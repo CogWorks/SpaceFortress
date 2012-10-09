@@ -9,11 +9,6 @@ clean:
 	@rm -rf build dist
 	@cd docs; \
 	rm -rf *.log *.aux *.out *.pdf *.backup *~
-	
-build-info:
-	@./build-info.sh
-	
-deps: build-info
 
 docs:
 	cd docs; \

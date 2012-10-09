@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-
 from __future__ import division
 import subprocess, os, sys, platform, math, copy
 from random import randrange, choice
@@ -14,31 +13,6 @@ from twisted.internet.task import LoopingCall
 
 os.environ['SDL_VIDEO_WINDOW_POS'] = 'center'
 
-githash = None
-env = os.environ
-env['PATH'] = '/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/local/git/bin:/opt/local/bin:/opt/local/sbin'
-if platform.system() == 'Windows':
-    try:
-        subprocess.call( ['make', 'deps'], env = env )
-    except OSError:
-        pass
-    except WindowsError:
-        pass
-else:
-    try:
-        subprocess.call( ['make', 'deps'], env = env )
-    except OSError:
-        pass
-try:
-    f = open( os.path.join( os.path.realpath( os.path.dirname( sys.argv[0] ) ), 'build-info' ), 'r' )
-    githash = f.read()
-    githash = githash[:-1]
-    f.close()
-except IOError:
-    pass
-if not githash:
-    sys.exit( "Must run 'make deps' before running." )
-
 import tokens
 from tokens.gameevent import *
 import sys, os
@@ -52,6 +26,7 @@ get_time = time.time
 if platform.system() == 'Windows':
     get_time = time.clock
 
+__version__ = "5.0.1_beta1"
 def get_psf_version_string():
     return "Space Fortress 5"
 
@@ -141,7 +116,7 @@ class Game( object ):
             if hasattr( self.plugins[name], 'eventCallback' ):
                 self.gameevents.addCallback( self.plugins[name].eventCallback )
 
-        self.gameevents.add( "game", "version", githash, type = 'EVENT_SYSTEM' )
+        self.gameevents.add( "game", "version", __version__, type = 'EVENT_SYSTEM' )
 
         self.config = defaults.get_config()
         if os.path.isfile( 'config.json' ):
@@ -215,7 +190,7 @@ class Game( object ):
                 sys.exit()
 
         d = datetime.datetime.now().timetuple()
-        base = "SpaceFortress-%s_%s_%d-%d-%d_%d-%d-%d" % ( githash, self.config.get_setting( 'General', 'id' ), d[0], d[1], d[2], d[3], d[4], d[5] )
+        base = "SpaceFortress-%s_%s_%d-%d-%d_%d-%d-%d" % ( __version__, self.config.get_setting( 'General', 'id' ), d[0], d[1], d[2], d[3], d[4], d[5] )
         logdir = self.config.get_setting( 'Logging', 'logdir' )
         if not os.path.exists( logdir ):
             os.makedirs( logdir )
@@ -1234,7 +1209,7 @@ class Game( object ):
         title_rect.center = ( self.SCREEN_WIDTH / 2, self.SCREEN_HEIGHT / 5 )
         fh = int( self.SCREEN_HEIGHT / 72 )
         font2 = pygame.font.Font( self.fp, fh )
-        vers = font2.render( 'Version: %s' % ( githash ), True, ( 255, 200, 100 ) )
+        vers = font2.render( 'Version: %s' % ( __version__ ), True, ( 255, 200, 100 ) )
         vers_rect = vers.get_rect()
         vers_rect.center = ( self.SCREEN_WIDTH / 2, 4 * self.SCREEN_HEIGHT / 5 - fh / 2 - 2 )
         copy = font2.render( 'Copyright \xa92011 CogWorks Laboratory, Rensselaer Polytechnic Institute', True, ( 255, 200, 100 ) )
