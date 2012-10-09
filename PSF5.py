@@ -133,6 +133,9 @@ class Game( object ):
 
         pygame.display.init()
         pygame.font.init()
+        
+        pygame.event.set_blocked((pygame.MOUSEMOTION, pygame.MOUSEBUTTONUP, pygame.MOUSEBUTTONDOWN))
+        
         mode_list = pygame.display.list_modes()
         if self.config['Display']['display_mode'] == 'Windowed':
 			for mode in mode_list:
