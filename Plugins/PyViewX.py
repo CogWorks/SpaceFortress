@@ -30,14 +30,14 @@ try:
             self.null_data = ["NA"] * len( self.header )
     
         def ready( self ):
-            if self.app.config.get_setting( self.name, 'enabled' ):
-                self.client = iViewXClient( self.app.config.get_setting( self.name, 'server_address' ), int( self.app.config.get_setting( 'PyViewX', 'server_outport' ) ) )
+            if self.app.config[self.name]['enabled']:
+                self.client = iViewXClient( self.app.config[self.name]['server_address'], int( self.app.config['PyViewX']['server_outport'] ) )
                 self.client.addDispatcher( self.d )
                 if self.client:
-                    if self.app.config.get_setting( self.name, 'calmode' ) == 'Once':
+                    if self.app.config[self.name]['calmode'] == 'Once':
                         self.post_calibrate_mode = self.app.state
                         self.app.state = self.app.STATE_CALIBRATE
-                    self.app.reactor.listenUDP( int( self.app.config.get_setting( self.name, 'server_inport' ) ), self.client )
+                    self.app.reactor.listenUDP( int( self.app.config[self.name]['server_inport'] ), self.client )
                     self.startDataStreaming()
     
         def logHeader( self ):
@@ -55,7 +55,7 @@ try:
         @d.listen( 'ET_SPL' )
         def iViewXEvent( self, inSender, inEvent, inResponse ):
             self.eye_data = inResponse
-            if self.app.config.get_setting( 'Logging', 'logging' ) and self.app.config.get_setting( 'Logging', 'logDriver' ) == 'PyViewX:Samples':
+            if self.app.config['Logging']['logging'] and self.app.config['Logging']['logDriver'] == 'PyViewX:Samples':
                 self.app.log_world()
     
         def startDataStreaming( self ):
@@ -95,13 +95,13 @@ try:
                 if args[4] == 'setmode':
                     if self.client:
                         self.calibrator = Calibrator( self.client, self.app.screen, reactor = self.app.reactor )
-                        if self.app.config.get_setting( self.name, 'calmode' ) == 'Once':
+                        if self.app.config[self.name]['calmode'] == 'Once':
                             self.app.reactor.callLater( 1, self.calibrate, False )
     
             elif args[3] == 'game':
     
                 if args[4] == 'ready':
-                    if self.client and self.app.config.get_setting( self.name, 'calmode' ) == 'Every Game':
+                    if self.client and self.app.config[self.name]['calmode'] == 'Every Game':
                         self.calibrate( True )
 
 except ImportError:

@@ -26,11 +26,11 @@ class Mine(token.Token):
         self.position.y = 0 #400
         self.app = app
         #set random pos
-        self.speed = self.app.config.get_setting('Mine','mine_speed')
+        self.speed = self.app.config['Mine']['mine_speed']
         self.health = 1
         self.alive = True
-        self.collision_radius = self.app.config.get_setting('Mine','mine_radius')*self.app.aspect_ratio
-        self.foe_probability = self.app.config.get_setting('Mine','mine_probability')
+        self.collision_radius = self.app.config['Mine']['mine_radius']*self.app.aspect_ratio
+        self.foe_probability = self.app.config['Mine']['mine_probability']
         self.iff = None
         self.tagged = "untagged"
         self.color = (0, 255, 255)
@@ -42,7 +42,7 @@ class Mine(token.Token):
             self.type = type
         else:
             self.type = random.choice(range(0,len(mine_types)))
-        if self.app.config.get_setting('Graphics','fancy'):
+        if self.app.config['Graphics']['fancy']:
             img = mine_types[self.type]
             self.mine = picture.Picture(os.path.join(self.app.approot, img), 64*self.app.aspect_ratio/128, self.orientation)
                 
@@ -60,7 +60,7 @@ class Mine(token.Token):
         
     def draw(self, worldsurf):
         """draws mine to worldsurf"""
-        if self.app.config.get_setting('Graphics','fancy'):
+        if self.app.config['Graphics']['fancy']:
             self.mine.rect.centerx = self.position.x
             self.mine.rect.centery = self.position.y
             worldsurf.blit(self.mine.image, self.mine.rect)
@@ -79,32 +79,32 @@ class MineList(list):
         super(MineList, self).__init__()
         self.app = app
         self.mine_count = 0
-        self.mine_mode = self.app.config.get_setting('Mine','mine_mode')
-        self.minimum_spawn_distance = self.app.config.get_setting('Mine','minimum_spawn_distance')
-        self.maximum_spawn_distance = self.app.config.get_setting('Mine','maximum_spawn_distance')
-        self.iff_lower_bound = self.app.config.get_setting('Mine','intrvl_min')
-        self.iff_upper_bound = self.app.config.get_setting('Mine','intrvl_max')
-        self.num_foes = self.app.config.get_setting('Mine','num_foes')
+        self.mine_mode = self.app.config['Mine']['mine_mode']
+        self.minimum_spawn_distance = self.app.config['Mine']['minimum_spawn_distance']
+        self.maximum_spawn_distance = self.app.config['Mine']['maximum_spawn_distance']
+        self.iff_lower_bound = self.app.config['Mine']['intrvl_min']
+        self.iff_upper_bound = self.app.config['Mine']['intrvl_max']
+        self.num_foes = self.app.config['Mine']['num_foes']
         self.letters = list(string.letters[26:]) #list of uppercase letters
         self.generate_foes()
-        self.timeout = self.app.config.get_setting('Mine','mine_timeout') #milliseconds after spawn when mine "gives up"
-        self.spawn_time = self.app.config.get_setting('Mine','mine_spawn') #milliseconds after destruction when mine "respawns"
+        self.timeout = self.app.config['Mine']['mine_timeout'] #milliseconds after spawn when mine "gives up"
+        self.spawn_time = self.app.config['Mine']['mine_spawn'] #milliseconds after destruction when mine "respawns"
         self.timer = timer.Timer()
         self.flag = False #for timer, to determine state of standard mine
         self.iff_timer = timer.Timer()
         self.iff_flag = False #are we in the middle of trying to identify a foe mine?
         #MOT constants
         self.f = pygame.font.Font(self.app.fp, 14)
-        self.MOT_count = self.app.config.get_setting('MOT','MOT_count')
+        self.MOT_count = self.app.config['MOT']['MOT_count']
         self.MOT_state = "off" #states are off, onset, move, identify
-        self.MOT_off_time = self.app.config.get_setting('MOT','MOT_off_time')
-        self.MOT_onset_time = self.app.config.get_setting('MOT','MOT_onset_time')
-        self.MOT_move_time = self.app.config.get_setting('MOT','MOT_move_time')     
-        self.MOT_switch_time = self.app.config.get_setting('MOT','MOT_switch_time')
-        self.MOT_max_deflection = self.app.config.get_setting('MOT','MOT_max_deflection')
-        self.MOT_movement_style = self.app.config.get_setting('MOT','MOT_movement_style')
-        self.MOT_identification_time = self.app.config.get_setting('MOT','MOT_identification_time')
-        self.MOT_identification_type = self.app.config.get_setting('MOT','MOT_identification_type')
+        self.MOT_off_time = self.app.config['MOT']['MOT_off_time']
+        self.MOT_onset_time = self.app.config['MOT']['MOT_onset_time']
+        self.MOT_move_time = self.app.config['MOT']['MOT_move_time']
+        self.MOT_switch_time = self.app.config['MOT']['MOT_switch_time']
+        self.MOT_max_deflection = self.app.config['MOT']['MOT_max_deflection']
+        self.MOT_movement_style = self.app.config['MOT']['MOT_movement_style']
+        self.MOT_identification_time = self.app.config['MOT']['MOT_identification_time']
+        self.MOT_identification_type = self.app.config['MOT']['MOT_identification_type']
         self.MOT_timer = timer.Timer() #determines when MOT mines change state
         self.MOT_switch_timer = timer.Timer() #determine when moving MOT mine changes direction
         

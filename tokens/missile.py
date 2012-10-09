@@ -23,11 +23,11 @@ class Missile(token.Token):
             self.orientation = self.app.ship.orientation
         self.position.x = self.app.ship.nose[0]
         self.position.y = self.app.ship.nose[1]
-        self.collision_radius = self.app.config.get_setting('Missile','missile_radius')*self.app.aspect_ratio
-        self.speed = self.app.config.get_setting('Missile','missile_speed')
+        self.collision_radius = self.app.config['Missile']['missile_radius']*self.app.aspect_ratio
+        self.speed = self.app.config['Missile']['missile_speed']
         self.velocity.x = math.cos(math.radians((self.orientation) % 360)) * self.speed
         self.velocity.y = -math.sin(math.radians((self.orientation) % 360)) * self.speed
-        if self.app.config.get_setting('Graphics','fancy'):
+        if self.app.config['Graphics']['fancy']:
             self.missile = picture.Picture(os.path.join(self.app.approot, 'gfx/plasma-blue-small.png'), 25*self.app.aspect_ratio/29, self.orientation-90)
         
     def compute(self):
@@ -54,7 +54,7 @@ class Missile(token.Token):
         self.x4 = ((-5 * self.cosphi) - (-5 * self.sinphi))*self.app.aspect_ratio + self.position.x
         self.y4 = (-((-5 * self.cosphi) + (-5 * self.sinphi)))*self.app.aspect_ratio + self.position.y
         
-        if self.app.config.get_setting('Graphics','fancy'):
+        if self.app.config['Graphics']['fancy']:
             self.missile.rect.centerx = self.position.x
             self.missile.rect.centery = self.position.y
             worldsurf.blit(self.missile.image, self.missile.rect)

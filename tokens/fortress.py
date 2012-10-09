@@ -20,19 +20,19 @@ class Fortress(token.Token):
     def __init__(self, app):
         super(Fortress, self).__init__()
         self.app = app
-        self.position.x = int(self.app.config.get_setting('Fortress','fortress_pos_x')*self.app.aspect_ratio)
-        self.position.y = int(self.app.config.get_setting('Fortress','fortress_pos_y')*self.app.aspect_ratio)
-        self.collision_radius = self.app.config.get_setting('Fortress','fortress_radius')*self.app.aspect_ratio
+        self.position.x = int(self.app.config['Fortress']['fortress_pos_x']*self.app.aspect_ratio)
+        self.position.y = int(self.app.config['Fortress']['fortress_pos_y']*self.app.aspect_ratio)
+        self.collision_radius = self.app.config['Fortress']['fortress_radius']*self.app.aspect_ratio
         self.last_orientation = self.orientation 
-        if self.app.config.get_setting('General','player') == 'Model':
+        if self.app.config['General']['player'] == 'Model':
             self.timer = frame_timer(self.app)
         else:
             self.timer = clock_timer()
-        self.sector_size = self.app.config.get_setting('Fortress','fortress_sector_size')
-        self.lock_time = self.app.config.get_setting('Fortress','fortress_lock_time')
+        self.sector_size = self.app.config['Fortress']['fortress_sector_size']
+        self.lock_time = self.app.config['Fortress']['fortress_lock_time']
         self.reset_timer = clock_timer()
         self.alive = True
-        if self.app.config.get_setting('Graphics','fancy'):
+        if self.app.config['Graphics']['fancy']:
             self.fortress = picture.Picture(os.path.join(self.app.approot, 'psf5.png'), (72*self.app.aspect_ratio)/128)
         
   
@@ -81,7 +81,7 @@ class Fortress(token.Token):
         x6 = - (18 * self.sinphi)*self.app.aspect_ratio + self.position.x
         y6 = -(18 * self.cosphi)*self.app.aspect_ratio + self.position.y
         
-        if self.app.config.get_setting('Graphics','fancy'):
+        if self.app.config['Graphics']['fancy']:
             fortress = pygame.transform.rotate(self.fortress.image, self.orientation-90)
             fortressrect = fortress.get_rect()
             fortressrect.centerx = self.position.x

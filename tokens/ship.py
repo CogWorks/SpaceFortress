@@ -17,39 +17,39 @@ class Ship(token.Token):
     def __init__(self, app):
         super(Ship, self).__init__()
         self.app = app
-        self.collision_radius = self.app.config.get_setting('Ship','ship_radius')*self.app.aspect_ratio
-        self.position.x = self.app.config.get_setting('Ship','ship_pos_x')*self.app.aspect_ratio
-        self.position.y = self.app.config.get_setting('Ship','ship_pos_y')*self.app.aspect_ratio
+        self.collision_radius = self.app.config['Ship']['ship_radius']*self.app.aspect_ratio
+        self.position.x = self.app.config['Ship']['ship_pos_x']*self.app.aspect_ratio
+        self.position.y = self.app.config['Ship']['ship_pos_y']*self.app.aspect_ratio
         self.nose = (self.position.x, self.position.y)
-        self.velocity.x = self.app.config.get_setting('Ship','ship_vel_x')
-        self.velocity.y = self.app.config.get_setting('Ship','ship_vel_y')
-        self.orientation = self.app.config.get_setting('Ship','ship_orientation')
-        self.missile_capacity = self.app.config.get_setting('Missile','missile_max')
-        self.missile_count = self.app.config.get_setting('Missile','missile_num')
+        self.velocity.x = self.app.config['Ship']['ship_vel_x']
+        self.velocity.y = self.app.config['Ship']['ship_vel_y']
+        self.orientation = self.app.config['Ship']['ship_orientation']
+        self.missile_capacity = self.app.config['Missile']['missile_max']
+        self.missile_count = self.app.config['Missile']['missile_num']
         self.thrust_flag = False
         self.thrust = 0
         self.turn_left_flag = False
         self.turn_right_flag = False
         self.fire_flag = False
-        self.turn_speed = self.app.config.get_setting('Ship','ship_turn_speed')
+        self.turn_speed = self.app.config['Ship']['ship_turn_speed']
         self.acceleration = 0
-        self.acceleration_factor = self.app.config.get_setting('Ship','ship_acceleration')
-        self.start_health = self.app.config.get_setting('Ship','ship_hit_points')
-        self.health = self.app.config.get_setting('Ship','ship_hit_points')
-        self.max_vel = self.app.config.get_setting('Ship','ship_max_vel')
+        self.acceleration_factor = self.app.config['Ship']['ship_acceleration']
+        self.start_health = self.app.config['Ship']['ship_hit_points']
+        self.health = self.app.config['Ship']['ship_hit_points']
+        self.max_vel = self.app.config['Ship']['ship_max_vel']
         self.alive = True
         self.small_hex_flag = False #did we hit the small hex?
         self.shot_timer = Timer() #time between shots, for VLNER assessment
         self.joy_turn = 0.0
         self.joy_thrust = 0.0
         self.invert_x = 1.0
-        if self.app.config.get_setting('Joystick','invert_x'):
+        if self.app.config['Joystick']['invert_x']:
             self.invert_x = -1.0
         self.invert_y = 1.0
-        if self.app.config.get_setting('Joystick','invert_y'):
+        if self.app.config['Joystick']['invert_y']:
             self.invert_y = -1.0
         self.color = (255,255,0)
-        if self.app.config.get_setting('Graphics','fancy'):
+        if self.app.config['Graphics']['fancy']:
             self.ship = picture.Picture(os.path.join(self.app.approot, 'gfx/ship.png'), 48*self.app.aspect_ratio/128)
             self.ship2 = picture.Picture(os.path.join(self.app.approot, 'gfx/ship2.png'), 66*self.app.aspect_ratio/175)
             self.shields = []
@@ -111,16 +111,16 @@ class Ship(token.Token):
 
     def fire(self):
         """fires missile"""
-        if self.app.config.get_setting('General','next_gen'):
+        if self.app.config['General']['next_gen']:
             if self.app.score.shots > 0:
                 self.app.missile_list.append(missile.Missile(self.app))
                 self.app.sounds.missile_fired.play()
                 self.app.score.shots -= 1
             else:
                 self.app.sounds.empty.play()
-                if self.app.config.get_setting('Missile','empty_penalty'):
-                    self.app.score.pnts -= self.app.config.get_setting('Missile','missile_penalty')
-                    self.app.score.bonus -= self.app.config.get_setting('Missile','missile_penalty')
+                if self.app.config['Missile']['empty_penalty']:
+                    self.app.score.pnts -= self.app.config['Missile']['missile_penalty']
+                    self.app.score.bonus -= self.app.config['Missile']['missile_penalty']
         else:
             self.app.missile_list.append(missile.Missile(self.app))
             self.app.sounds.missile_fired.play()
@@ -128,8 +128,8 @@ class Ship(token.Token):
                 self.app.score.shots -= 1
             else:
                 self.app.sounds.empty.play()
-                self.app.score.pnts -= self.app.config.get_setting('Missile','missile_penalty')
-                self.app.score.bonus -= self.app.config.get_setting('Missile','missile_penalty')
+                self.app.score.pnts -= self.app.config['Missile']['missile_penalty']
+                self.app.score.bonus -= self.app.config['Missile']['missile_penalty']
 
     def draw(self, worldsurf):
         """draw ship to worldsurf"""
@@ -157,7 +157,7 @@ class Ship(token.Token):
         x5 = (-18 * self.cosphi - -18 * self.sinphi)*self.app.aspect_ratio + self.position.x
         y5 = (-((-18 * self.cosphi) + (-18 * self.sinphi)))*self.app.aspect_ratio + self.position.y
 
-        if self.app.config.get_setting('Graphics','fancy'):
+        if self.app.config['Graphics']['fancy']:
             if not self.thrust_flag:
                 ship = pygame.transform.rotate(self.ship.image, self.orientation-90)
             else:

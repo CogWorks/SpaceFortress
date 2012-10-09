@@ -8,11 +8,12 @@ class MyEncoder(JSONEncoder):
     def default(self, o):
         return o.__dict__
 
-class Config():
+class Config(dict):
         
     def __init__(self, user_file=None):
         self.config = OrderedDict()
         self.user_file = user_file
+        self.update(self.get_running_config())
         
     def set_user_file(self, user_file):
         self.user_file = user_file
@@ -34,6 +35,7 @@ class Config():
             self.config[category][setting]['type'] = type
             for k in kwargs:
                 self.config[category][setting][k] = kwargs[k]
+        self.update(self.get_running_config())
         
     def get_setting(self, category, setting, complete=False):
         assert category!=None, 'Must specify a category'
@@ -53,6 +55,7 @@ class Config():
         if self.config.has_key(category):
             if self.config[category].has_key(setting):
                 self.config[category][setting]['value'] = value
+                self.update(self.get_running_config())
     
     def get_settings(self, category):
         assert category!=None, 'Must specify a category'
@@ -77,11 +80,13 @@ class Config():
             with open(self.user_file, 'r') as f:
                 return self.update_from_string(f.read())
             
+    def get_running_config(self):
+        tmpCfg = {}
+        for category in self.config.keys():
+            tmpCfg[category] = {}
+            for setting in self.config[category].keys():
+                tmpCfg[category][setting] = self.config[category][setting]['value']
+        return tmpCfg
+            
     def __str__(self):
-        tmpCfg = copy.deepcopy(self.config)
-        for category in tmpCfg.keys():
-            for setting in tmpCfg[category].keys():
-                for info in tmpCfg[category][setting].keys():
-                    if info != 'value':
-                        del tmpCfg[category][setting][info]
-        return json.dumps(tmpCfg, separators=(',',':'),sort_keys=True)        
+        return json.dumps(self.get_running_config(), separators=(',',':'),sort_keys=True)        

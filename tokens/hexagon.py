@@ -17,9 +17,9 @@ class Hex(token.Token):
         self.app = app
         self.original_radius = radius
         self.radius = radius*self.app.aspect_ratio
-        self.x = self.app.config.get_setting('Hexagon','hex_pos_x')*self.app.aspect_ratio
-        self.y = self.app.config.get_setting('Hexagon','hex_pos_y')*self.app.aspect_ratio
-        self.shrink_radius = self.app.config.get_setting('Hexagon','hex_shrink_radius')
+        self.x = self.app.config['Hexagon']['hex_pos_x']*self.app.aspect_ratio
+        self.y = self.app.config['Hexagon']['hex_pos_y']*self.app.aspect_ratio
+        self.shrink_radius = self.app.config['Hexagon']['hex_shrink_radius']
         self.set_points(self.radius)
         self.small_hex_flag = False #simple flag to prevent ship getting "stuck" in small hex
         self.color = (0,255,0)
@@ -56,7 +56,7 @@ class Hex(token.Token):
         #original radius at beginning, shrink radius at end
         
         #how far through are we? 
-        percent_time = self.app.gametimer.elapsed() / self.app.config.get_setting('General','game_time')
+        percent_time = self.app.gametimer.elapsed() / self.app.config['General']['game_time']
         
         #scale to new radius based on percent time that's elapsed
         self.radius = self.original_radius - percent_time * (self.original_radius - self.shrink_radius)

@@ -31,30 +31,30 @@ try:
 
                 elif args[5] == 'user':
 
-                    if self.app.config.get_setting('CogWorks Exp','subject_window'):
+                    if self.app.config['CogWorks Exp']['subject_window']:
 
                         self.subjectInfo = getSubjectInfo(minimal=True)
                         if self.subjectInfo:
                             eid = rin2id(self.subjectInfo['rin'])
                             self.app.config.update_setting_value("General","id",eid[:8])
-                            if self.app.config.get_setting('CogWorks Exp','subdir'):
-                                self.app.config.update_setting_value( 'Logging', 'logdir', os.path.join(self.app.config.get_setting( 'Logging', 'logdir'),eid[:8]))
+                            if self.app.config['CogWorks Exp']['subdir']:
+                                self.app.config.update_setting_value( 'Logging', 'logdir', os.path.join(self.app.config[ 'Logging']['logdir'],eid[:8]))
                         else:
                             sys.exit()
 
-                    self.expRoom = self.app.config.get_setting('CogWorks Exp','experiment_room').strip()
+                    self.expRoom = self.app.config['CogWorks Exp']['experiment_room'].strip()
 
             elif args[3] == 'log':
 
                 if args[4] == 'basename' and args[5] == 'ready':
-                    if self.app.config.get_setting('CogWorks Exp','subject_window') and self.subjectInfo:
+                    if self.app.config['CogWorks Exp']['subject_window'] and self.subjectInfo:
                         eid = rin2id( self.subjectInfo['rin'] )
                         self.subjectInfo['encrypted_rin'] = eid
                         self.subjectInfo['cipher'] = 'AES/CBC (RIJNDAEL) - 16Byte Key'
                         writeHistoryFile( self.app.log_basename, self.subjectInfo )
 
                 elif args[4] == 'header' and args[5] == 'ready':
-                    if self.app.config.get_setting('CogWorks Exp','subject_window'):
+                    if self.app.config['CogWorks Exp']['subject_window']:
                         self.app.gameevents.add("participant", "encrypted_rin", self.subjectInfo['encrypted_rin'], type='EVENT_SYSTEM')
                     if self.expRoom and len(self.expRoom) > 0:
                         self.app.gameevents.add("experiment", "room", self.expRoom, type='EVENT_SYSTEM')

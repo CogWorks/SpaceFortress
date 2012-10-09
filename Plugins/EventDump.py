@@ -17,7 +17,7 @@ class SF5Plugin(object):
                 self.app.config.add_setting('Logging', 'print_events', False, alias='Print Events', type=2, about='Print events to stdout')
                 
             elif args[5] == 'user':
-                self.print_events = self.app.config.get_setting('Logging','print_events')
+                self.print_events = self.app.config['Logging']['print_events']
 
         if self.print_events and kwargs['log']:
             print args

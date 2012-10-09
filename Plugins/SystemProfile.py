@@ -32,7 +32,7 @@ class SF5Plugin(object):
         
                 if args[4] == 'header' and args[5] == 'ready':
                     
-                    if self.app.config.get_setting('SystemProfile','log_mac_hw'):
+                    if self.app.config['SystemProfile']['log_mac_hw']:
                         info = getHWInfo()
                         self.app.gameevents.add("exp_hw", "model", info['Model Identifier'], type='EVENT_SYSTEM')
                         self.app.gameevents.add("exp_hw", "processor", info['Processor Name'], type='EVENT_SYSTEM')

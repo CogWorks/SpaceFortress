@@ -20,11 +20,11 @@ class Shell(token.Token):
         self.orientation = orientation
         self.position.x = self.app.fortress.position.x
         self.position.y = self.app.fortress.position.y
-        self.speed = self.app.config.get_setting('Shell','shell_speed')
+        self.speed = self.app.config['Shell']['shell_speed']
         self.collision_radius = 3*self.app.aspect_ratio
         self.velocity.x = math.cos(math.radians((self.orientation) % 360)) * self.speed
         self.velocity.y = -math.sin(math.radians((self.orientation) % 360)) * self.speed
-        if self.app.config.get_setting('Graphics','fancy'):
+        if self.app.config['Graphics']['fancy']:
             self.shell = picture.Picture(os.path.join(self.app.approot, 'gfx/plasma-red-big.png'), 24*self.app.aspect_ratio/43, self.orientation-90)
         
     def compute(self):
@@ -50,7 +50,7 @@ class Shell(token.Token):
         x4 = -(6 * self.sinphi)*self.app.aspect_ratio + self.position.x
         y4 = -(6 * self.cosphi)*self.app.aspect_ratio + self.position.y
         
-        if self.app.config.get_setting('Graphics','fancy'):
+        if self.app.config['Graphics']['fancy']:
             self.shell.rect.centerx = self.position.x
             self.shell.rect.centery = self.position.y
             worldsurf.blit(self.shell.image, self.shell.rect)

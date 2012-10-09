@@ -13,46 +13,46 @@ class Bonus(object):
     def __init__(self, app):
         super(Bonus, self).__init__()
         self.app = app
-        self.symbols = self.app.config.get_setting('Bonus','non_bonus_symbols')
+        self.symbols = self.app.config['Bonus']['non_bonus_symbols']
         self.set_bonus_location()
         self.visible = False
         self.font = pygame.font.Font(self.app.fp, int(28*self.app.aspect_ratio))
-        self.bonus_symbol = self.app.config.get_setting('Bonus','bonus_symbol')
+        self.bonus_symbol = self.app.config['Bonus']['bonus_symbol']
         self.current_symbol = None
         self.prior_symbol = None
-        if self.app.config.get_setting('General','bonus_system') == "AX-CPT":
+        if self.app.config['General']['bonus_system'] == "AX-CPT":
             self.bonus_count = 1
         else:
             self.bonus_count = 0
         self.flag = False
-        self.probability = self.app.config.get_setting('Bonus','bonus_probability')
+        self.probability = self.app.config['Bonus']['bonus_probability']
         self.timer = Timer()
         #new attributes for AX-CPT
-        self.cue_time = self.app.config.get_setting('AX-CPT','cue_visibility')
-        self.target_time = self.app.config.get_setting('AX-CPT','target_visibility')
-        self.isi_time = self.app.config.get_setting('AX-CPT','isi_time')
-        self.iti_time = self.app.config.get_setting('AX-CPT','iti_time')
-        self.state = self.app.config.get_setting('AX-CPT','state')
-        self.ax_prob = self.app.config.get_setting('AX-CPT','ax_prob')
-        self.ay_prob = self.app.config.get_setting('AX-CPT','ay_prob')
-        self.bx_prob = self.app.config.get_setting('AX-CPT','bx_prob')
-        self.by_prob = self.app.config.get_setting('AX-CPT','by_prob')
-        self.a_symbols = self.app.config.get_setting('AX-CPT','a_symbols')
-        self.b_symbols = self.app.config.get_setting('AX-CPT','b_symbols')
-        self.x_symbols = self.app.config.get_setting('AX-CPT','x_symbols')
-        self.y_symbols = self.app.config.get_setting('AX-CPT','y_symbols')
+        self.cue_time = self.app.config['AX-CPT']['cue_visibility']
+        self.target_time = self.app.config['AX-CPT']['target_visibility']
+        self.isi_time = self.app.config['AX-CPT']['isi_time']
+        self.iti_time = self.app.config['AX-CPT']['iti_time']
+        self.state = self.app.config['AX-CPT']['state']
+        self.ax_prob = self.app.config['AX-CPT']['ax_prob']
+        self.ay_prob = self.app.config['AX-CPT']['ay_prob']
+        self.bx_prob = self.app.config['AX-CPT']['bx_prob']
+        self.by_prob = self.app.config['AX-CPT']['by_prob']
+        self.a_symbols = self.app.config['AX-CPT']['a_symbols']
+        self.b_symbols = self.app.config['AX-CPT']['b_symbols']
+        self.x_symbols = self.app.config['AX-CPT']['x_symbols']
+        self.y_symbols = self.app.config['AX-CPT']['y_symbols']
         self.current_pair = "nothing" #either "ax", "ay", "bx", or "by"
         self.current_symbols = self.pick_next_pair()
         self.axcpt_flag = False #bonus is capturable
         
     def set_bonus_location(self):
-        if self.app.config.get_setting('General','bonus_location') == 'Random':
+        if self.app.config['General']['bonus_location'] == 'Random':
             self.x = random.randint(30, self.app.WORLD_WIDTH - 30)
             self.y = random.randint(30, self.app.WORLD_HEIGHT - 30)
-        elif self.app.config.get_setting('General','bonus_location') == 'Probabilistic':
+        elif self.app.config['General']['bonus_location'] == 'Probabilistic':
             w = self.app.WORLD_WIDTH / 5
             h = self.app.WORLD_HEIGHT / 5
-            probs = map(float,self.app.config.get_setting('Bonus','quadrant_probs').split(','))
+            probs = map(float,self.app.config['Bonus']['quadrant_probs'].split(','))
             if random.random() <= probs[0]:
                 self.x = w
                 self.y = h
@@ -66,8 +66,8 @@ class Bonus(object):
                 self.x = w*4
                 self.y = h*4
         else:
-            self.x = self.app.config.get_setting('Bonus','bonus_pos_x')*self.app.aspect_ratio
-            self.y = self.app.config.get_setting('Bonus','bonus_pos_y')*self.app.aspect_ratio
+            self.x = self.app.config['Bonus']['bonus_pos_x']*self.app.aspect_ratio
+            self.y = self.app.config['Bonus']['bonus_pos_y']*self.app.aspect_ratio
         
     def draw(self, worldsurf):
         """draws bonus symbol to screen"""
