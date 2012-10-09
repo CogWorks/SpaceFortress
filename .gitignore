@@ -2,6 +2,7 @@
 .pydevproject
 .project
 *.pyc
+*.pyo
 config.txt
 *.dat
 .directory

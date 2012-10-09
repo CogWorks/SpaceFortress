@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python -O
 from __future__ import division
 import subprocess, os, sys, platform, math, copy
 from random import randrange, choice
