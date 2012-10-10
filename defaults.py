@@ -102,7 +102,6 @@ def get_config():
     cfg.add_setting( 'Keybindings', 'pnts_key', 'l', alias = 'Points Bonus', type = CT_COMBO, options = PYGAME_KEYS )
     cfg.add_setting( 'Keybindings', 'IFF_key', 'j', alias = 'Identify Friend or Foe', type = CT_COMBO, options = PYGAME_KEYS )
     cfg.add_setting( 'Keybindings', 'pause_key', 'p', alias = 'Pause', type = CT_COMBO, options = PYGAME_KEYS )
-    cfg.add_setting( 'Keybindings', 'screenshot_key', 'RETURN', alias = 'Screenshot', type = CT_COMBO, options = PYGAME_KEYS )
 
     cfg.add_setting( 'Ship', 'ship_acceleration', 0.3, 'Ship acceleration factor', type = CT_DBLSPINBOX )
     cfg.add_setting( 'Ship', 'ship_hit_points', 4, 'Number of hits ship takes before it is destroyed' )

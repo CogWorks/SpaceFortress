@@ -289,7 +289,6 @@ class Game( object ):
         self.pnts_key = eval( "pygame.K_%s" % self.config['Keybindings']['pnts_key'] )
 
         self.pause_key = eval( "pygame.K_%s" % self.config['Keybindings']['pause_key'])
-        self.screenshot_key = eval( "pygame.K_%s" % self.config['Keybindings']['screenshot_key'])
 
         self.sounds = tokens.sounds.Sounds( self )
         if self.config['Display']['display_mode'] == 'Fullscreen' or self.config['Display']['display_mode'] == 'Current':
@@ -485,11 +484,10 @@ class Game( object ):
                             self.gameevents.add( "press", "shots", type = 'EVENT_USER' )
                         elif event.key == self.pnts_key:
                             self.gameevents.add( "press", "pnts", type = 'EVENT_USER' )
-                        elif event.key == self.screenshot_key:
-                            pygame.image.save( self.screen, "screenshot.jpeg" )
-
                         elif event.key == self.pause_key and self.config['General']['allow_pause']:
                             self.gameevents.add( "press", "pause", type = 'EVENT_USER' )
+                        else:
+                            self.gameevents.add( "press", event.key, "user", type = 'EVENT_SYSTEM' )
 
 
                 elif event.type == pygame.KEYUP:
