@@ -4,8 +4,8 @@ import sys, os
 from PySide.QtGui import *
 
 import defaults
-from config.editor import ConfigEditor
-    
+from jsonConfig import ConfigEditor
+
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     cfg = defaults.get_config()
