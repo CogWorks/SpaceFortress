@@ -49,7 +49,7 @@ class Score(object):
         #indexed array of what score goes in which position. Setting it to 9 to use indicies 1-8
         self.position_map = {}
         for key in ('VLNER_pos', 'IFF_pos', 'INTRVL_pos', 'SHOTS_pos',
-                    'PNTS_pos','CNTRL_pos', 'VLCTY_pos', 'SPEED_pos'):
+                    'PNTS_pos', 'CNTRL_pos', 'VLCTY_pos', 'SPEED_pos'):
             self.position_map[key] = self.app.config['Score'][key]
         num_positions = max(self.position_map.values()) + 1
         self.positions = [0] * num_positions
@@ -91,31 +91,31 @@ class Score(object):
         self.NEW_SCORE_X_C_LEFT = half_width - 192 * self.app.aspect_ratio
         self.NEW_SCORE_X_C_RIGHT = half_width + 148 * self.app.aspect_ratio
         if self.app.config['General']['next_gen']:
-            self.NEW_SCORE_X_R_RIGHT = half_width + 456*self.app.aspect_ratio
+            self.NEW_SCORE_X_R_RIGHT = half_width + 456 * self.app.aspect_ratio
             self.NEW_SCORE_X_L_LEFT = half_width - 460 * self.app.aspect_ratio
         else:
-            self.NEW_SCORE_X_R_RIGHT = half_width + 428*self.app.aspect_ratio
+            self.NEW_SCORE_X_R_RIGHT = half_width + 428 * self.app.aspect_ratio
             self.NEW_SCORE_X_L_LEFT = half_width - 432 * self.app.aspect_ratio
 
         self.scores_locations = []
         if self.app.config['Score']['new_scoring_pos']:
-            self.scores_locations.append((self.NEW_SCORE_X_C_LEFT,self.NEW_SCORE_Y_C_BOTTOM))
-            self.scores_locations.append((self.NEW_SCORE_X_C_RIGHT,self.NEW_SCORE_Y_C_BOTTOM))
-            self.scores_locations.append((self.NEW_SCORE_X_R_RIGHT,self.NEW_SCORE_Y_LR_TOP))
-            self.scores_locations.append((self.NEW_SCORE_X_R_RIGHT,self.NEW_SCORE_Y_LR_BOTTOM))
-            self.scores_locations.append((self.NEW_SCORE_X_C_RIGHT,self.NEW_SCORE_Y_C_TOP))
-            self.scores_locations.append((self.NEW_SCORE_X_C_LEFT,self.NEW_SCORE_Y_C_TOP))
-            self.scores_locations.append((self.NEW_SCORE_X_L_LEFT,self.NEW_SCORE_Y_LR_BOTTOM))
-            self.scores_locations.append((self.NEW_SCORE_X_L_LEFT,self.NEW_SCORE_Y_LR_TOP))
+            self.scores_locations.append((self.NEW_SCORE_X_C_LEFT, self.NEW_SCORE_Y_C_BOTTOM))
+            self.scores_locations.append((self.NEW_SCORE_X_C_RIGHT, self.NEW_SCORE_Y_C_BOTTOM))
+            self.scores_locations.append((self.NEW_SCORE_X_R_RIGHT, self.NEW_SCORE_Y_LR_TOP))
+            self.scores_locations.append((self.NEW_SCORE_X_R_RIGHT, self.NEW_SCORE_Y_LR_BOTTOM))
+            self.scores_locations.append((self.NEW_SCORE_X_C_RIGHT, self.NEW_SCORE_Y_C_TOP))
+            self.scores_locations.append((self.NEW_SCORE_X_C_LEFT, self.NEW_SCORE_Y_C_TOP))
+            self.scores_locations.append((self.NEW_SCORE_X_L_LEFT, self.NEW_SCORE_Y_LR_BOTTOM))
+            self.scores_locations.append((self.NEW_SCORE_X_L_LEFT, self.NEW_SCORE_Y_LR_TOP))
         else:
-            self.scores_locations.append((self.OLD_SCORE_X_P1,self.OLD_SCORE_Y_BASE))
-            self.scores_locations.append((self.OLD_SCORE_X_P2,self.OLD_SCORE_Y_BASE))
-            self.scores_locations.append((self.OLD_SCORE_X_P3,self.OLD_SCORE_Y_BASE))
-            self.scores_locations.append((self.OLD_SCORE_X_P4,self.OLD_SCORE_Y_BASE))
-            self.scores_locations.append((self.OLD_SCORE_X_P5,self.OLD_SCORE_Y_BASE))
-            self.scores_locations.append((self.OLD_SCORE_X_P6,self.OLD_SCORE_Y_BASE))
-            self.scores_locations.append((self.OLD_SCORE_X_P7,self.OLD_SCORE_Y_BASE))
-            self.scores_locations.append((self.OLD_SCORE_X_P8,self.OLD_SCORE_Y_BASE))
+            self.scores_locations.append((self.OLD_SCORE_X_P1, self.OLD_SCORE_Y_BASE))
+            self.scores_locations.append((self.OLD_SCORE_X_P2, self.OLD_SCORE_Y_BASE))
+            self.scores_locations.append((self.OLD_SCORE_X_P3, self.OLD_SCORE_Y_BASE))
+            self.scores_locations.append((self.OLD_SCORE_X_P4, self.OLD_SCORE_Y_BASE))
+            self.scores_locations.append((self.OLD_SCORE_X_P5, self.OLD_SCORE_Y_BASE))
+            self.scores_locations.append((self.OLD_SCORE_X_P6, self.OLD_SCORE_Y_BASE))
+            self.scores_locations.append((self.OLD_SCORE_X_P7, self.OLD_SCORE_Y_BASE))
+            self.scores_locations.append((self.OLD_SCORE_X_P8, self.OLD_SCORE_Y_BASE))
 
     def update_score(self):
         """updates positions list to reflect current scores"""
@@ -142,7 +142,7 @@ class Score(object):
                 self.positions[self.position_map["VLCTY_pos"]] = self.vlcty
                 self.positions[self.position_map["CNTRL_pos"]] = self.cntrl
                 self.positions[self.position_map["SPEED_pos"]] = self.speed
-        for item in range(1,9):
+        for item in range(1, 9):
             if isinstance(self.positions[item], float):
                 self.positions[item] = int(self.positions[item])
 
@@ -151,35 +151,35 @@ class Score(object):
         #get some floats from adding fractions. Change to int for font rendering
         self.update_score()
         #print self.positions
-        self.p1_surf = self.f.render("%s"%str(self.positions[1]),0, (255,255,0))
+        self.p1_surf = self.f.render("%s" % str(self.positions[1]), 0, (255, 255, 0))
         self.p1_rect = self.p1_surf.get_rect()
         self.p1_rect.center = self.scores_locations[0]
         if self.app.config['General']['next_gen']:
-            time = (self.app.config['General']['game_time']-self.app.gametimer.elapsed()) / 1000.0
-            if (time<0): time = 0
-            self.p2_surf = self.f.render("%.1f" % (time),0, (255,255,0))
+            time = (self.app.config['General']['game_time'] - self.app.gametimer.elapsed()) / 1000.0
+            if (time < 0): time = 0
+            self.p2_surf = self.f.render("%.1f" % (time), 0, (255, 255, 0))
             self.p2_rect = self.p2_surf.get_rect()
             self.p2_rect.center = self.scores_locations[1]
         else:
-            self.p2_surf = self.f.render("%s"%str(self.positions[2]),0, (255,255,0))
+            self.p2_surf = self.f.render("%s" % str(self.positions[2]), 0, (255, 255, 0))
             self.p2_rect = self.p2_surf.get_rect()
             self.p2_rect.center = self.scores_locations[1]
-        self.p3_surf = self.f.render("%s"%str(self.positions[3]),0, (255,255,0))
+        self.p3_surf = self.f.render("%s" % str(self.positions[3]), 0, (255, 255, 0))
         self.p3_rect = self.p3_surf.get_rect()
         self.p3_rect.center = self.scores_locations[2]
-        self.p4_surf = self.f.render("%s"%str(self.positions[4]),0, (255,255,0))
+        self.p4_surf = self.f.render("%s" % str(self.positions[4]), 0, (255, 255, 0))
         self.p4_rect = self.p4_surf.get_rect()
         self.p4_rect.center = self.scores_locations[3]
-        self.p5_surf = self.f.render("%s"%str(self.positions[5]),0, (255,255,0))
+        self.p5_surf = self.f.render("%s" % str(self.positions[5]), 0, (255, 255, 0))
         self.p5_rect = self.p5_surf.get_rect()
         self.p5_rect.center = self.scores_locations[4]
-        self.p6_surf = self.f.render("%s"%str(self.positions[6]),0, (255,255,0))
+        self.p6_surf = self.f.render("%s" % str(self.positions[6]), 0, (255, 255, 0))
         self.p6_rect = self.p6_surf.get_rect()
         self.p6_rect.center = self.scores_locations[5]
-        self.p7_surf = self.f.render("%s"%str(self.positions[7]),0, (255,255,0))
+        self.p7_surf = self.f.render("%s" % str(self.positions[7]), 0, (255, 255, 0))
         self.p7_rect = self.p7_surf.get_rect()
         self.p7_rect.center = self.scores_locations[6]
-        self.p8_surf = self.f.render("%s"%str(self.positions[8]),0, (255,255,0))
+        self.p8_surf = self.f.render("%s" % str(self.positions[8]), 0, (255, 255, 0))
         self.p8_rect = self.p8_surf.get_rect()
         self.p8_rect.center = self.scores_locations[7]
         if self.app.config['Score']['new_scoring_pos']:

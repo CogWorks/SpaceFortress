@@ -13,7 +13,7 @@ if platform.system() == 'Windows':
 
 class GameEvent(object):
     """an event that happens during gameplay"""
-    def __init__(self, time, ticks, eid, command, obj=None, target=None, log=True, game=0, state=-1, type='EVENT_GAME'):
+    def __init__(self, time, ticks, eid, command, obj=None, target=None, log=True, game=0, state= -1, type='EVENT_GAME'):
         super(GameEvent, self).__init__()
         self.time = time
         self.ticks = ticks

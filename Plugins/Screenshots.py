@@ -29,7 +29,7 @@ try:
                     self.app.config.add_setting('Keybindings', 'screenshot_key', 'SLASH', alias='Screenshot', type=CT_COMBO, options=PYGAME_KEYS)
             
             if args[3] == 'press' and args[5] == 'user' and args[4] == self.screenshot_key:
-                filename = os.path.join(self.app.config['Screenshots']['screenshot_dir'],"%s.jpg" % getDateTimeStamp())
+                filename = os.path.join(self.app.config['Screenshots']['screenshot_dir'], "%s.jpg" % getDateTimeStamp())
                 pygame.image.save(self.app.screen, filename)
 
 except ImportError as e:

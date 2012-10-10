@@ -2,7 +2,7 @@ import sys
 from cx_Freeze import setup, Executable
 
 includes = []
-excludes = ['pkg_resources','email','distutils','PySide','Tkinter','nose','ssl','xml','numpy','multiprocessing']
+excludes = ['pkg_resources', 'email', 'distutils', 'PySide', 'Tkinter', 'nose', 'ssl', 'xml', 'numpy', 'multiprocessing']
 packages = []
 path = []
 icon = None
@@ -25,21 +25,21 @@ elif sys.platform == 'darwin':
 	packages = ['pygame.macosx']
 	
 spacefortress = Executable(
-	script = 'PSF5.py',
-	compress = True,
-	base = base,
-	copyDependentFiles = True,
-	appendScriptToExe = False,
-	appendScriptToLibrary = False,
-	icon = icon,
+	script='PSF5.py',
+	compress=True,
+	base=base,
+	copyDependentFiles=True,
+	appendScriptToExe=False,
+	appendScriptToLibrary=False,
+	icon=icon,
 )
 
 setup(
-	version = '5.0',
-	description = '2D frictionless space shooter for psycological research',
-	author = 'Marc Destefano and Ryan Hope',
-	name = 'SpaceFortress',
-	options = {'build_exe': {
+	version='5.0',
+	description='2D frictionless space shooter for psycological research',
+	author='Marc Destefano and Ryan Hope',
+	name='SpaceFortress',
+	options={'build_exe': {
 							'includes': includes,
 							'excludes': excludes,
 				 			'packages': packages,
@@ -47,5 +47,5 @@ setup(
                  			'include_files': include_files,
                  			'zip_includes': zip_includes
 				 }},
-	executables = [spacefortress]
+	executables=[spacefortress]
 )

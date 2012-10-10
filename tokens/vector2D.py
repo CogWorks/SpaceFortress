@@ -17,7 +17,7 @@ class Vector2D(object):
         
     def norm(self):
         '''Returns the norm of the vector'''
-        return math.sqrt(self.x**2 + self.y**2)
+        return math.sqrt(self.x ** 2 + self.y ** 2)
       
     def normalize(self):
         '''Normalizes the current vector'''
@@ -28,8 +28,8 @@ class Vector2D(object):
     def normal(self):
         '''Returns a normalized vector'''
         norm = self.norm()
-        x = self.x/norm
-        y = self.y/norm
+        x = self.x / norm
+        y = self.y / norm
         return Vector2D(x, y)
 
     def scalar_product(self, scalar):
@@ -43,14 +43,14 @@ class Vector2D(object):
 
     def projection(self, hVector):
         '''Returns the projection of a vector onto the current one'''
-        return self.scalar_product(self.dot_product(hVector)/self.dot_product(self))
+        return self.scalar_product(self.dot_product(hVector) / self.dot_product(self))
         
     @classmethod
     def random2D(cls):
         """returns a random normal vector"""
         x = random.random()
         y = random.random()
-        return cls(x,y).normal()
+        return cls(x, y).normal()
 
     @classmethod
     def parseVector(cls, hSource, hTarget):

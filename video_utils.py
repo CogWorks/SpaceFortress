@@ -38,6 +38,6 @@ def NumPy2Ipl(input):
 def surf2CV(surf):
     
     numpyImage = surfarray.pixels3d(surf)
-    cvImage = NumPy2Ipl(numpyImage.transpose(1,0,2))
+    cvImage = NumPy2Ipl(numpyImage.transpose(1, 0, 2))
     
     return cvImage

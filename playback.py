@@ -44,11 +44,11 @@ class GamePicker(QDialog):
         self.activateWindow()
         self.raise_()
         
-        self.setMinimumWidth(self.geometry().width()*1.25)
+        self.setMinimumWidth(self.geometry().width() * 1.25)
         
         screen = QDesktopWidget().screenGeometry()
         size = self.geometry()
-        self.move((screen.width()-size.width())/2, (screen.height()-size.height())/2)
+        self.move((screen.width() - size.width()) / 2, (screen.height() - size.height()) / 2)
     
     def mainbutton_clicked(self, button):
         if button == self.ok:

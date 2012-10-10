@@ -8,7 +8,7 @@ try:
     
     def getHWInfo():
         output = subprocess.Popen(["system_profiler", "SPHardwareDataType"], stdout=subprocess.PIPE).communicate()[0]
-        output = map(lambda x: x.strip(), output[output.find('Overview:')+len('Overview:'):].strip().split('\n'))
+        output = map(lambda x: x.strip(), output[output.find('Overview:') + len('Overview:'):].strip().split('\n'))
         info = {}
         for val in output:
             tmp = val.split(':')

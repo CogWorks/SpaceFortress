@@ -16,13 +16,13 @@ class Hex(token.Token):
         super(Hex, self).__init__()
         self.app = app
         self.original_radius = radius
-        self.radius = radius*self.app.aspect_ratio
-        self.x = self.app.config['Hexagon']['hex_pos_x']*self.app.aspect_ratio
-        self.y = self.app.config['Hexagon']['hex_pos_y']*self.app.aspect_ratio
+        self.radius = radius * self.app.aspect_ratio
+        self.x = self.app.config['Hexagon']['hex_pos_x'] * self.app.aspect_ratio
+        self.y = self.app.config['Hexagon']['hex_pos_y'] * self.app.aspect_ratio
         self.shrink_radius = self.app.config['Hexagon']['hex_shrink_radius']
         self.set_points(self.radius)
         self.small_hex_flag = False #simple flag to prevent ship getting "stuck" in small hex
-        self.color = (0,255,0)
+        self.color = (0, 255, 0)
         
     def set_points(self, radius):
         """sets points of hex based on radius"""
@@ -62,7 +62,7 @@ class Hex(token.Token):
         self.radius = self.original_radius - percent_time * (self.original_radius - self.shrink_radius)
         self.set_points(self.radius)
         
-    def draw(self,worldsurf):
+    def draw(self, worldsurf):
         """draws hex"""
         for i in range(6):
             pygame.draw.line(worldsurf, self.color, (self.points_x[i], self.points_y[i]), (self.points_x[(i + 1) % 6], self.points_y[(i + 1) % 6]), self.app.linewidth)

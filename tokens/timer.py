@@ -28,7 +28,7 @@ class FrameTimer(object):
         super(Timer, self).__init__()
         self.app = app
         self.start_time = self.app.game_frame
-        self.frame_factor = 1000/self.app.frames_per_second #number of milliseconds per frame
+        self.frame_factor = 1000 / self.app.frames_per_second #number of milliseconds per frame
 
     def elapsed(self):
         """time elapsed since timer created"""

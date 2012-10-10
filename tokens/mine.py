@@ -16,11 +16,11 @@ import picture
 
 #from frame import Frame
 
-mine_types = ['gfx/clust1.png','gfx/clust2.png','gfx/clust3.png','gfx/clust4.png']
+mine_types = ['gfx/clust1.png', 'gfx/clust2.png', 'gfx/clust3.png', 'gfx/clust4.png']
 
 class Mine(token.Token):
     """represents the friend or foe mine object"""
-    def __init__(self, app, type=-1, orientation=-1):
+    def __init__(self, app, type= -1, orientation= -1):
         super(Mine, self).__init__()
         self.position.x = 0 #600
         self.position.y = 0 #400
@@ -29,7 +29,7 @@ class Mine(token.Token):
         self.speed = self.app.config['Mine']['mine_speed']
         self.health = 1
         self.alive = True
-        self.collision_radius = self.app.config['Mine']['mine_radius']*self.app.aspect_ratio
+        self.collision_radius = self.app.config['Mine']['mine_radius'] * self.app.aspect_ratio
         self.foe_probability = self.app.config['Mine']['mine_probability']
         self.iff = None
         self.tagged = "untagged"
@@ -37,14 +37,14 @@ class Mine(token.Token):
         if orientation > -1 and orientation < 360:
             self.orientation = orientation
         else:
-            self.orientation = random.randint(0,359)
+            self.orientation = random.randint(0, 359)
         if type > -1 and type < len(mine_types):
             self.type = type
         else:
-            self.type = random.choice(range(0,len(mine_types)))
+            self.type = random.choice(range(0, len(mine_types)))
         if self.app.config['Graphics']['fancy']:
             img = mine_types[self.type]
-            self.mine = picture.Picture(os.path.join(self.app.approot, img), 64*self.app.aspect_ratio/128, self.orientation)
+            self.mine = picture.Picture(os.path.join(self.app.approot, img), 64 * self.app.aspect_ratio / 128, self.orientation)
                 
     def generate_new_position(self):
         """chooses random location to place mine"""
@@ -65,13 +65,13 @@ class Mine(token.Token):
             self.mine.rect.centery = self.position.y
             worldsurf.blit(self.mine.image, self.mine.rect)
         else:
-            pygame.draw.line(worldsurf, self.color, (self.position.x - 16*self.app.aspect_ratio, self.position.y), (self.position.x, self.position.y - 24*self.app.aspect_ratio), self.app.linewidth)
-            pygame.draw.line(worldsurf, self.color, (self.position.x, self.position.y - 24*self.app.aspect_ratio), (self.position.x + 16*self.app.aspect_ratio, self.position.y), self.app.linewidth)
-            pygame.draw.line(worldsurf, self.color, (self.position.x + 16*self.app.aspect_ratio, self.position.y), (self.position.x, self.position.y + 24*self.app.aspect_ratio), self.app.linewidth)
-            pygame.draw.line(worldsurf, self.color, (self.position.x, self.position.y + 24*self.app.aspect_ratio), (self.position.x - 16*self.app.aspect_ratio, self.position.y), self.app.linewidth)
+            pygame.draw.line(worldsurf, self.color, (self.position.x - 16 * self.app.aspect_ratio, self.position.y), (self.position.x, self.position.y - 24 * self.app.aspect_ratio), self.app.linewidth)
+            pygame.draw.line(worldsurf, self.color, (self.position.x, self.position.y - 24 * self.app.aspect_ratio), (self.position.x + 16 * self.app.aspect_ratio, self.position.y), self.app.linewidth)
+            pygame.draw.line(worldsurf, self.color, (self.position.x + 16 * self.app.aspect_ratio, self.position.y), (self.position.x, self.position.y + 24 * self.app.aspect_ratio), self.app.linewidth)
+            pygame.draw.line(worldsurf, self.color, (self.position.x, self.position.y + 24 * self.app.aspect_ratio), (self.position.x - 16 * self.app.aspect_ratio, self.position.y), self.app.linewidth)
 
     def __str__(self):
-        return '(%.2f,%.2f,%d,%.2f)' % (self.position.x,self.position.y,self.type,self.orientation)
+        return '(%.2f,%.2f,%d,%.2f)' % (self.position.x, self.position.y, self.type, self.orientation)
 
 class MineList(list):
     """extension of list to contain properties for mine subsystem"""
@@ -153,36 +153,36 @@ class MineList(list):
                     if self.MOT_movement_style == "warp":
                         if mine.position.x > self.app.WORLD_WIDTH:
                             mine.position.x = 0
-                            mine.app.gameevents.add("mine%d_warp"%i, "right")
+                            mine.app.gameevents.add("mine%d_warp" % i, "right")
                         if mine.position.x < 0:
                             mine.position.x = self.app.WORLD_WIDTH
-                            mine.app.gameevents.add("mine%d_warp"%i, "left")
+                            mine.app.gameevents.add("mine%d_warp" % i, "left")
                         if mine.position.y > self.app.WORLD_HEIGHT:
                             mine.position.y = 0
-                            mine.app.gameevents.add("mine%d_warp"%i, "down")
+                            mine.app.gameevents.add("mine%d_warp" % i, "down")
                         if mine.position.y < 0:
                             mine.position.y = self.app.WORLD_HEIGHT
-                            mine.app.gameevents.add("mine%d_warp"%i, "up")
+                            mine.app.gameevents.add("mine%d_warp" % i, "up")
                     elif self.MOT_movement_style == "bounce":
                         if mine.position.x > self.app.WORLD_WIDTH - 10:
                             mine.vec.x *= -1
-                            mine.app.gameevents.add("mine%d_bounce"%i, "right")
+                            mine.app.gameevents.add("mine%d_bounce" % i, "right")
                         if mine.position.x < 10:
                             mine.vec.x *= -1
-                            mine.app.gameevents.add("mine%d_bounce"%i, "left")
+                            mine.app.gameevents.add("mine%d_bounce" % i, "left")
                         if mine.position.y > self.app.WORLD_HEIGHT - 10:
                             mine.vec.y *= -1
-                            mine.app.gameevents.add("mine%d_bounce"%i, "down")
+                            mine.app.gameevents.add("mine%d_bounce" % i, "down")
                         if mine.position.y < 10:
                             mine.vec.y *= -1
-                            mine.app.gameevents.add("mine%d_bounce"%i, "up")
+                            mine.app.gameevents.add("mine%d_bounce" % i, "up")
             if self.MOT_state == "moving" and self.MOT_timer.elapsed() > self.MOT_move_time:
                 self.MOT_state = "identify"
                 self.MOT_timer.reset()
                 #change some to red
                 for i, item in enumerate(self):
-                    if (random.randint(0,1)):
-                        self[i].color = (255,0,0)
+                    if (random.randint(0, 1)):
+                        self[i].color = (255, 0, 0)
                 
             if self.MOT_state == "identify" and self.MOT_timer.elapsed() > self.MOT_identification_time:
                 self.MOT_state = "off"
@@ -194,7 +194,7 @@ class MineList(list):
         for mine in self:
             mine.draw(self.app.worldsurf)
             if self.MOT_state == "onset":
-                tag = self.f.render(mine.iff, 0, (255,255,0))
+                tag = self.f.render(mine.iff, 0, (255, 255, 0))
                 tag_rect = tag.get_rect()
                 tag_rect.centerx = mine.position.x
                 tag_rect.centery = mine.position.y
@@ -202,8 +202,8 @@ class MineList(list):
                 
     def __str__(self):
         s = ''
-        for i in range(0,len(self)):
-            s = '%s,%s' % (s,self[i])
+        for i in range(0, len(self)):
+            s = '%s,%s' % (s, self[i])
         return '[%s]' % (s[1:])
 
 class MOTMine(Mine):

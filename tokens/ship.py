@@ -17,9 +17,9 @@ class Ship(token.Token):
     def __init__(self, app):
         super(Ship, self).__init__()
         self.app = app
-        self.collision_radius = self.app.config['Ship']['ship_radius']*self.app.aspect_ratio
-        self.position.x = self.app.config['Ship']['ship_pos_x']*self.app.aspect_ratio
-        self.position.y = self.app.config['Ship']['ship_pos_y']*self.app.aspect_ratio
+        self.collision_radius = self.app.config['Ship']['ship_radius'] * self.app.aspect_ratio
+        self.position.x = self.app.config['Ship']['ship_pos_x'] * self.app.aspect_ratio
+        self.position.y = self.app.config['Ship']['ship_pos_y'] * self.app.aspect_ratio
         self.nose = (self.position.x, self.position.y)
         self.velocity.x = self.app.config['Ship']['ship_vel_x']
         self.velocity.y = self.app.config['Ship']['ship_vel_y']
@@ -48,15 +48,15 @@ class Ship(token.Token):
         self.invert_y = 1.0
         if self.app.config['Joystick']['invert_y']:
             self.invert_y = -1.0
-        self.color = (255,255,0)
+        self.color = (255, 255, 0)
         if self.app.config['Graphics']['fancy']:
-            self.ship = picture.Picture(os.path.join(self.app.approot, 'gfx/ship.png'), 48*self.app.aspect_ratio/128)
-            self.ship2 = picture.Picture(os.path.join(self.app.approot, 'gfx/ship2.png'), 66*self.app.aspect_ratio/175)
+            self.ship = picture.Picture(os.path.join(self.app.approot, 'gfx/ship.png'), 48 * self.app.aspect_ratio / 128)
+            self.ship2 = picture.Picture(os.path.join(self.app.approot, 'gfx/ship2.png'), 66 * self.app.aspect_ratio / 175)
             self.shields = []
-            for i in range(0,self.start_health):
+            for i in range(0, self.start_health):
                 self.shields.append(picture.Picture(os.path.join(self.app.approot, 'gfx/shield.png'),
-                                                    70*self.app.aspect_ratio/400,
-                                                    alpha=int(255.0 / (self.start_health-1) * i)))
+                                                    70 * self.app.aspect_ratio / 400,
+                                                    alpha=int(255.0 / (self.start_health - 1) * i)))
 
 
     def compute(self):
@@ -146,22 +146,22 @@ class Ship(token.Token):
         x2 = 18 * self.cosphi * self.app.aspect_ratio + self.position.x
         y2 = -(18 * self.sinphi) * self.app.aspect_ratio + self.position.y
         # nose
-        self.nose = (x2,y2)
+        self.nose = (x2, y2)
         #x3 will be center point
         x3 = self.position.x
         y3 = self.position.y
         #x4, y4 = -18, 18
-        x4 = (-18 * self.cosphi - 18 * self.sinphi)*self.app.aspect_ratio + self.position.x
-        y4 = (-((18 * self.cosphi) + (-18 * self.sinphi)))*self.app.aspect_ratio + self.position.y
+        x4 = (-18 * self.cosphi - 18 * self.sinphi) * self.app.aspect_ratio + self.position.x
+        y4 = (-((18 * self.cosphi) + (-18 * self.sinphi))) * self.app.aspect_ratio + self.position.y
         #x5, y5 = -18, -18
-        x5 = (-18 * self.cosphi - -18 * self.sinphi)*self.app.aspect_ratio + self.position.x
-        y5 = (-((-18 * self.cosphi) + (-18 * self.sinphi)))*self.app.aspect_ratio + self.position.y
+        x5 = (-18 * self.cosphi - -18 * self.sinphi) * self.app.aspect_ratio + self.position.x
+        y5 = (-((-18 * self.cosphi) + (-18 * self.sinphi))) * self.app.aspect_ratio + self.position.y
 
         if self.app.config['Graphics']['fancy']:
             if not self.thrust_flag:
-                ship = pygame.transform.rotate(self.ship.image, self.orientation-90)
+                ship = pygame.transform.rotate(self.ship.image, self.orientation - 90)
             else:
-                ship = pygame.transform.rotate(self.ship2.image, self.orientation-90)
+                ship = pygame.transform.rotate(self.ship2.image, self.orientation - 90)
             shiprect = ship.get_rect()
             shiprect.centerx = self.position.x
             shiprect.centery = self.position.y
@@ -169,11 +169,11 @@ class Ship(token.Token):
             if self.app.playback and self.app.playback_logver <= 4:
                 pass
             else:
-                s = self.health-1
+                s = self.health - 1
                 self.shields[s].rect.centerx = self.position.x
                 self.shields[s].rect.centery = self.position.y
                 worldsurf.blit(self.shields[s].image, self.shields[s].rect)
         else:
-            pygame.draw.line(worldsurf, self.color, (x1,y1), (x2,y2), self.app.linewidth)
-            pygame.draw.line(worldsurf, self.color, (x3,y3), (x4,y4), self.app.linewidth)
-            pygame.draw.line(worldsurf, self.color, (x3,y3), (x5,y5), self.app.linewidth)
+            pygame.draw.line(worldsurf, self.color, (x1, y1), (x2, y2), self.app.linewidth)
+            pygame.draw.line(worldsurf, self.color, (x3, y3), (x4, y4), self.app.linewidth)
+            pygame.draw.line(worldsurf, self.color, (x3, y3), (x5, y5), self.app.linewidth)

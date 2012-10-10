@@ -16,7 +16,7 @@ class Bonus(object):
         self.symbols = self.app.config['Bonus']['non_bonus_symbols']
         self.set_bonus_location()
         self.visible = False
-        self.font = pygame.font.Font(self.app.fp, int(28*self.app.aspect_ratio))
+        self.font = pygame.font.Font(self.app.fp, int(28 * self.app.aspect_ratio))
         self.bonus_symbol = self.app.config['Bonus']['bonus_symbol']
         self.current_symbol = None
         self.prior_symbol = None
@@ -52,29 +52,29 @@ class Bonus(object):
         elif self.app.config['General']['bonus_location'] == 'Probabilistic':
             w = self.app.WORLD_WIDTH / 5
             h = self.app.WORLD_HEIGHT / 5
-            probs = map(float,self.app.config['Bonus']['quadrant_probs'].split(','))
+            probs = map(float, self.app.config['Bonus']['quadrant_probs'].split(','))
             if random.random() <= probs[0]:
                 self.x = w
                 self.y = h
             elif random.random() <= probs[1]:
-                self.x = w*4
+                self.x = w * 4
                 self.y = h
             elif random.random() <= probs[2]:
                 self.x = w
-                self.y = h*4
+                self.y = h * 4
             else:
-                self.x = w*4
-                self.y = h*4
+                self.x = w * 4
+                self.y = h * 4
         else:
-            self.x = self.app.config['Bonus']['bonus_pos_x']*self.app.aspect_ratio
-            self.y = self.app.config['Bonus']['bonus_pos_y']*self.app.aspect_ratio
+            self.x = self.app.config['Bonus']['bonus_pos_x'] * self.app.aspect_ratio
+            self.y = self.app.config['Bonus']['bonus_pos_y'] * self.app.aspect_ratio
         
     def draw(self, worldsurf):
         """draws bonus symbol to screen"""
-        bonus = self.font.render("%s"%self.current_symbol, 1, (255, 255, 0))
+        bonus = self.font.render("%s" % self.current_symbol, 1, (255, 255, 0))
         bonus_rect = bonus.get_rect()
         bonus_rect.center = (self.x, self.y)
-        worldsurf.blit(bonus,bonus_rect)
+        worldsurf.blit(bonus, bonus_rect)
     
     def get_new_symbol(self):
         """assigns new bonus symbol"""
