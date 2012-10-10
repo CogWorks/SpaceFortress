@@ -1,11 +1,10 @@
 """
 PyViewX Integration
 """
-import json
-import pygame
-import numpy as np
-
 try:
+    import json
+    import pygame
+    import numpy as np
     from pyviewx import iViewXClient, Dispatcher
     from pyviewx.pygamesupport import Calibrator
 
@@ -104,5 +103,5 @@ try:
                     if self.client and self.app.config[self.name]['calmode'] == 'Every Game':
                         self.calibrate( True )
 
-except ImportError:
-    pass
+except ImportError as e:
+    sys.stderr.write("Failed to load 'PyViewX' plugin, missing dependencies. [%s]\n" % e)

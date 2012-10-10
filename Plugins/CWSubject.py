@@ -2,12 +2,13 @@
 Cogworks Subject Info
 """
 
-import sys, os
-
-from PySide.QtCore import *
-from PySide.QtGui import *
-
 try:
+    
+    import sys, os
+
+    from PySide.QtCore import *
+    from PySide.QtGui import *
+
     from pycogworks.cwsubject import *
     from pycogworks.util import rin2id
 
@@ -59,5 +60,6 @@ try:
                     if self.expRoom and len(self.expRoom) > 0:
                         self.app.gameevents.add("experiment", "room", self.expRoom, type='EVENT_SYSTEM')
 
-except ImportError:
-    pass
+
+except ImportError as e:
+    sys.stderr.write("Failed to load 'CWSubject' plugin, missing dependencies. [%s]\n" % e)
