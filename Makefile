@@ -7,8 +7,9 @@ all: clean macosx
 
 clean:
 	@rm -rf build dist
-	@cd docs; \
-	rm -rf *.log *.aux *.out *.pdf *.backup *~
+	@cd docs; rm -rf *.log *.aux *.out *.pdf *.backup *~
+	@rm -rf `find . -name "*.pyc"`
+	@rm -rf `find . -name "*.pyo"`
 
 docs:
 	cd docs; \
