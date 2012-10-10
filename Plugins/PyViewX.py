@@ -2,6 +2,7 @@
 PyViewX Integration
 """
 try:
+    import sys
     import json
     import pygame
     import numpy as np
