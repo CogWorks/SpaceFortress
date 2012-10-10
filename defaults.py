@@ -67,7 +67,6 @@ def get_config():
 
     cfg = Config()
 
-    cfg.add_setting('General', 'player', 'Human', alias='Player', options=['Human', 'Model'], type=CT_COMBO, about='Will this game be played by a human or a cognitive model? Set to f to disable human control, enabling ACT-R')
     cfg.add_setting('General', 'next_gen', True, type=2, alias='Next Gen Mode')
     cfg.add_setting('General', 'id', '1234', alias='Subject ID#', type=CT_LINEEDIT, about='Subject identifier used in log filename"')
     cfg.add_setting('General', 'games_per_session', 8, alias='Max # of Games', about='Number of games per "session"')
