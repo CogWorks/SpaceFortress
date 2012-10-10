@@ -26,7 +26,7 @@ class Bonus(object):
             self.bonus_count = 0
         self.flag = False
         self.probability = self.app.config['Bonus']['bonus_probability']
-        self.timer = Timer()
+        self.timer = Timer(self.app.gametimer.elapsed)
         #new attributes for AX-CPT
         self.cue_time = self.app.config['AX-CPT']['cue_visibility']
         self.target_time = self.app.config['AX-CPT']['target_visibility']

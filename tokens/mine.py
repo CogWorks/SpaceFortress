@@ -89,9 +89,9 @@ class MineList(list):
         self.generate_foes()
         self.timeout = self.app.config['Mine']['mine_timeout'] #milliseconds after spawn when mine "gives up"
         self.spawn_time = self.app.config['Mine']['mine_spawn'] #milliseconds after destruction when mine "respawns"
-        self.timer = timer.Timer()
+        self.timer = timer.Timer(self.app.gametimer.elapsed)
         self.flag = False #for timer, to determine state of standard mine
-        self.iff_timer = timer.Timer()
+        self.iff_timer = timer.Timer(self.app.gametimer.elapsed)
         self.iff_flag = False #are we in the middle of trying to identify a foe mine?
         #MOT constants
         self.f = pygame.font.Font(self.app.fp, 14)
@@ -105,8 +105,8 @@ class MineList(list):
         self.MOT_movement_style = self.app.config['MOT']['MOT_movement_style']
         self.MOT_identification_time = self.app.config['MOT']['MOT_identification_time']
         self.MOT_identification_type = self.app.config['MOT']['MOT_identification_type']
-        self.MOT_timer = timer.Timer() #determines when MOT mines change state
-        self.MOT_switch_timer = timer.Timer() #determine when moving MOT mine changes direction
+        self.MOT_timer = timer.Timer(self.app.gametimer.elapsed) #determines when MOT mines change state
+        self.MOT_switch_timer = timer.Timer(self.app.gametimer.elapsed) #determine when moving MOT mine changes direction
         
     def generate_foes(self):
         """determine which mine designations are 'foes'"""

@@ -39,7 +39,7 @@ class Ship(token.Token):
         self.max_vel = self.app.config['Ship']['ship_max_vel']
         self.alive = True
         self.small_hex_flag = False #did we hit the small hex?
-        self.shot_timer = Timer() #time between shots, for VLNER assessment
+        self.shot_timer = Timer(self.app.gametimer.elapsed) #time between shots, for VLNER assessment
         self.joy_turn = 0.0
         self.joy_thrust = 0.0
         self.invert_x = 1.0

@@ -12,8 +12,7 @@ import shell
 import pygame
 import picture
 from gameevent import GameEvent
-from timer import Timer as clock_timer
-from timer import FrameTimer as frame_timer
+from timer import Timer
 
 class Fortress(token.Token):
     """represents the fortress object that typically appears in the center of the worldsurf"""
@@ -24,13 +23,10 @@ class Fortress(token.Token):
         self.position.y = int(self.app.config['Fortress']['fortress_pos_y'] * self.app.aspect_ratio)
         self.collision_radius = self.app.config['Fortress']['fortress_radius'] * self.app.aspect_ratio
         self.last_orientation = self.orientation 
-        if self.app.config['General']['player'] == 'Model':
-            self.timer = frame_timer(self.app)
-        else:
-            self.timer = clock_timer()
+        self.timer = Timer(self.app.gametimer.elapsed)
         self.sector_size = self.app.config['Fortress']['fortress_sector_size']
         self.lock_time = self.app.config['Fortress']['fortress_lock_time']
-        self.reset_timer = clock_timer()
+        self.reset_timer = Timer(self.app.gametimer.elapsed)
         self.alive = True
         if self.app.config['Graphics']['fancy']:
             self.fortress = picture.Picture(os.path.join(self.app.approot, 'psf5.png'), (72 * self.app.aspect_ratio) / 128)

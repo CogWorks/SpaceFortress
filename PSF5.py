@@ -25,6 +25,8 @@ import defaults
 get_time = time.time
 if platform.system() == 'Windows':
     get_time = time.clock
+def get_time_ms(): return get_time() * 1000
+
 
 __version__ = "5.0.1_beta1"
 def get_psf_version_string():
@@ -61,8 +63,9 @@ class Game(object):
         self.STATE_IFF = 4
         self.STATE_PREPARE = 5
         self.STATE_PLAY = 6
-        self.STATE_SCORES = 7
-        self.STATE_DONE = 8
+        self.STATE_PAUSED = 7
+        self.STATE_SCORES = 8
+        self.STATE_DONE = 9
 
         self.state = self.STATE_INTRO
 
@@ -310,8 +313,8 @@ class Game(object):
             self.explosion_small = picture.Picture(os.path.join(self.approot, 'gfx/exp.png'), 1)
 
         self.clock = pygame.time.Clock()
-        self.gametimer = tokens.timer.Timer()
-        self.flighttimer = tokens.timer.Timer()
+        self.gametimer = tokens.timer.Timer(get_time_ms)
+        self.flighttimer = tokens.timer.Timer(self.gametimer.elapsed)
         self.worldsurf = pygame.Surface((self.WORLD_WIDTH, self.WORLD_HEIGHT))
         self.worldrect = self.worldsurf.get_rect()
         self.worldrect.centerx = self.SCREEN_WIDTH / 2
@@ -394,24 +397,13 @@ class Game(object):
         self.mine_list.MOT_timer.reset()
         self.mine_list.MOT_switch_timer.reset()
 
-    def pause_game(self):
-        """pause game till player is ready to resume"""
-        if self.config['Display']['pause_overlay']:
-            backup = self.screen.copy()
-            self.screen.fill((0, 0, 0))
-            pause = self.f96.render("Paused!", True, (255, 255, 255))
-            pause_rect = pause.get_rect()
-            pause_rect.centerx = self.SCREEN_WIDTH / 2
-            pause_rect.centery = self.SCREEN_HEIGHT / 2
-            self.screen.blit(pause, pause_rect)
-            pygame.display.flip()
-        while True:
-            event = pygame.event.wait()
-            if event.type == pygame.KEYDOWN and event.key == self.pause_key:
-                self.gameevents.add("press", "unpause", type='EVENT_USER')
-                if self.config['Display']['pause_overlay']:
-                    self.screen.blit(backup, (0, 0))
-                return
+    def draw_pause_overlay(self):
+        #self.screen.fill((0, 0, 0))
+        pause = self.f96.render("Paused!", True, (255, 255, 255))
+        pause_rect = pause.get_rect()
+        pause_rect.centerx = self.SCREEN_WIDTH / 2
+        pause_rect.centery = self.SCREEN_HEIGHT / 2
+        self.screen.blit(pause, pause_rect)
 
     def process_input(self):
         """creates game events based on pygame events"""
@@ -485,10 +477,13 @@ class Game(object):
                         elif event.key == self.pnts_key:
                             self.gameevents.add("press", "pnts", type='EVENT_USER')
                         elif event.key == self.pause_key and self.config['General']['allow_pause']:
-                            self.gameevents.add("press", "pause", type='EVENT_USER')
-                        else:
-                            self.gameevents.add("press", event.key, "user", type='EVENT_SYSTEM')
-
+                                self.gameevents.add("press", "pause", type='EVENT_USER')
+                                
+                    elif self.state == self.STATE_PAUSED and event.key == self.pause_key:
+                        self.gameevents.add("press", "unpause", type='EVENT_USER')
+                                
+                    else:
+                        self.gameevents.add("press", event.key, "user", type='EVENT_SYSTEM')
 
                 elif event.type == pygame.KEYUP:
 
@@ -526,7 +521,6 @@ class Game(object):
         elif self.state == self.STATE_PREPARE:
             self.gameevents.add("game", "ready", type='EVENT_SYSTEM')
             self.setup_world()
-            gameTimer = tokens.timer.Timer()
             self.state = self.STATE_PLAY
             self.gameevents.add("game", "start", type='EVENT_SYSTEM')
         elif self.state == self.STATE_PLAY:
@@ -614,7 +608,11 @@ class Game(object):
                 self.log.write("%s\t%f\t%d\t%d\t%d\t%s\t%s\t%s\n" % (type, time, ticks, game, eid, command, obj, target))
             if command == "press":
                 if obj == "pause":
-                    self.pause_game()
+                    self.gametimer.pause()
+                    self.state = self.STATE_PAUSED
+                elif obj == "unpause":
+                    self.state = self.STATE_PLAY
+                    self.gametimer.unpause()
                 elif obj == "quit":
                     self.lc.stop()
                 elif obj == "left":
@@ -986,36 +984,37 @@ class Game(object):
     def draw_stars(self):
 
         for star in self.stars:
-            if sum(self.playback_keyheld) > 0:
-                diff = self.playback_index - self.playback_index_prev
-            else:
-                if self.playback_pause:
-                    diff = 0
+            if self.state == self.STATE_PLAY:
+                if sum(self.playback_keyheld) > 0:
+                    diff = self.playback_index - self.playback_index_prev
                 else:
-                    diff = 1
-            if diff != 0:
-                if self.config['Graphics']['parallax_mode'] == 'Fortress':
-                    orientation = self.fortress.orientation
-                else:
-                    orientation = self.starfield_orientation
-                star[0] += star[2] * math.cos(math.radians(orientation - 180)) * self.config['Graphics']['star_speed'] * diff
-                star[1] += star[2] * math.sin(math.radians(orientation)) * self.config['Graphics']['star_speed'] * diff
-                if star[0] >= self.WORLD_WIDTH:
-                    star[0] = 0
-                    star[1] = randrange(0, self.WORLD_WIDTH - self.linewidth)
-                    star[2] = choice([1, 2, 3])
-                elif star[0] <= 0:
-                    star[0] = self.WORLD_WIDTH
-                    star[1] = randrange(0, self.WORLD_WIDTH - self.linewidth)
-                    star[2] = choice([1, 2, 3])
-                elif star[1] >= self.WORLD_HEIGHT:
-                    star[1] = 0
-                    star[0] = randrange(0, self.WORLD_WIDTH - self.linewidth)
-                    star[2] = choice([1, 2, 3])
-                elif star[1] <= 0:
-                    star[1] = self.WORLD_HEIGHT
-                    star[0] = randrange(0, self.WORLD_WIDTH - self.linewidth)
-                    star[2] = choice([1, 2, 3])
+                    if self.playback_pause:
+                        diff = 0
+                    else:
+                        diff = 1
+                if diff != 0:
+                    if self.config['Graphics']['parallax_mode'] == 'Fortress':
+                        orientation = self.fortress.orientation
+                    else:
+                        orientation = self.starfield_orientation
+                    star[0] += star[2] * math.cos(math.radians(orientation - 180)) * self.config['Graphics']['star_speed'] * diff
+                    star[1] += star[2] * math.sin(math.radians(orientation)) * self.config['Graphics']['star_speed'] * diff
+                    if star[0] >= self.WORLD_WIDTH:
+                        star[0] = 0
+                        star[1] = randrange(0, self.WORLD_WIDTH - self.linewidth)
+                        star[2] = choice([1, 2, 3])
+                    elif star[0] <= 0:
+                        star[0] = self.WORLD_WIDTH
+                        star[1] = randrange(0, self.WORLD_WIDTH - self.linewidth)
+                        star[2] = choice([1, 2, 3])
+                    elif star[1] >= self.WORLD_HEIGHT:
+                        star[1] = 0
+                        star[0] = randrange(0, self.WORLD_WIDTH - self.linewidth)
+                        star[2] = choice([1, 2, 3])
+                    elif star[1] <= 0:
+                        star[1] = self.WORLD_HEIGHT
+                        star[0] = randrange(0, self.WORLD_WIDTH - self.linewidth)
+                        star[2] = choice([1, 2, 3])
             if star[2] == 1:
                 color = (100, 100, 100)
             elif star[2] == 2:
@@ -1037,43 +1036,47 @@ class Game(object):
         elif self.state == self.STATE_IFF:
             self.draw_foe_mines()
 
-        elif self.state == self.STATE_PLAY:
-
-            self.frame.draw(self.worldsurf, self.scoresurf)
-            self.score.draw(self.scoresurf)
-
-            if self.stars:
-                self.draw_stars()
-
-            self.bighex.draw(self.worldsurf)
-            self.smallhex.draw(self.worldsurf)
-            if self.playback and self.config['Display']['show_kp']:
-                self.draw_kp()
-            for shell in self.shell_list:
-                shell.draw(self.worldsurf)
-            if self.fortress_exists:
-                if self.fortress.alive:
-                    self.fortress.draw(self.worldsurf)
-                else:
-                    self.explosion.rect.center = (self.fortress.position.x, self.fortress.position.y)
-                    self.worldsurf.blit(self.explosion.image, self.explosion.rect)
-            for missile in self.missile_list:
-                missile.draw(self.worldsurf)
-            if self.ship.alive:
-                self.ship.draw(self.worldsurf)
+        elif self.state == self.STATE_PLAY or self.state == self.STATE_PAUSED:
+            
+            if self.state == self.STATE_PAUSED and self.config['Display']['pause_overlay']:
+                self.draw_pause_overlay()            
             else:
-                self.explosion_small.rect.center = (self.ship.position.x, self.ship.position.y)
-                self.worldsurf.blit(self.explosion_small.image, self.explosion_small.rect)
-            self.mine_list.draw()
-            if self.bonus_exists:
-                if self.bonus.visible:
-                    self.bonus.draw(self.worldsurf)
-            self.screen.blit(self.scoresurf, self.scorerect)
-            self.screen.blit(self.worldsurf, self.worldrect)
-            if self.config['Display']['show_fps'] and not self.config['Playback']['makevideo']:
-                self.draw_fps()
-            if self.config['Display']['show_et'] and not self.config['Playback']['makevideo']:
-                self.draw_et()
+
+                self.frame.draw(self.worldsurf, self.scoresurf)
+                self.score.draw(self.scoresurf)
+    
+                if self.stars:
+                    self.draw_stars()
+    
+                self.bighex.draw(self.worldsurf)
+                self.smallhex.draw(self.worldsurf)
+                if self.playback and self.config['Display']['show_kp']:
+                    self.draw_kp()
+                for shell in self.shell_list:
+                    shell.draw(self.worldsurf)
+                if self.fortress_exists:
+                    if self.fortress.alive:
+                        self.fortress.draw(self.worldsurf)
+                    else:
+                        self.explosion.rect.center = (self.fortress.position.x, self.fortress.position.y)
+                        self.worldsurf.blit(self.explosion.image, self.explosion.rect)
+                for missile in self.missile_list:
+                    missile.draw(self.worldsurf)
+                if self.ship.alive:
+                    self.ship.draw(self.worldsurf)
+                else:
+                    self.explosion_small.rect.center = (self.ship.position.x, self.ship.position.y)
+                    self.worldsurf.blit(self.explosion_small.image, self.explosion_small.rect)
+                self.mine_list.draw()
+                if self.bonus_exists:
+                    if self.bonus.visible:
+                        self.bonus.draw(self.worldsurf)
+                self.screen.blit(self.scoresurf, self.scorerect)
+                self.screen.blit(self.worldsurf, self.worldrect)
+                if self.config['Display']['show_fps'] and not self.config['Playback']['makevideo']:
+                    self.draw_fps()
+                if self.config['Display']['show_et'] and not self.config['Playback']['makevideo']:
+                    self.draw_et()
 
         elif self.state == self.STATE_SCORES:
             self.draw_scores()
