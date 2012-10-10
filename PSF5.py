@@ -141,13 +141,16 @@ class Game(object):
         
         mode_list = pygame.display.list_modes()
         if self.config['Display']['display_mode'] == 'Windowed':
-			for mode in mode_list:
-				tmp = mode[0] / 2
-				for m in mode_list:
-					if tmp == m[0]:
-						mode_list.remove(mode)
-						break
-			best_mode = mode_list[1]
+            if self.config['Display']['screen_width'] > 0 and self.config['Display']['screen_height'] > 0:
+                best_mode = (self.config['Display']['screen_width'], self.config['Display']['screen_height'])
+            else:
+    			for mode in mode_list:
+    				tmp = mode[0] / 2
+    				for m in mode_list:
+    					if tmp == m[0]:
+    						mode_list.remove(mode)
+    						break
+    			best_mode = mode_list[1]
         else:
             if self.config['Display']['display_mode'] == 'Current':
                 info = pygame.display.Info()
