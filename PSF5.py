@@ -27,8 +27,7 @@ if platform.system() == 'Windows':
     get_time = time.clock
 def get_time_ms(): return get_time() * 1000
 
-
-__version__ = "5.0.1_beta1"
+from version import __version__
 def get_psf_version_string():
     return "Space Fortress 5"
 

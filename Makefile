@@ -1,152 +1,51 @@
-.PHONY: build-info resources docs
+.PHONY: macosx
 
-help:
-	@echo "Valid options are: macosx"
+all: macosx
 
-all: clean macosx
+macosx: macosx/Space\ Fortress.app macosx/Config\ Editor.app
+	@osx=10.`sw_vers -productVersion | cut -f 2 -d "."`;\
+	ver=`./version.py`;\
+	cd macosx; \
+	productbuild \
+		--component Space\ Fortress.app /Applications/Space\ Fortress\ 5 \
+		--component Config\ Editor.app /Applications/Space\ Fortress\ 5 \
+		SpaceFortress-$$ver-x86_64-macosx$$osx.pkg 
 
+macosx/Space\ Fortress.app: sf-dist/dist
+	@mkdir -p macosx/Space\ Fortress.app/Contents/MacOS
+	@mkdir -p macosx/Space\ Fortress.app/Contents/Resources
+	@cp -r sf-dist/dist/* macosx/Space\ Fortress.app/Contents/MacOS/
+	@cp -r fonts macosx/Space\ Fortress.app/Contents/MacOS/
+	@cp -r gfx macosx/Space\ Fortress.app/Contents/MacOS/
+	@cp -r sounds macosx/Space\ Fortress.app/Contents/MacOS/
+	@cp psf5.png macosx/Space\ Fortress.app/Contents/MacOS/
+	@cp psf5.icns macosx/Space\ Fortress.app/Contents/Resources/
+	@osx=10.`sw_vers -productVersion | cut -f 2 -d "."`;\
+	ver=`./version.py`;\
+	cat Info.plist.sf | sed s/SFVERSION/"$$ver"/ | sed s/OSXVERSION/"$$osx"/ > macosx/Space\ Fortress.app/Contents/Info.plist
+	@echo "APPL????" > macosx/Space\ Fortress.app/Contents/PkgInfo
+	@SetFile -a B macosx/Space\ Fortress.app
+	
+macosx/Config\ Editor.app: ce-dist/dist
+	@mkdir -p macosx/Config\ Editor.app/Contents/MacOS
+	@mkdir -p macosx/Config\ Editor.app/Contents/Resources
+	@cp -r ce-dist/dist/* macosx/Config\ Editor.app/Contents/MacOS/
+	@cp prefs.icns macosx/Config\ Editor.app/Contents/Resources/
+	@osx=10.`sw_vers -productVersion | cut -f 2 -d "."`;\
+	ver=`./version.py`;\
+	cat Info.plist.ce | sed s/SFVERSION/"$$ver"/ | sed s/OSXVERSION/"$$osx"/ > macosx/Config\ Editor.app/Contents/Info.plist
+	@echo "APPL????" > macosx/Config\ Editor.app/Contents/PkgInfo
+	@SetFile -a B macosx/Config\ Editor.app
+
+sf-dist/dist:
+	@mkdir -p sf-dist
+	@cd sf-dist; bb-freeze ../PSF5.py
+
+ce-dist/dist:
+	@mkdir -p ce-dist
+	@cd ce-dist; bb-freeze ../configEditor.py
+		
 clean:
-	@rm -rf build dist
-	@cd docs; rm -rf *.log *.aux *.out *.pdf *.backup *~
+	@rm -rf sf-dist
 	@rm -rf `find . -name "*.pyc"`
 	@rm -rf `find . -name "*.pyo"`
-
-docs:
-	cd docs; \
-	pdflatex -interaction=nonstopmode experimenter_instructions.tex 
-
-macosx: docs ce-macosx sf-macosx
-	mkdir -p dist/macosx/Space\ Fortress\ 5/Documentation
-	mkdir -p dist/macosx/Space\ Fortress\ 5/Plugins
-	cp -r Plugins/*.py dist/macosx/Space\ Fortress\ 5/Plugins/
-	mkdir dist/macosx/Space\ Fortress\ 5/Plugins/pycogworks
-	cp Plugins/pycogworks/eyegaze.py dist/macosx/Space\ Fortress\ 5/Plugins/pycogworks/
-	cp Plugins/pycogworks/fixation.py dist/macosx/Space\ Fortress\ 5/Plugins/pycogworks/
-	cp Plugins/pycogworks/util.py dist/macosx/Space\ Fortress\ 5/Plugins/pycogworks/
-	mkdir dist/macosx/bundle
-	cp docs/experimenter_instructions.pdf dist/macosx/Space\ Fortress\ 5/Documentation/Experimenter\ Instructions\ for\ Subjects.pdf
-	cp Changelog dist/macosx/Space\ Fortress\ 5/Documentation/
-	mv dist/macosx/*.app dist/macosx/Space\ Fortress\ 5/
-	cd dist/macosx/Space\ Fortress\ 5/Space\ Fortress.app/Contents/MacOS; \
-	ln -s ../../../Plugins .
-	cd dist/macosx/Space\ Fortress\ 5/Config\ Editor.app/Contents/MacOS; \
-	ln -s ../../../Plugins .
-	python mac-tools/AssignIcon.py psf5.png dist/macosx/Space\ Fortress\ 5
-	mv dist/macosx/Space\ Fortress\ 5 dist/macosx/bundle
-	ver=`cat build-info`;\
-	cd dist/macosx; \
-	arch -i386 /Developer/usr/bin/packagemaker -b -r bundle -v -i edu.rpi.cogsci.cogworks.spacefortress \
-		-o SpaceFortress-$$ver-i386-macosx10.6.mpkg --no-relocate -l /Applications -t "Space Fortress 5" --target 10.5 --version $$ver
-
-sf-macosx: deps
-	rm -rf dist/macosx/SpaceFortress*
-	arch -i386 python setup-sf.py build
-	mkdir -p dist/macosx/SpaceFortress.app/Contents
-	mkdir dist/macosx/SpaceFortress.app/Contents/MacOS
-	cp build-info dist/macosx/SpaceFortress.app/Contents/MacOS
-	cp psf5.png dist/macosx/SpaceFortress.app/Contents/MacOS
-	mkdir dist/macosx/SpaceFortress.app/Contents/Resources
-	cp psf5.icns dist/macosx/SpaceFortress.app/Contents/Resources
-	ver=`cat build-info`;\
-	cat Info.plist.sf | sed s/SFVERSION/"$$ver"/ > dist/macosx/SpaceFortress.app/Contents/Info.plist
-	echo "APPL????" > dist/macosx/SpaceFortress.app/Contents/PkgInfo
-	mv build/exe.macosx-10.6-*-2.7/PSF5 dist/macosx/SpaceFortress.app/Contents/MacOS/SpaceFortress
-	mv build/exe.macosx-10.6-*-2.7/PSF5.zip dist/macosx/SpaceFortress.app/Contents/MacOS/SpaceFortress.zip
-	mv build/exe.macosx-10.6-*-2.7/*.dylib dist/macosx/SpaceFortress.app/Contents/MacOS/
-	mv build/exe.macosx-10.6-*-2.7/*.so dist/macosx/SpaceFortress.app/Contents/MacOS/
-	mv build/exe.macosx-10.6-*-2.7/*.zip dist/macosx/SpaceFortress.app/Contents/MacOS/
-	morelibs=`ls build/exe.macosx-10.6-*-2.7`
-	cd dist/macosx/SpaceFortress.app/Contents/MacOS; \
-	for f in `ls *.so`; do \
-		libs=`otool -XL $$f | grep "/opt/local/lib" | cut -f 2 | cut -f 1 -d " "`; \
- 		if [[ -n $$libs ]]; then \
-  			for l in $$libs; do \
-   				ll=`echo $$l | cut -f 5 -d"/"`; \
-   				install_name_tool -change $$l @executable_path/$$ll $$f; \
-  			done; \
- 		fi; \
-	done; \
-	for f in `ls *.dylib`; do \
-		install_name_tool -id @executable_path/$$f $$f; \
-		libs=`otool -XL $$f | grep "/opt/local/lib" | cut -f 2 | cut -f 1 -d " "`; \
- 		if [[ -n $$libs ]]; then \
-  			for l in $$libs; do \
-   				ll=`echo $$l | cut -f 5 -d"/"`; \
-   				install_name_tool -change $$l @executable_path/$$ll $$f; \
-  			done; \
- 		fi; \
-	done
-	mv build/exe.macosx-10.6-*-2.7/* dist/macosx/SpaceFortress.app/Contents/MacOS/
-	cd dist/macosx/SpaceFortress.app/Contents/MacOS; \
-	install_name_tool -id @executable_path/Python Python; \
-	install_name_tool -change /opt/local/Library/Frameworks/Python.framework/Versions/2.7/Python @executable_path/Python SpaceFortress; \
-	for f in $$morelibs; do \
-		libs=`otool -XL $$f | grep "/opt/local/lib" | cut -f 2 | cut -f 1 -d " "`; \
- 		if [[ -n $$libs ]]; then \
-  			for l in $$libs; do \
-   				ll=`echo $$l | cut -f 5 -d"/"`; \
-   				install_name_tool -change $$l @executable_path/$$ll $$f; \
-  			done; \
- 		fi; \
-	done
-	mv dist/macosx/SpaceFortress.app dist/macosx/SpaceFortress-fat.app
-	ditto --rsrc --arch i386 dist/macosx/SpaceFortress-fat.app dist/macosx/Space\ Fortress.app
-	rm -rf dist/macosx/SpaceFortress-fat.app
-	/Developer/Tools/SetFile -a B dist/macosx/Space\ Fortress.app
-
-ce-macosx:
-	rm -rf dist/macosx/configEditor*
-	arch -i386 python setup-ce.py build
-	mkdir -p dist/macosx/configEditor.app/Contents
-	mkdir dist/macosx/configEditor.app/Contents/MacOS
-	mkdir dist/macosx/configEditor.app/Contents/Resources
-	cp prefs.icns dist/macosx/configEditor.app/Contents/Resources
-	cp -r /opt/local/lib/Resources/qt_menu.nib dist/macosx/configEditor.app/Contents/Resources
-	cp Info.plist.ce dist/macosx/configEditor.app/Contents/Info.plist
-	echo "APPL????" > dist/macosx/configEditor.app/Contents/PkgInfo
-	mv build/exe.macosx-10.6-*-2.7/configEditor dist/macosx/configEditor.app/Contents/MacOS/
-	mv build/exe.macosx-10.6-*-2.7/*.dylib dist/macosx/configEditor.app/Contents/MacOS/
-	mv build/exe.macosx-10.6-*-2.7/PySide* dist/macosx/configEditor.app/Contents/MacOS/
-	mv build/exe.macosx-10.6-*-2.7/*.zip dist/macosx/configEditor.app/Contents/MacOS/
-	morelibs=`ls build/exe.macosx-10.6-*-2.7`
-	cd dist/macosx/configEditor.app/Contents/MacOS; \
-	install_name_tool -change /opt/local/lib/libQtCore.4.dylib @executable_path/libQtCore.4.dylib PySide.QtCore.so; \
-	install_name_tool -change /opt/local/lib/libQtGui.4.dylib @executable_path/libQtGui.4.dylib PySide.QtGui.so; \
-	install_name_tool -change /opt/local/lib/libQtCore.4.dylib @executable_path/libQtCore.4.dylib PySide.QtGui.so; \
-	install_name_tool -change /opt/local/lib/libQtCore.4.dylib @executable_path/libQtCore.4.dylib libpyside-python2.7.1.0.dylib; \
-	for f in `ls *.so`; do \
-		libs=`otool -XL $$f | grep "/opt/local/lib" | cut -f 2 | cut -f 1 -d " "`; \
- 		if [[ -n $$libs ]]; then \
-  			for l in $$libs; do \
-   				ll=`echo $$l | cut -f 5 -d"/"`; \
-   				install_name_tool -change $$l @executable_path/$$ll $$f; \
-  			done; \
- 		fi; \
-	done; \
-	for f in `ls *.dylib`; do \
-		install_name_tool -id @executable_path/$$f $$f; \
-		libs=`otool -XL $$f | grep "/opt/local/lib" | cut -f 2 | cut -f 1 -d " "`; \
- 		if [[ -n $$libs ]]; then \
-  			for l in $$libs; do \
-   				ll=`echo $$l | cut -f 5 -d"/"`; \
-   				install_name_tool -change $$l @executable_path/$$ll $$f; \
-  			done; \
- 		fi; \
-	done
-	mv build/exe.macosx-10.6-*-2.7/* dist/macosx/configEditor.app/Contents/MacOS/
-	cd dist/macosx/configEditor.app/Contents/MacOS; \
-	install_name_tool -id @executable_path/Python Python; \
-	install_name_tool -change /opt/local/Library/Frameworks/Python.framework/Versions/2.7/Python @executable_path/Python configEditor; \
-	for f in $$morelibs; do \
-		libs=`otool -XL $$f | grep "/opt/local/lib" | cut -f 2 | cut -f 1 -d " "`; \
- 		if [[ -n $$libs ]]; then \
-  			for l in $$libs; do \
-   				ll=`echo $$l | cut -f 5 -d"/"`; \
-   				install_name_tool -change $$l @executable_path/$$ll $$f; \
-  			done; \
- 		fi; \
-	done
-	mv dist/macosx/configEditor.app dist/macosx/configEditor-fat.app
-	ditto --rsrc --arch i386 dist/macosx/configEditor-fat.app dist/macosx/Config\ Editor.app
-	rm -rf dist/macosx/configEditor-fat.app
-	/Developer/Tools/SetFile -a B dist/macosx/Config\ Editor.app

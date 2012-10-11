@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
 	<key>CFBundleDisplayName</key>
-	<string>SpaceFortress</string>
+	<string>Space Fortress</string>
 	<key>CFBundleDocumentTypes</key>
 	<array>
 		<dict>
@@ -20,11 +20,11 @@
 		</dict>
 	</array>
 	<key>CFBundleExecutable</key>
-	<string>SpaceFortress</string>
+	<string>PSF5</string>
 	<key>CFBundleIconFile</key>
 	<string>psf5.icns</string>
 	<key>CFBundleIdentifier</key>
-	<string>edu.rpi.cogsci.cogworks.SpaceFortress</string>
+	<string>edu.rpi.cogsci.cogworks.spacefortress.game</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
@@ -48,7 +48,7 @@
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
 	<key>LSMinimumSystemVersion</key>
-	<string>10.6.0</string>
+	<string>OSXVERSION</string>
 	<key>LSUIPresentationMode</key>
 	<integer>3</integer>
 </dict>
