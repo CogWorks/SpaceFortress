@@ -1,18 +1,13 @@
-#shell.py
-#this code is to be placed in the "tokens" subfolder
-#Space Fortress 5
-#Marc Destefano
-#Rensselaer Polytechnic Institute
-#Fall 2010
 from __future__ import division
 from vector2D import Vector2D
 import math, os
-import token
 import pygame
 import picture
-#from frame import Frame
+from sftoken import Token
 
-class Shell(token.Token):
+import pkg_resources
+
+class Shell(Token):
     """represents the weapon fired from the fortress"""
     def __init__(self, app, orientation):
         super(Shell, self).__init__()
@@ -25,7 +20,7 @@ class Shell(token.Token):
         self.velocity.x = math.cos(math.radians((self.orientation) % 360)) * self.speed
         self.velocity.y = -math.sin(math.radians((self.orientation) % 360)) * self.speed
         if self.app.config['Graphics']['fancy']:
-            self.shell = picture.Picture(os.path.join(self.app.approot, 'gfx/plasma-red-big.png'), 24 * self.app.aspect_ratio / 43, self.orientation - 90)
+            self.shell = picture.Picture(pkg_resources.resource_stream("resources", 'gfx/plasmaredbig.png'), 24 * self.app.aspect_ratio / 43, self.orientation - 90)
         
     def compute(self):
         """calculates new position of shell"""

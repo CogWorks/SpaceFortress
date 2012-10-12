@@ -1,20 +1,16 @@
-#fortress.py
-#this code is to be placed in the "tokens" subfolder
-#Space Fortress 5
-#Marc Destefano
-#Rensselaer Polytechnic Institute
-#Fall 2010
 from __future__ import division
 from vector2D import Vector2D
 import math, os
-import token
 import shell
 import pygame
 import picture
 from gameevent import GameEvent
 from timer import Timer
+from sftoken import Token
 
-class Fortress(token.Token):
+import pkg_resources
+
+class Fortress(Token):
     """represents the fortress object that typically appears in the center of the worldsurf"""
     def __init__(self, app):
         super(Fortress, self).__init__()
@@ -29,7 +25,7 @@ class Fortress(token.Token):
         self.reset_timer = Timer(self.app.gametimer.elapsed)
         self.alive = True
         if self.app.config['Graphics']['fancy']:
-            self.fortress = picture.Picture(os.path.join(self.app.approot, 'psf5.png'), (72 * self.app.aspect_ratio) / 128)
+            self.fortress = picture.Picture(pkg_resources.resource_stream("resources", 'gfx/psf5.png'), (72 * self.app.aspect_ratio) / 128)
         
   
     def compute(self):
@@ -47,7 +43,7 @@ class Fortress(token.Token):
             self.alive = True
             
     def fire(self):
-        self.app.sounds.shell_fired.play()
+        self.app.snd_shell_fired.play()
         self.app.shell_list.append(shell.Shell(self.app, self.to_target_orientation(self.app.ship)))
         
     def draw(self, worldsurf):

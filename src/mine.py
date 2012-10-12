@@ -10,8 +10,6 @@ from sftoken import Token
 
 import pkg_resources
 
-#from frame import Frame
-
 mine_types = ['gfx/clust1.png',
               'gfx/clust2.png',
               'gfx/clust3.png',

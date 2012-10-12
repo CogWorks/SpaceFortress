@@ -1,16 +1,10 @@
-#hexagon.py
-#this code is to be placed in the "tokens" subfolder
-#Space Fortress 5
-#Marc Destefano
-#Rensselaer Polytechnic Institute
-#Fall 2010
 from __future__ import division
 from vector2D import Vector2D
 import math
-import token
 import pygame
+from sftoken import Token
 
-class Hex(token.Token):
+class Hex(Token):
     """represents the hexagons the delineate the 'proper' playing space"""
     def __init__(self, app, radius):
         super(Hex, self).__init__()

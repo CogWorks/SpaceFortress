@@ -1,18 +1,14 @@
-#ship.py
-#this code is to be placed in the "tokens" subfolder
-#Space Fortress 5
-#Marc Destefano
-#Rensselaer Polytechnic Institute
-#Fall 2010
 import math, os
-import token
 import missile
 import pygame
 import picture
 from timer import Timer
 from gameevent import GameEvent
+from sftoken import Token
 
-class Ship(token.Token):
+import pkg_resources
+
+class Ship(Token):
     """represents the fortress object that typically appears in the center of the worldsurf"""
     def __init__(self, app):
         super(Ship, self).__init__()
@@ -50,11 +46,11 @@ class Ship(token.Token):
             self.invert_y = -1.0
         self.color = (255, 255, 0)
         if self.app.config['Graphics']['fancy']:
-            self.ship = picture.Picture(os.path.join(self.app.approot, 'gfx/ship.png'), 48 * self.app.aspect_ratio / 128)
-            self.ship2 = picture.Picture(os.path.join(self.app.approot, 'gfx/ship2.png'), 66 * self.app.aspect_ratio / 175)
+            self.ship = picture.Picture(pkg_resources.resource_stream("resources", 'gfx/ship.png'), 48 * self.app.aspect_ratio / 128)
+            self.ship2 = picture.Picture(pkg_resources.resource_stream("resources", 'gfx/ship2.png'), 66 * self.app.aspect_ratio / 175)
             self.shields = []
             for i in range(0, self.start_health):
-                self.shields.append(picture.Picture(os.path.join(self.app.approot, 'gfx/shield.png'),
+                self.shields.append(picture.Picture(pkg_resources.resource_stream("resources", 'gfx/shield.png'),
                                                     70 * self.app.aspect_ratio / 400,
                                                     alpha=int(255.0 / (self.start_health - 1) * i)))
 
@@ -114,20 +110,20 @@ class Ship(token.Token):
         if self.app.config['General']['next_gen']:
             if self.app.score.shots > 0:
                 self.app.missile_list.append(missile.Missile(self.app))
-                self.app.sounds.missile_fired.play()
+                self.app.snd_missile_fired.play()
                 self.app.score.shots -= 1
             else:
-                self.app.sounds.empty.play()
+                self.app.snd_empty.play()
                 if self.app.config['Missile']['empty_penalty']:
                     self.app.score.pnts -= self.app.config['Missile']['missile_penalty']
                     self.app.score.bonus -= self.app.config['Missile']['missile_penalty']
         else:
             self.app.missile_list.append(missile.Missile(self.app))
-            self.app.sounds.missile_fired.play()
+            self.app.snd_missile_fired.play()
             if self.app.score.shots > 0:
                 self.app.score.shots -= 1
             else:
-                self.app.sounds.empty.play()
+                self.app.snd_empty.play()
                 self.app.score.pnts -= self.app.config['Missile']['missile_penalty']
                 self.app.score.bonus -= self.app.config['Missile']['missile_penalty']
 
@@ -166,13 +162,10 @@ class Ship(token.Token):
             shiprect.centerx = self.position.x
             shiprect.centery = self.position.y
             worldsurf.blit(ship, shiprect)
-            if self.app.playback and self.app.playback_logver <= 4:
-                pass
-            else:
-                s = self.health - 1
-                self.shields[s].rect.centerx = self.position.x
-                self.shields[s].rect.centery = self.position.y
-                worldsurf.blit(self.shields[s].image, self.shields[s].rect)
+            s = self.health - 1
+            self.shields[s].rect.centerx = self.position.x
+            self.shields[s].rect.centery = self.position.y
+            worldsurf.blit(self.shields[s].image, self.shields[s].rect)
         else:
             pygame.draw.line(worldsurf, self.color, (x1, y1), (x2, y2), self.app.linewidth)
             pygame.draw.line(worldsurf, self.color, (x3, y3), (x4, y4), self.app.linewidth)
