@@ -1,6 +1,5 @@
-Requires:
-  1) PyGame
-  2) NumPy
-  3) Argparse
+================
+Space Fortress 5
+================
 
-easy_install argparse
+Put something here that is useful to people!
