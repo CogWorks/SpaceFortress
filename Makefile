@@ -12,14 +12,14 @@ pkg: $(BUNDLES)
 		dist/SpaceFortress-$(APP_VERSION)-$(ARCH)-macosx$(OSX_VERSION).pkg
 	
 dist/freeze/%:
-	python build/setup_$*.py
+	python misc/setup_$*.py
 	
 dist/bundles/%.app: dist/freeze/%
 	mkdir -p $@/Contents/Resources
 	cp icons/$*.icns $@/Contents/Resources/
 	cp -r $? $@/Contents/MacOS
 	echo "APPL????" > $@/Contents/PkgInfo
-	cat build/Info.plist.$* | sed s/SFVERSION/"$(APP_VERSION)"/ | sed s/OSXVERSION/"$(OSX_VERSION)"/ > $@/Contents/Info.plist
+	cat misc/Info.plist.$* | sed s/SFVERSION/"$(APP_VERSION)"/ | sed s/OSXVERSION/"$(OSX_VERSION)"/ > $@/Contents/Info.plist
 	SetFile -a B $@
 	
 clean:
