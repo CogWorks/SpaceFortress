@@ -7,6 +7,9 @@ ARCH		:= $(shell uname -m)
 
 .SECONDARY: $(addprefix dist/freeze/,$(PROJECTS))
 
+info:
+	@echo "Usage: make [pkg|tag|clean]"
+
 pkg: $(BUNDLES)
 	productbuild $(subst .app,.app /Applications/Space\ Fortress\ 5,$(addprefix --component ,$?)) \
 		dist/SpaceFortress-$(APP_VERSION)-$(ARCH)-macosx$(OSX_VERSION).pkg
@@ -26,3 +29,7 @@ clean:
 	rm -rf dist
 	rm -rf `find . -name "*.pyo"`
 	rm -rf `find . -name "*.pyc"`
+	
+tag:
+	git tag v$(APP_VERSION) -m "v$(APP_VERSION)"
+	git push origin v$(APP_VERSION)
