@@ -42,8 +42,6 @@ def get_default_logdir():
         logdir = os.path.join(_home, 'Documents', 'Spacefortress')
     else:
         logdir = os.path.join(_home, 'Spacefortress')
-    if not os.path.exists(logdir):
-        os.makedirs(logdir)
     return logdir
 
 release_build = False
@@ -141,17 +139,17 @@ class Game(object):
         self.SCREEN_WIDTH = best_mode[0]
         self.SCREEN_HEIGHT = best_mode[1]
 
-        d = datetime.datetime.now().timetuple()
-        base = "SpaceFortress-%s_%s_%d-%d-%d_%d-%d-%d" % (__version__, self.config['General']['id'], d[0], d[1], d[2], d[3], d[4], d[5])
-        logdir = self.config['Logging']['logdir']
-        if len(logdir.strip()) == 0:
-            logdir = get_default_logdir()
-        if not os.path.exists(logdir):
-            os.makedirs(logdir)
-        self.log_basename = os.path.join(logdir, base)
-        self.gameevents.add("log", "basename", "ready", type='EVENT_SYSTEM')
-
         if self.config['Logging']['logging']:
+            d = datetime.datetime.now().timetuple()
+            base = "SpaceFortress-%s_%s_%d-%d-%d_%d-%d-%d" % (__version__, self.config['General']['id'], d[0], d[1], d[2], d[3], d[4], d[5])
+            logdir = self.config['Logging']['logdir']
+            print logdir
+            if len(logdir.strip()) == 0:
+                logdir = get_default_logdir()
+            if not os.path.exists(logdir):
+                os.makedirs(logdir)
+            self.log_basename = os.path.join(logdir, base)
+            self.gameevents.add("log", "basename", "ready", type='EVENT_SYSTEM')
             self.log_filename = "%s.txt.incomplete" % (self.log_basename)
             self.log = open(self.log_filename, "w")
             self.log_header = ["event_type", "system_time", "game_time",

@@ -93,7 +93,7 @@ def get_config():
     cfg.add_setting('Graphics', 'parallax_mode', 'Random', type=CT_COMBO, options=['Random', 'Fortress'])
 
     cfg.add_setting('Logging', 'logging', True, alias='Logging', type=CT_CHECKBOX, about='Enable/disable logging')
-    cfg.add_setting('Logging', 'logdir', 'data', alias='Log Directory', type=CT_LINEEDIT, about='Directory for log files, leave blank for default.')
+    cfg.add_setting('Logging', 'logdir', '', alias='Log Directory', type=CT_LINEEDIT, about='Directory for log files, leave blank for default.')
     cfg.add_setting('Logging', 'logDriver', 'Default', alias='Log Driver', type=CT_COMBO, options=logDrivers)
 
     cfg.add_setting('Keybindings', 'fire_key', 'SPACE', alias='Fire', type=CT_COMBO, options=PYGAME_KEYS)
