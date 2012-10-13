@@ -1,5 +1,6 @@
 import sys, os, platform
-from jsonConfig import *
+from jsonConfig.config import Config
+from jsonConfig.constants import *
 
 logDrivers = [ 'Default' ]
 

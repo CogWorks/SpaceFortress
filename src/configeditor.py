@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from PySide.QtGui import QApplication
-from jsonConfig import ConfigEditor
+from jsonConfig.editor import ConfigEditor
 import os, defaults
 
 if __name__ == '__main__':
