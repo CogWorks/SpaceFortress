@@ -33,3 +33,6 @@ clean:
 tag:
 	git tag v$(APP_VERSION) -m "v$(APP_VERSION)"
 	git push origin v$(APP_VERSION)
+	
+profile:
+	python -m cProfile -o spacefortress5.prof src/spacefortress5.py 
