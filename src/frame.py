@@ -1,8 +1,3 @@
-#frame.py
-#Space Fortress 5
-#Marc Destefano
-#Rensselaer Polytechnic Institute
-#Fall 2010
 import pygame, os
 
 class Frame(object):
