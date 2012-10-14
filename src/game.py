@@ -143,7 +143,6 @@ class Game(object):
             d = datetime.datetime.now().timetuple()
             base = "SpaceFortress-%s_%s_%d-%d-%d_%d-%d-%d" % (__version__, self.config['General']['id'], d[0], d[1], d[2], d[3], d[4], d[5])
             logdir = self.config['Logging']['logdir']
-            print logdir
             if len(logdir.strip()) == 0:
                 logdir = get_default_logdir()
             if not os.path.exists(logdir):
