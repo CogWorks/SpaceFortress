@@ -1020,10 +1020,6 @@ class Game(object):
                         self.bonus.draw(self.worldsurf)
                 self.screen.blit(self.scoresurf, self.scorerect)
                 self.screen.blit(self.worldsurf, self.worldrect)
-                if self.config['Display']['show_fps'] and not self.config['Playback']['makevideo']:
-                    self.draw_fps()
-                if self.config['Display']['show_et'] and not self.config['Playback']['makevideo']:
-                    self.draw_et()
 
         elif self.state == self.STATE_SCORES:
             self.draw_scores()
