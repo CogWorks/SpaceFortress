@@ -887,10 +887,11 @@ class Game(object):
 
     def test_collisions(self):
         """test collisions between relevant game entities"""
-        if self.smallhex.collide(self.ship):
-            self.gameevents.add("collide", "small_hex", "ship")
-        else:
-            self.smallhex.small_hex_flag = False
+        if self.fortress_exists:
+            if self.smallhex.collide(self.ship):
+                self.gameevents.add("collide", "small_hex", "ship")
+            else:
+                self.smallhex.small_hex_flag = False
         for i, shell in enumerate(self.shell_list):
             if shell.collide(self.ship):
                 self.gameevents.add("collide", "shell", i)
