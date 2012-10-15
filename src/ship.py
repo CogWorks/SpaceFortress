@@ -13,6 +13,7 @@ class Ship(Token):
     def __init__(self, app):
         super(Ship, self).__init__()
         self.app = app
+        self.dirt = []
         self.collision_radius = self.app.config['Ship']['ship_radius'] * self.app.aspect_ratio
         self.position.x = self.app.config['Ship']['ship_pos_x'] * self.app.aspect_ratio
         self.position.y = self.app.config['Ship']['ship_pos_y'] * self.app.aspect_ratio
@@ -90,8 +91,10 @@ class Ship(Token):
             self.velocity.y = self.max_vel
         elif self.velocity.y < -self.max_vel:
             self.velocity.y = -self.max_vel
-        self.position.x += self.velocity.x
-        self.position.y -= self.velocity.y
+        
+        self.position.x = round(self.position.x + self.velocity.x)
+        self.position.y = round(self.position.y - self.velocity.y)
+            
         if self.position.x > self.app.WORLD_WIDTH:
             self.position.x = 0
             self.app.gameevents.add("warp", "right")
@@ -127,32 +130,10 @@ class Ship(Token):
                 self.app.score.pnts -= self.app.config['Missile']['missile_penalty']
                 self.app.score.bonus -= self.app.config['Missile']['missile_penalty']
 
-    def draw(self, worldsurf):
-        """draw ship to worldsurf"""
-        #ship's nose is x+18 to x-18, wings are 18 back and 18 to the side of 0,0
-        #NewX = (OldX*Cos(Theta)) - (OldY*Sin(Theta))
-        #NewY = -((OldY*Cos(Theta)) + (OldX*Sin(Theta))) - taking inverse because +y is down
-        #these formulae rotate about the origin. Need to translate to origin, rotate, and translate back
-        self.sinphi = math.sin(math.radians((self.orientation) % 360))
-        self.cosphi = math.cos(math.radians((self.orientation) % 360))
-        #old x1 = -18
-        x1 = -18 * self.cosphi * self.app.aspect_ratio + self.position.x
-        y1 = -(-18 * self.sinphi) * self.app.aspect_ratio + self.position.y
-        #old x2 = + 18
-        x2 = 18 * self.cosphi * self.app.aspect_ratio + self.position.x
-        y2 = -(18 * self.sinphi) * self.app.aspect_ratio + self.position.y
-        # nose
-        self.nose = (x2, y2)
-        #x3 will be center point
-        x3 = self.position.x
-        y3 = self.position.y
-        #x4, y4 = -18, 18
-        x4 = (-18 * self.cosphi - 18 * self.sinphi) * self.app.aspect_ratio + self.position.x
-        y4 = (-((18 * self.cosphi) + (-18 * self.sinphi))) * self.app.aspect_ratio + self.position.y
-        #x5, y5 = -18, -18
-        x5 = (-18 * self.cosphi - -18 * self.sinphi) * self.app.aspect_ratio + self.position.x
-        y5 = (-((-18 * self.cosphi) + (-18 * self.sinphi))) * self.app.aspect_ratio + self.position.y
-
+    def draw(self):
+        for dirt in self.dirt:
+            self.app.screen.blit(self.app.starfield, dirt, dirt)
+            self.app.screen_buffer.blit(self.app.starfield, dirt, dirt)
         if self.app.config['Graphics']['fancy']:
             if not self.thrust_flag:
                 ship = pygame.transform.rotate(self.ship.image, self.orientation - 90)
@@ -161,12 +142,28 @@ class Ship(Token):
             shiprect = ship.get_rect()
             shiprect.centerx = self.position.x
             shiprect.centery = self.position.y
-            worldsurf.blit(ship, shiprect)
+            self.app.screen_buffer.blit(ship, shiprect)
             s = self.health - 1
             self.shields[s].rect.centerx = self.position.x
             self.shields[s].rect.centery = self.position.y
-            worldsurf.blit(self.shields[s].image, self.shields[s].rect)
+            self.app.screen_buffer.blit(self.shields[s].image, self.shields[s].rect)
+            self.dirt = [shiprect, self.shields[s].rect]
         else:
-            pygame.draw.line(worldsurf, self.color, (x1, y1), (x2, y2), self.app.linewidth)
-            pygame.draw.line(worldsurf, self.color, (x3, y3), (x4, y4), self.app.linewidth)
-            pygame.draw.line(worldsurf, self.color, (x3, y3), (x5, y5), self.app.linewidth)
+            self.sinphi = math.sin(math.radians((self.orientation) % 360))
+            self.cosphi = math.cos(math.radians((self.orientation) % 360))
+            x1 = -18 * self.cosphi * self.app.aspect_ratio + self.position.x
+            y1 = -(-18 * self.sinphi) * self.app.aspect_ratio + self.position.y
+            x2 = 18 * self.cosphi * self.app.aspect_ratio + self.position.x
+            y2 = -(18 * self.sinphi) * self.app.aspect_ratio + self.position.y
+            self.nose = (x2, y2)
+            x3 = self.position.x
+            y3 = self.position.y
+            x4 = (-18 * self.cosphi - 18 * self.sinphi) * self.app.aspect_ratio + self.position.x
+            y4 = (-((18 * self.cosphi) + (-18 * self.sinphi))) * self.app.aspect_ratio + self.position.y
+            x5 = (-18 * self.cosphi - -18 * self.sinphi) * self.app.aspect_ratio + self.position.x
+            y5 = (-((-18 * self.cosphi) + (-18 * self.sinphi))) * self.app.aspect_ratio + self.position.y
+            self.dirt = [
+                 pygame.draw.line(self.app.screen_buffer, self.color, (x1, y1), (x2, y2), self.app.linewidth),
+                 pygame.draw.line(self.app.screen_buffer, self.color, (x3, y3), (x4, y4), self.app.linewidth),
+                 pygame.draw.line(self.app.screen_buffer, self.color, (x3, y3), (x5, y5), self.app.linewidth)]
+        self.app.dirty_rects += self.dirt

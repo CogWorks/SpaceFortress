@@ -54,6 +54,9 @@ class Game(object):
         self.ret = 1
 
         self.reactor = reactor
+        
+        self.dirty_rects = []
+        self.dirty_stars = []
 
         self.STATE_UNKNOWN = -1
         self.STATE_CALIBRATE = 0
@@ -185,6 +188,8 @@ class Game(object):
         else:
             self.WORLD_WIDTH = int(710 * self.aspect_ratio)
             self.WORLD_HEIGHT = int(626 * self.aspect_ratio)
+        self.world = pygame.Rect(0, 0, self.WORLD_WIDTH, self.WORLD_HEIGHT)
+        
         self.linewidth = self.config['Display']['linewidth']
 
         self.kp_space = self.linewidth
@@ -258,32 +263,34 @@ class Game(object):
             self.screen = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT), pygame.NOFRAME)
         else:
             self.screen = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
+        self.screen_buffer = self.screen.copy()
+        self.starfield = self.screen.copy()
 
         self.gameevents.add("display", 'setmode', (self.SCREEN_WIDTH, self.SCREEN_HEIGHT, self.aspect_ratio), type='EVENT_SYSTEM')
 
         if self.config['Graphics']['fancy']:
             self.explosion = picture.Picture(pkg_resources.resource_stream("resources", 'gfx/exp2.png'), 182 * self.aspect_ratio / 344)
-            self.explosion.adjust_alpha(204)
+            #self.explosion.adjust_alpha(204)
             self.explosion_small = picture.Picture(pkg_resources.resource_stream("resources", 'gfx/exp3.png'), 70 * self.aspect_ratio / 85)
-            self.explosion_small.adjust_alpha(204)
+            #self.explosion_small.adjust_alpha(204)
         else:
             self.explosion = picture.Picture(pkg_resources.resource_stream("resources", 'gfx/exp.png'), 1)
             self.explosion_small = picture.Picture(pkg_resources.resource_stream("resources", 'gfx/exp.png'), 1)
 
         self.gametimer = Timer(get_time_ms)
         self.flighttimer = Timer(self.gametimer.elapsed)
-        self.worldsurf = pygame.Surface((self.WORLD_WIDTH, self.WORLD_HEIGHT))
-        self.worldrect = self.worldsurf.get_rect()
-        self.worldrect.centerx = self.SCREEN_WIDTH / 2
-        self.worldrect.centery = self.SCREEN_HEIGHT / 2
+        ##self.worldsurf = pygame.Surface((self.WORLD_WIDTH, self.WORLD_HEIGHT))
+        ##self.worldrect = self.worldsurf.get_rect()
+        ##self.worldrect.centerx = self.SCREEN_WIDTH / 2
+        ##self.worldrect.centery = self.SCREEN_HEIGHT / 2
         if not self.config['Score']['new_scoring_pos']:
-            self.worldrect.top = 5 * self.aspect_ratio
+            #self.worldrect.top = 5 * self.aspect_ratio
             self.scoresurf = pygame.Surface((self.WORLD_WIDTH, 64 * self.aspect_ratio))
             self.scorerect = self.scoresurf.get_rect()
             self.scorerect.top = 634 * self.aspect_ratio
             self.scorerect.centerx = self.SCREEN_WIDTH / 2
         else:
-            self.worldrect.top = 70 * self.aspect_ratio
+            #self.worldrect.top = 70 * self.aspect_ratio
             self.scoresurf = pygame.Surface.copy(self.screen)
             self.scorerect = self.screen.get_rect()
         self.bighex = Hex(self, self.config['Hexagon']['big_hex'])
@@ -399,6 +406,7 @@ class Game(object):
 
                         if self.state == self.STATE_INTRO:
                             self.state = self.STATE_SETUP
+                            self.screen.fill((0, 0, 0))
 
                         elif self.state == self.STATE_SETUP:
                             self.state = self.STATE_GAMENO
@@ -408,9 +416,11 @@ class Game(object):
                                 self.state = self.STATE_IFF
                             else:
                                 self.state = self.STATE_PREPARE
+                            self.screen.fill((0, 0, 0))
 
                         elif self.state == self.STATE_IFF:
                             self.state = self.STATE_PREPARE
+                            self.screen.fill((0, 0, 0))
 
                         elif self.state == self.STATE_SCORES:
                             self.state = self.STATE_SETUP
@@ -476,6 +486,7 @@ class Game(object):
             self.gameevents.add("game", "ready", type='EVENT_SYSTEM')
             self.setup_world()
             self.state = self.STATE_PLAY
+            self.screen.fill((0, 0, 0))
             self.gameevents.add("game", "start", type='EVENT_SYSTEM')
         elif self.state == self.STATE_PLAY:
             self.ship.compute()
@@ -501,7 +512,7 @@ class Game(object):
                 elif self.mine_list.flag and self.mine_list.timer.elapsed() > self.mine_list.timeout:
                     self.gameevents.add("timeout", "mine")
             self.mine_list.compute()
-            self.check_bounds()
+            #self.check_bounds()
             #test collisions to generate game events
             self.test_collisions()
             if self.flighttimer.elapsed() > self.config['Score']['update_timer']:
@@ -912,14 +923,16 @@ class Game(object):
 
     def check_bounds(self):
         """determine whether any shells or missiles have left the world"""
-        width = self.WORLD_WIDTH
-        height = self.WORLD_HEIGHT
         for i, missile in enumerate(self.missile_list):
-            if missile.out_of_bounds(width, height):
+            if missile.dirt and not self.world.contains(missile.dirt[0].unionall(missile.dirt[1:])):
+                for dirt in missile.dirt: 
+                    self.screen_buffer.fill((0, 0, 0), dirt.clip(self.world))
                 del self.missile_list[i]
                 self.gameevents.add("bounds_remove", "missile")
         for i, shell in enumerate(self.shell_list):
-            if shell.out_of_bounds(width, height):
+            if shell.dirt and not self.world.contains(shell.dirt[0].unionall(shell.dirt[1:])):
+                for dirt in shell.dirt: 
+                    self.screen_buffer.fill((0, 0, 0), dirt.clip(self.world))
                 del self.shell_list[i]
                 self.gameevents.add("bounds_remove", "shell")
 
@@ -937,16 +950,19 @@ class Game(object):
         self.ship.orientation = self.config['Ship']['ship_orientation']
 
     def draw_stars(self):
+        
+        if self.config['Graphics']['parallax_mode'] == 'Fortress':
+            orientation = self.fortress.orientation
+        else:
+            orientation = self.starfield_orientation
 
         for star in self.stars:
             if self.state == self.STATE_PLAY:
-                if self.config['Graphics']['parallax_mode'] == 'Fortress':
-                    orientation = self.fortress.orientation
-                else:
-                    orientation = self.starfield_orientation
-                diff = 1
-                star[0] += star[2] * math.cos(math.radians(orientation - 180)) * self.config['Graphics']['star_speed'] * diff
-                star[1] += star[2] * math.sin(math.radians(orientation)) * self.config['Graphics']['star_speed'] * diff
+                r = pygame.Rect(star[0], star[1], star[2], star[2])
+                self.dirty_stars += [r]
+                self.starfield.fill((0, 0, 0), r)
+                star[0] += star[2] * math.cos(math.radians(orientation - 180)) * self.config['Graphics']['star_speed']
+                star[1] += star[2] * math.sin(math.radians(orientation)) * self.config['Graphics']['star_speed']
                 if star[0] >= self.WORLD_WIDTH:
                     star[0] = 0
                     star[1] = randrange(0, self.WORLD_WIDTH - self.linewidth)
@@ -969,11 +985,12 @@ class Game(object):
                 color = (190, 190, 190)
             elif star[2] == 3:
                 color = (255, 255, 255)
-            self.worldsurf.fill(color, (star[0], star[1], star[2], star[2]))
-
+            r = pygame.Rect(star[0], star[1], star[2], star[2])
+            self.dirty_stars += [r]
+            self.starfield.fill(color, r)
+            
     def draw(self):
         """draws the world"""
-        self.screen.fill((0, 0, 0))
 
         if self.state == self.STATE_INTRO:
             self.draw_intro()
@@ -990,42 +1007,49 @@ class Game(object):
                 self.draw_pause_overlay()            
             else:
 
-                self.frame.draw(self.worldsurf, self.scoresurf)
-                self.score.draw(self.scoresurf)
+                ##self.frame.draw(self.worldsurf, self.scoresurf)
+                ##self.score.draw(self.scoresurf)
     
                 if self.stars:
                     self.draw_stars()
     
-                self.bighex.draw(self.worldsurf)
-                self.smallhex.draw(self.worldsurf)
+                ##self.bighex.draw(self.worldsurf)
+                ##self.smallhex.draw(self.worldsurf)
                 
                 for shell in self.shell_list:
-                    shell.draw(self.worldsurf)
+                    shell.draw()
                 if self.fortress_exists:
                     if self.fortress.alive:
-                        self.fortress.draw(self.worldsurf)
-                    else:
-                        self.explosion.rect.center = (self.fortress.position.x, self.fortress.position.y)
-                        self.worldsurf.blit(self.explosion.image, self.explosion.rect)
+                        self.fortress.draw()
+                    ##else:
+                        ##self.explosion.rect.center = (self.fortress.position.x, self.fortress.position.y)
+                        ##self.worldsurf.blit(self.explosion.image, self.explosion.rect)
                 for missile in self.missile_list:
-                    missile.draw(self.worldsurf)
+                    missile.draw()
                 if self.ship.alive:
-                    self.ship.draw(self.worldsurf)
-                else:
-                    self.explosion_small.rect.center = (self.ship.position.x, self.ship.position.y)
-                    self.worldsurf.blit(self.explosion_small.image, self.explosion_small.rect)
-                self.mine_list.draw()
-                if self.bonus_exists:
-                    if self.bonus.visible:
-                        self.bonus.draw(self.worldsurf)
-                self.screen.blit(self.scoresurf, self.scorerect)
-                self.screen.blit(self.worldsurf, self.worldrect)
+                    self.ship.draw()
+                ##else:
+                    ##self.explosion_small.rect.center = (self.ship.position.x, self.ship.position.y)
+                    ##self.worldsurf.blit(self.explosion_small.image, self.explosion_small.rect)
+                ##self.mine_list.draw()
+                ##if self.bonus_exists:
+                    ##if self.bonus.visible:
+                        ##self.bonus.draw(self.worldsurf)
+                ##self.screen.blit(self.scoresurf, self.scorerect)
+                ##self.screen.blit(self.worldsurf, self.worldrect)
 
         elif self.state == self.STATE_SCORES:
             self.draw_scores()
 
         self.gameevents.add("display", 'preflip', 'main', False, type='EVENT_SYSTEM')
-        pygame.display.flip()
+        for r in self.dirty_stars:
+            self.screen.blit(self.starfield, r, r)
+        for r in self.dirty_rects:
+            #pygame.draw.rect(self.screen_buffer, (0, 255, 0), r, 1)
+            self.screen.blit(self.screen_buffer, r, r)
+        pygame.display.update(self.dirty_rects + self.dirty_rects)
+        del self.dirty_rects[:]
+        del self.dirty_stars[:]
 
     def log_world(self):
         """logs current state of world to logfile"""
@@ -1162,25 +1186,27 @@ class Game(object):
         scale = .4 * self.SCREEN_HEIGHT / 128
         logo = picture.Picture(pkg_resources.resource_stream("resources", 'gfx/psf5.png'), scale)
         logo.rect.center = (self.SCREEN_WIDTH / 2, self.SCREEN_HEIGHT / 2)
-        self.screen.fill((0, 0, 0))
-        self.screen.blit(title, title_rect)
-        self.screen.blit(vers, vers_rect)
-        self.screen.blit(copy, copy_rect)
-        self.screen.blit(logo.image, logo.rect)
+        self.screen_buffer.fill((0, 0, 0))
+        self.screen_buffer.blit(title, title_rect)
+        self.screen_buffer.blit(vers, vers_rect)
+        self.screen_buffer.blit(copy, copy_rect)
+        self.screen_buffer.blit(logo.image, logo.rect)
+        self.dirty_rects += [logo.rect, title_rect, vers_rect, copy_rect]
 
     def draw_game_number(self):
         """before game begins, present the game number"""
         self.gameevents.add("display_game", self.current_game)
         self.mine_list.generate_foes()
-        self.screen.fill((0, 0, 0))
+        self.screen_buffer.fill((0, 0, 0))
         title = "Game: %d of %d" % (self.current_game, self.config['General']['games_per_session'])
         gamesurf = self.f36.render(title, True, (255, 255, 0))
         gamerect = gamesurf.get_rect()
         gamerect.centery = self.SCREEN_HEIGHT / 16 * 7
         gamerect.centerx = self.SCREEN_WIDTH / 2
-        self.screen.blit(gamesurf, gamerect)
-        pygame.draw.line(self.screen, (255, 255, 255), (self.SCREEN_WIDTH / 4 , self.SCREEN_HEIGHT / 16 * 8.5), (self.SCREEN_WIDTH / 4 * 3, self.SCREEN_HEIGHT / 16 * 8.5))
-        pygame.draw.line(self.screen, (255, 255, 255), (self.SCREEN_WIDTH / 4 , self.SCREEN_HEIGHT / 16 * 5.5), (self.SCREEN_WIDTH / 4 * 3, self.SCREEN_HEIGHT / 16 * 5.5))
+        self.screen_buffer.blit(gamesurf, gamerect)
+        self.dirty_rects += [pygame.draw.line(self.screen_buffer, (255, 255, 255), (self.SCREEN_WIDTH / 4 , self.SCREEN_HEIGHT / 16 * 8.5), (self.SCREEN_WIDTH / 4 * 3, self.SCREEN_HEIGHT / 16 * 8.5))]
+        self.dirty_rects += [pygame.draw.line(self.screen_buffer, (255, 255, 255), (self.SCREEN_WIDTH / 4 , self.SCREEN_HEIGHT / 16 * 5.5), (self.SCREEN_WIDTH / 4 * 3, self.SCREEN_HEIGHT / 16 * 5.5))]
+        self.dirty_rects += [gamerect]
 
     def draw_foe_mines(self):
         """before game begins, present the list of IFF letters to target"""
@@ -1206,6 +1232,7 @@ class Game(object):
         self.screen.blit(midbot, midbot_rect)
         self.screen.blit(bottom, bottom_rect)
         self.gameevents.add("display_foes", " ".join(self.mine_list.foe_letters), "player")
+        self.dirty_rects += [top_rect, middle_rect, midbot_rect, bottom_rect]
 
     def draw_old_score(self):
         """shows score for last game and waits to continue"""

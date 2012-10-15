@@ -12,6 +12,7 @@ class Shell(Token):
     def __init__(self, app, orientation):
         super(Shell, self).__init__()
         self.app = app
+        self.dirt = []
         self.orientation = orientation
         self.position.x = self.app.fortress.position.x
         self.position.y = self.app.fortress.position.y
@@ -27,33 +28,32 @@ class Shell(Token):
         self.position.x += self.velocity.x
         self.position.y += self.velocity.y
                
-    def draw(self, worldsurf):
-        """draws shell to worldsurf"""       
-        #photoshop measurement shows, from center, 16 points ahead, 8 points behind, and 6 points to either side
-        #NewX = (OldX*Cos(Theta)) - (OldY*Sin(Theta))
-        #NewY = -((OldY*Cos(Theta)) + (OldX*Sin(Theta))) flip 'cause +y is down
-        #these formulae rotate about the origin. Need to translate to origin, rotate, and translate back
-        self.sinphi = math.sin(math.radians((self.orientation) % 360))
-        self.cosphi = math.cos(math.radians((self.orientation) % 360))
-        
-        x1 = -8 * self.cosphi * self.app.aspect_ratio + self.position.x
-        y1 = -(-8 * self.sinphi) * self.app.aspect_ratio + self.position.y
-        x2 = -(-6 * self.sinphi) * self.app.aspect_ratio + self.position.x
-        y2 = -(-6 * self.cosphi) * self.app.aspect_ratio + self.position.y
-        x3 = 16 * self.cosphi * self.app.aspect_ratio + self.position.x
-        y3 = -(16 * self.sinphi) * self.app.aspect_ratio + self.position.y
-        x4 = -(6 * self.sinphi) * self.app.aspect_ratio + self.position.x
-        y4 = -(6 * self.cosphi) * self.app.aspect_ratio + self.position.y
-        
+    def draw(self):       
+        for dirt in self.dirt:
+            self.app.screen.blit(self.app.starfield, dirt, dirt)
+            self.app.screen_buffer.blit(self.app.starfield, dirt, dirt)
         if self.app.config['Graphics']['fancy']:
             self.shell.rect.centerx = self.position.x
             self.shell.rect.centery = self.position.y
-            worldsurf.blit(self.shell.image, self.shell.rect)
+            self.app.screen_buffer.blit(self.shell.image, self.shell.rect)
+            self.dirt = [self.shell.rect]
         else:
-            pygame.draw.line(worldsurf, (255, 0, 0), (x1, y1), (x2, y2), self.app.linewidth)
-            pygame.draw.line(worldsurf, (255, 0, 0), (x2, y2), (x3, y3), self.app.linewidth)
-            pygame.draw.line(worldsurf, (255, 0, 0), (x3, y3), (x4, y4), self.app.linewidth)
-            pygame.draw.line(worldsurf, (255, 0, 0), (x4, y4), (x1, y1), self.app.linewidth)
+            self.sinphi = math.sin(math.radians((self.orientation) % 360))
+            self.cosphi = math.cos(math.radians((self.orientation) % 360))
+            x1 = -8 * self.cosphi * self.app.aspect_ratio + self.position.x
+            y1 = -(-8 * self.sinphi) * self.app.aspect_ratio + self.position.y
+            x2 = -(-6 * self.sinphi) * self.app.aspect_ratio + self.position.x
+            y2 = -(-6 * self.cosphi) * self.app.aspect_ratio + self.position.y
+            x3 = 16 * self.cosphi * self.app.aspect_ratio + self.position.x
+            y3 = -(16 * self.sinphi) * self.app.aspect_ratio + self.position.y
+            x4 = -(6 * self.sinphi) * self.app.aspect_ratio + self.position.x
+            y4 = -(6 * self.cosphi) * self.app.aspect_ratio + self.position.y
+            self.dirt = [
+                         pygame.draw.line(self.app.screen_buffer, (255, 0, 0), (x1, y1), (x2, y2), self.app.linewidth),
+                         pygame.draw.line(self.app.screen_buffer, (255, 0, 0), (x2, y2), (x3, y3), self.app.linewidth),
+                         pygame.draw.line(self.app.screen_buffer, (255, 0, 0), (x3, y3), (x4, y4), self.app.linewidth),
+                         pygame.draw.line(self.app.screen_buffer, (255, 0, 0), (x4, y4), (x1, y1), self.app.linewidth)]
+        self.app.dirty_rects += self.dirt
         
     def __str__(self):
         return '(%.2f,%.2f,%.2f)' % (self.position.x, self.position.y, self.orientation)

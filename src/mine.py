@@ -61,6 +61,7 @@ class Mine(Token):
             self.mine.rect.centerx = self.position.x
             self.mine.rect.centery = self.position.y
             worldsurf.blit(self.mine.image, self.mine.rect)
+            self.app.dirty_rects += [self.mine.rect]
         else:
             pygame.draw.line(worldsurf, self.color, (self.position.x - 16 * self.app.aspect_ratio, self.position.y), (self.position.x, self.position.y - 24 * self.app.aspect_ratio), self.app.linewidth)
             pygame.draw.line(worldsurf, self.color, (self.position.x, self.position.y - 24 * self.app.aspect_ratio), (self.position.x + 16 * self.app.aspect_ratio, self.position.y), self.app.linewidth)

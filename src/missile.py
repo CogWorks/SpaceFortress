@@ -12,12 +12,13 @@ class Missile(Token):
     def __init__(self, app, orientation=None):
         super(Missile, self).__init__()
         self.app = app
+        self.dirt = []
         if orientation:
             self.orientation = orientation
         else:
             self.orientation = self.app.ship.orientation
-        self.position.x = self.app.ship.nose[0]
-        self.position.y = self.app.ship.nose[1]
+        self.position.x = self.app.ship.position.x
+        self.position.y = self.app.ship.position.y
         self.collision_radius = self.app.config['Missile']['missile_radius'] * self.app.aspect_ratio
         self.speed = self.app.config['Missile']['missile_speed']
         self.velocity.x = math.cos(math.radians((self.orientation) % 360)) * self.speed
@@ -31,32 +32,31 @@ class Missile(Token):
         self.position.y += self.velocity.y
         
         
-    def draw(self, worldsurf):
-        """draws ship's missile to worldsurf"""
-        #photoshop measurement shows 25 pixels long, and two wings at 45 degrees to the left and right, 7 pixels long
-        #these formulae rotate about the origin. Need to translate to origin, rotate, and translate back
-        self.sinphi = math.sin(math.radians((self.orientation) % 360))
-        self.cosphi = math.cos(math.radians((self.orientation) % 360))
-        self.x1 = self.position.x
-        self.y1 = self.position.y
-        #x2 is -25
-        self.x2 = -25 * self.cosphi * self.app.aspect_ratio + self.position.x
-        self.y2 = -(-25 * self.sinphi) * self.app.aspect_ratio + self.position.y
-        #x3, y3 is -5, +5
-        self.x3 = ((-5 * self.cosphi) - (5 * self.sinphi)) * self.app.aspect_ratio + self.position.x
-        self.y3 = (-((5 * self.cosphi) + (-5 * self.sinphi))) * self.app.aspect_ratio + self.position.y
-        #x4, y4 is -5, -5
-        self.x4 = ((-5 * self.cosphi) - (-5 * self.sinphi)) * self.app.aspect_ratio + self.position.x
-        self.y4 = (-((-5 * self.cosphi) + (-5 * self.sinphi))) * self.app.aspect_ratio + self.position.y
-        
+    def draw(self):
+        for dirt in self.dirt:
+            self.app.screen.blit(self.app.starfield, dirt, dirt)
+            self.app.screen_buffer.blit(self.app.starfield, dirt, dirt)        
         if self.app.config['Graphics']['fancy']:
             self.missile.rect.centerx = self.position.x
             self.missile.rect.centery = self.position.y
-            worldsurf.blit(self.missile.image, self.missile.rect)
+            self.app.screen_buffer.blit(self.missile.image, self.missile.rect)
+            self.dirt = [self.missile.rect]
         else:
-            pygame.draw.line(worldsurf, (255, 0, 0), (self.x1, self.y1), (self.x2, self.y2), self.app.linewidth)
-            pygame.draw.line(worldsurf, (255, 0, 0), (self.x1, self.y1), (self.x3, self.y3), self.app.linewidth)
-            pygame.draw.line(worldsurf, (255, 0, 0), (self.x1, self.y1), (self.x4, self.y4), self.app.linewidth)
+            self.sinphi = math.sin(math.radians((self.orientation) % 360))
+            self.cosphi = math.cos(math.radians((self.orientation) % 360))
+            self.x1 = self.position.x
+            self.y1 = self.position.y
+            self.x2 = -25 * self.cosphi * self.app.aspect_ratio + self.position.x
+            self.y2 = -(-25 * self.sinphi) * self.app.aspect_ratio + self.position.y
+            self.x3 = ((-5 * self.cosphi) - (5 * self.sinphi)) * self.app.aspect_ratio + self.position.x
+            self.y3 = (-((5 * self.cosphi) + (-5 * self.sinphi))) * self.app.aspect_ratio + self.position.y
+            self.x4 = ((-5 * self.cosphi) - (-5 * self.sinphi)) * self.app.aspect_ratio + self.position.x
+            self.y4 = (-((-5 * self.cosphi) + (-5 * self.sinphi))) * self.app.aspect_ratio + self.position.y
+            self.dirt = [
+                         pygame.draw.line(self.app.screen_buffer, (255, 0, 0), (self.x1, self.y1), (self.x2, self.y2), self.app.linewidth),
+                         pygame.draw.line(self.app.screen_buffer, (255, 0, 0), (self.x1, self.y1), (self.x3, self.y3), self.app.linewidth),
+                         pygame.draw.line(self.app.screen_buffer, (255, 0, 0), (self.x1, self.y1), (self.x4, self.y4), self.app.linewidth)]
+        self.app.dirty_rects += self.dirt
         
     def __str__(self):
         return '(%.2f,%.2f,%.2f)' % (self.position.x, self.position.y, self.orientation)
