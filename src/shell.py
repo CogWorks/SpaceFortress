@@ -7,6 +7,8 @@ from sftoken import Token
 
 import pkg_resources
 
+import pygl2d
+
 class Shell(Token):
     """represents the weapon fired from the fortress"""
     def __init__(self, app, orientation):
@@ -20,36 +22,32 @@ class Shell(Token):
         self.velocity.x = math.cos(math.radians((self.orientation) % 360)) * self.speed
         self.velocity.y = -math.sin(math.radians((self.orientation) % 360)) * self.speed
         if self.app.config['Graphics']['fancy']:
-            self.shell = picture.Picture(pkg_resources.resource_stream("resources", 'gfx/plasmaredbig.png'), 24 * self.app.aspect_ratio / 43, self.orientation - 90)
+            self.shell = pygl2d.image.Image(pkg_resources.resource_stream("resources", 'gfx/plasmaredbig.png'))
+            self.shell_rect = self.shell.get_rect()
+            self.shell.scale(24 * self.app.aspect_ratio / 43)
+            self.shell.rotate(self.orientation - 90)
         
     def compute(self):
         """calculates new position of shell"""
         self.position.x += self.velocity.x
         self.position.y += self.velocity.y
                
-    def draw(self, worldsurf):
+    def draw(self):
         """draws shell to worldsurf"""       
-        #photoshop measurement shows, from center, 16 points ahead, 8 points behind, and 6 points to either side
-        #NewX = (OldX*Cos(Theta)) - (OldY*Sin(Theta))
-        #NewY = -((OldY*Cos(Theta)) + (OldX*Sin(Theta))) flip 'cause +y is down
-        #these formulae rotate about the origin. Need to translate to origin, rotate, and translate back
-        self.sinphi = math.sin(math.radians((self.orientation) % 360))
-        self.cosphi = math.cos(math.radians((self.orientation) % 360))
-        
-        x1 = -8 * self.cosphi * self.app.aspect_ratio + self.position.x
-        y1 = -(-8 * self.sinphi) * self.app.aspect_ratio + self.position.y
-        x2 = -(-6 * self.sinphi) * self.app.aspect_ratio + self.position.x
-        y2 = -(-6 * self.cosphi) * self.app.aspect_ratio + self.position.y
-        x3 = 16 * self.cosphi * self.app.aspect_ratio + self.position.x
-        y3 = -(16 * self.sinphi) * self.app.aspect_ratio + self.position.y
-        x4 = -(6 * self.sinphi) * self.app.aspect_ratio + self.position.x
-        y4 = -(6 * self.cosphi) * self.app.aspect_ratio + self.position.y
-        
         if self.app.config['Graphics']['fancy']:
-            self.shell.rect.centerx = self.position.x
-            self.shell.rect.centery = self.position.y
-            worldsurf.blit(self.shell.image, self.shell.rect)
+            self.shell_rect.center = (self.position.x, self.position.y)
+            self.shell.draw(self.shell_rect.topleft)
         else:
+            self.sinphi = math.sin(math.radians((self.orientation) % 360))
+            self.cosphi = math.cos(math.radians((self.orientation) % 360))
+            x1 = -8 * self.cosphi * self.app.aspect_ratio + self.position.x
+            y1 = -(-8 * self.sinphi) * self.app.aspect_ratio + self.position.y
+            x2 = -(-6 * self.sinphi) * self.app.aspect_ratio + self.position.x
+            y2 = -(-6 * self.cosphi) * self.app.aspect_ratio + self.position.y
+            x3 = 16 * self.cosphi * self.app.aspect_ratio + self.position.x
+            y3 = -(16 * self.sinphi) * self.app.aspect_ratio + self.position.y
+            x4 = -(6 * self.sinphi) * self.app.aspect_ratio + self.position.x
+            y4 = -(6 * self.cosphi) * self.app.aspect_ratio + self.position.y
             pygame.draw.line(worldsurf, (255, 0, 0), (x1, y1), (x2, y2), self.app.linewidth)
             pygame.draw.line(worldsurf, (255, 0, 0), (x2, y2), (x3, y3), self.app.linewidth)
             pygame.draw.line(worldsurf, (255, 0, 0), (x3, y3), (x4, y4), self.app.linewidth)

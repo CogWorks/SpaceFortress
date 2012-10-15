@@ -3,11 +3,19 @@ from __future__ import division
 from twisted.internet import reactor
 from twisted.internet.task import LoopingCall
 
-import os, sys, platform, math, copy, time, datetime, pkg_resources
+import os, sys, math, copy, time, datetime, pkg_resources
 from random import randrange, choice
 
+import platform as plat
+
 os.environ['SDL_VIDEO_WINDOW_POS'] = 'center'
+
+from OpenGL.GL import *
+from OpenGL.GLU import *
+
 import pygame
+from pygame.locals import *
+import pygl2d
 
 from gameevent import GameEvent, GameEventList
 from frame import Frame
@@ -26,7 +34,7 @@ import picture
 import defaults
 
 get_time = time.time
-if platform.system() == 'Windows':
+if plat.system() == 'Windows':
     get_time = time.clock
 def get_time_ms(): return get_time() * 1000
 
@@ -36,9 +44,9 @@ def get_psf_version_string():
 
 def get_default_logdir():
     _home = os.environ.get('HOME', '/')
-    if platform.system() == 'Windows':
+    if plat.system() == 'Windows':
         logdir = os.path.join(os.environ['USERPROFILE'], 'My Documents', 'Spacefortress')
-    elif platform.system() == 'Linux' or platform.system() == 'Darwin':
+    elif plat.system() == 'Linux' or plat.system() == 'Darwin':
         logdir = os.path.join(_home, 'Documents', 'Spacefortress')
     else:
         logdir = os.path.join(_home, 'Spacefortress')
@@ -87,7 +95,7 @@ class Game(object):
         self.starfield_orientation = randrange(0, 359)
 
         self.modifier = pygame.KMOD_CTRL
-        if platform.system() == 'Darwin':
+        if plat.system() == 'Darwin':
             self.modifier = pygame.KMOD_META
 
         self.gameevents = GameEventList(self)
@@ -207,18 +215,6 @@ class Game(object):
         self.f96 = pygame.font.Font(self.fp, int(72 * self.aspect_ratio))
         self.f36 = pygame.font.Font(self.fp, int(36 * self.aspect_ratio))
 
-        self.frame = Frame(self)
-        self.score = Score(self)
-
-        self.gameevents.add("score1", self.score.scores_locations[0][0], self.score.scores_locations[0][1], type='EVENT_SYSTEM')
-        self.gameevents.add("score2", self.score.scores_locations[1][0], self.score.scores_locations[1][1], type='EVENT_SYSTEM')
-        self.gameevents.add("score3", self.score.scores_locations[2][0], self.score.scores_locations[2][1], type='EVENT_SYSTEM')
-        self.gameevents.add("score4", self.score.scores_locations[3][0], self.score.scores_locations[3][1], type='EVENT_SYSTEM')
-        self.gameevents.add("score5", self.score.scores_locations[4][0], self.score.scores_locations[4][1], type='EVENT_SYSTEM')
-        self.gameevents.add("score6", self.score.scores_locations[5][0], self.score.scores_locations[5][1], type='EVENT_SYSTEM')
-        self.gameevents.add("score7", self.score.scores_locations[6][0], self.score.scores_locations[6][1], type='EVENT_SYSTEM')
-        self.gameevents.add("score8", self.score.scores_locations[7][0], self.score.scores_locations[7][1], type='EVENT_SYSTEM')
-
         self.joystick = None
         if self.config['Joystick']['use_joystick']:
             pygame.joystick.init()
@@ -253,39 +249,51 @@ class Game(object):
         self.snd_empty = Sound(self, pkg_resources.resource_stream("resources", "sounds/emptychamber.wav"))
         
         if self.config['Display']['display_mode'] == 'Fullscreen' or self.config['Display']['display_mode'] == 'Current':
-            self.screen = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT), pygame.FULLSCREEN)
+            self.screen = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT), pygame.FULLSCREEN | pygame.DOUBLEBUF | pygame.OPENGL)
         elif self.config['Display']['display_mode'] == 'Fake Fullscreen':
-            self.screen = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT), pygame.NOFRAME)
+            self.screen = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT), pygame.NOFRAME | pygame.DOUBLEBUF | pygame.OPENGL)
         else:
-            self.screen = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
-
+            self.screen = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT), pygame.DOUBLEBUF | pygame.OPENGL)
+        self.init_gl()
         self.gameevents.add("display", 'setmode', (self.SCREEN_WIDTH, self.SCREEN_HEIGHT, self.aspect_ratio), type='EVENT_SYSTEM')
 
+        self.frame = Frame(self)
+        self.score = Score(self)
+
+        self.gameevents.add("score1", self.score.scores_locations[0][0], self.score.scores_locations[0][1], type='EVENT_SYSTEM')
+        self.gameevents.add("score2", self.score.scores_locations[1][0], self.score.scores_locations[1][1], type='EVENT_SYSTEM')
+        self.gameevents.add("score3", self.score.scores_locations[2][0], self.score.scores_locations[2][1], type='EVENT_SYSTEM')
+        self.gameevents.add("score4", self.score.scores_locations[3][0], self.score.scores_locations[3][1], type='EVENT_SYSTEM')
+        self.gameevents.add("score5", self.score.scores_locations[4][0], self.score.scores_locations[4][1], type='EVENT_SYSTEM')
+        self.gameevents.add("score6", self.score.scores_locations[5][0], self.score.scores_locations[5][1], type='EVENT_SYSTEM')
+        self.gameevents.add("score7", self.score.scores_locations[6][0], self.score.scores_locations[6][1], type='EVENT_SYSTEM')
+        self.gameevents.add("score8", self.score.scores_locations[7][0], self.score.scores_locations[7][1], type='EVENT_SYSTEM')
+
         if self.config['Graphics']['fancy']:
-            self.explosion = picture.Picture(pkg_resources.resource_stream("resources", 'gfx/exp2.png'), 182 * self.aspect_ratio / 344)
-            self.explosion.adjust_alpha(204)
-            self.explosion_small = picture.Picture(pkg_resources.resource_stream("resources", 'gfx/exp3.png'), 70 * self.aspect_ratio / 85)
-            self.explosion_small.adjust_alpha(204)
+            self.explosion = pygl2d.image.Image(pkg_resources.resource_stream("resources", 'gfx/exp2.png'))
+            self.explosion_rect = self.explosion.get_rect()
+            self.explosion.scale(182 * self.aspect_ratio / 344)
+            self.explosion.colorize(255.0, 255.0, 255.0, 204)
+            self.explosion_small = pygl2d.image.Image(pkg_resources.resource_stream("resources", 'gfx/exp3.png'))
+            self.explosion_small_rect = self.explosion_small.get_rect()
+            self.explosion_small.scale(70 * self.aspect_ratio / 85)
+            self.explosion_small.colorize(255.0, 255.0, 255.0, 204)
         else:
-            self.explosion = picture.Picture(pkg_resources.resource_stream("resources", 'gfx/exp.png'), 1)
-            self.explosion_small = picture.Picture(pkg_resources.resource_stream("resources", 'gfx/exp.png'), 1)
+            self.explosion = pygl2d.image.Image(pkg_resources.resource_stream("resources", 'gfx/exp.png'))
+            self.explosion_rect = self.explosion.get_rect()
+            self.explosion_small = pygl2d.image.Image(pkg_resources.resource_stream("resources", 'gfx/exp.png'))
+            self.explosion_small_rect = self.explosion_small.get_rect()
 
         self.gametimer = Timer(get_time_ms)
         self.flighttimer = Timer(self.gametimer.elapsed)
-        self.worldsurf = pygame.Surface((self.WORLD_WIDTH, self.WORLD_HEIGHT))
-        self.worldrect = self.worldsurf.get_rect()
-        self.worldrect.centerx = self.SCREEN_WIDTH / 2
-        self.worldrect.centery = self.SCREEN_HEIGHT / 2
+        
+        self.world = pygame.rect.Rect(0, 0, self.WORLD_WIDTH, self.WORLD_HEIGHT)
+        self.world.center = (self.SCREEN_WIDTH / 2, self.SCREEN_HEIGHT / 2)
         if not self.config['Score']['new_scoring_pos']:
-            self.worldrect.top = 5 * self.aspect_ratio
-            self.scoresurf = pygame.Surface((self.WORLD_WIDTH, 64 * self.aspect_ratio))
-            self.scorerect = self.scoresurf.get_rect()
-            self.scorerect.top = 634 * self.aspect_ratio
-            self.scorerect.centerx = self.SCREEN_WIDTH / 2
+            self.world.top = 5 * self.aspect_ratio
         else:
-            self.worldrect.top = 70 * self.aspect_ratio
-            self.scoresurf = pygame.Surface.copy(self.screen)
-            self.scorerect = self.screen.get_rect()
+            self.world.top = 70 * self.aspect_ratio
+
         self.bighex = Hex(self, self.config['Hexagon']['big_hex'])
         if self.config['Hexagon']['hide_big_hex']:
             self.bighex.color = (0, 0, 0)
@@ -353,12 +361,10 @@ class Game(object):
         self.mine_list.timer.reset()
 
     def draw_pause_overlay(self):
-        #self.screen.fill((0, 0, 0))
-        pause = self.f96.render("Paused!", True, (255, 255, 255))
+        pause = pygl2d.font.RenderText("Paused!", (255, 255, 255), self.f96)
         pause_rect = pause.get_rect()
-        pause_rect.centerx = self.SCREEN_WIDTH / 2
-        pause_rect.centery = self.SCREEN_HEIGHT / 2
-        self.screen.blit(pause, pause_rect)
+        pause_rect.center = (self.SCREEN_WIDTH / 2, self.SCREEN_HEIGHT / 2)
+        pause.draw(pause_rect.topleft)
 
     def process_input(self):
         """creates game events based on pygame events"""
@@ -912,14 +918,12 @@ class Game(object):
 
     def check_bounds(self):
         """determine whether any shells or missiles have left the world"""
-        width = self.WORLD_WIDTH
-        height = self.WORLD_HEIGHT
         for i, missile in enumerate(self.missile_list):
-            if missile.out_of_bounds(width, height):
+            if missile.out_of_bounds(self.world):
                 del self.missile_list[i]
                 self.gameevents.add("bounds_remove", "missile")
         for i, shell in enumerate(self.shell_list):
-            if shell.out_of_bounds(width, height):
+            if shell.out_of_bounds(self.world):
                 del self.shell_list[i]
                 self.gameevents.add("bounds_remove", "shell")
 
@@ -930,8 +934,8 @@ class Game(object):
         pygame.time.delay(1000)
         self.score.iff = ""
         self.ship.alive = True
-        self.ship.position.x = self.config['Ship']['ship_pos_x'] * self.aspect_ratio
-        self.ship.position.y = self.config['Ship']['ship_pos_y'] * self.aspect_ratio
+        self.ship.position.x = self.world.left + self.config['Ship']['ship_pos_x'] * self.aspect_ratio
+        self.ship.position.y = self.world.top + self.config['Ship']['ship_pos_y'] * self.aspect_ratio
         self.ship.velocity.x = self.config['Ship']['ship_vel_x']
         self.ship.velocity.y = self.config['Ship']['ship_vel_y']
         self.ship.orientation = self.config['Ship']['ship_orientation']
@@ -944,24 +948,23 @@ class Game(object):
                     orientation = self.fortress.orientation
                 else:
                     orientation = self.starfield_orientation
-                diff = 1
-                star[0] += star[2] * math.cos(math.radians(orientation - 180)) * self.config['Graphics']['star_speed'] * diff
-                star[1] += star[2] * math.sin(math.radians(orientation)) * self.config['Graphics']['star_speed'] * diff
-                if star[0] >= self.WORLD_WIDTH:
-                    star[0] = 0
-                    star[1] = randrange(0, self.WORLD_WIDTH - self.linewidth)
+                star[0] += star[2] * math.cos(math.radians(orientation - 180)) * self.config['Graphics']['star_speed']
+                star[1] += star[2] * math.sin(math.radians(orientation)) * self.config['Graphics']['star_speed']
+                if star[0] >= self.world.right - self.linewidth:
+                    star[0] = self.world.left + self.linewidth
+                    star[1] = randrange(self.world.top + self.linewidth, self.world.bottom - self.linewidth)
                     star[2] = choice([1, 2, 3])
-                elif star[0] <= 0:
-                    star[0] = self.WORLD_WIDTH
-                    star[1] = randrange(0, self.WORLD_WIDTH - self.linewidth)
+                elif star[0] <= self.world.left + self.linewidth:
+                    star[0] = self.world.right - self.linewidth
+                    star[1] = randrange(self.world.top + self.linewidth, self.world.bottom - self.linewidth)
                     star[2] = choice([1, 2, 3])
-                elif star[1] >= self.WORLD_HEIGHT:
-                    star[1] = 0
-                    star[0] = randrange(0, self.WORLD_WIDTH - self.linewidth)
+                elif star[1] >= self.world.bottom - self.linewidth:
+                    star[1] = self.world.top + self.linewidth
+                    star[0] = randrange(self.world.left + self.linewidth, self.world.right - self.linewidth)
                     star[2] = choice([1, 2, 3])
-                elif star[1] <= 0:
-                    star[1] = self.WORLD_HEIGHT
-                    star[0] = randrange(0, self.WORLD_WIDTH - self.linewidth)
+                elif star[1] <= self.world.top + self.linewidth:
+                    star[1] = self.world.bottom - self.linewidth
+                    star[0] = randrange(self.world.left + self.linewidth, self.world.right - self.linewidth)
                     star[2] = choice([1, 2, 3])
             if star[2] == 1:
                 color = (100, 100, 100)
@@ -969,63 +972,100 @@ class Game(object):
                 color = (190, 190, 190)
             elif star[2] == 3:
                 color = (255, 255, 255)
-            self.worldsurf.fill(color, (star[0], star[1], star[2], star[2]))
+            pygl2d.draw.rect((star[0], star[1], star[2], star[2]), color)
+            
+    def init_gl(self):
+        glEnable(GL_BLEND)
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+        glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE)
+        glEnable(GL_TEXTURE_2D)
+        glShadeModel(GL_SMOOTH)
+        glClearColor(0.0, 0.0, 0.0, 0.0)
+        glClearDepth(1.0)
+        glEnable(GL_DEPTH_TEST)
+        glEnable(GL_ALPHA_TEST)
+        glDepthFunc(GL_LEQUAL)
+        glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST)
+        glAlphaFunc(GL_NOTEQUAL, 0.0)
+            
+    def enable2D(self, rect):
+        glMatrixMode(GL_PROJECTION)
+        glPushMatrix()
+        glLoadIdentity()
+        glOrtho(rect[0], rect[0] + rect[1], rect[2], rect[2] + rect[3], -1, 1)
+        glMatrixMode(GL_MODELVIEW)
+        glPushMatrix()
+        glLoadIdentity()
+
+    def disable2D(self):
+        glMatrixMode(GL_PROJECTION)
+        glPopMatrix()
+        glMatrixMode(GL_MODELVIEW)
+        glPopMatrix()
+        
+    def begin_draw(self):
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+        glLoadIdentity()
+        self.enable2D((0, self.SCREEN_WIDTH, 0, self.SCREEN_HEIGHT))
+        
+    def end_draw(self):
+        self.disable2D()
+        pygame.display.flip()
 
     def draw(self):
         """draws the world"""
-        self.screen.fill((0, 0, 0))
-
+        
+        self.begin_draw()
+        
         if self.state == self.STATE_INTRO:
             self.draw_intro()
-
+            
         elif self.state == self.STATE_GAMENO:
             self.draw_game_number()
-
+            
         elif self.state == self.STATE_IFF:
             self.draw_foe_mines()
-
-        elif self.state == self.STATE_PLAY or self.state == self.STATE_PAUSED:
             
+        elif self.state == self.STATE_PLAY or self.state == self.STATE_PAUSED:
             if self.state == self.STATE_PAUSED and self.config['Display']['pause_overlay']:
                 self.draw_pause_overlay()            
             else:
-
-                self.frame.draw(self.worldsurf, self.scoresurf)
-                self.score.draw(self.scoresurf)
-    
+                self.frame.draw()
+                self.score.draw()
                 if self.stars:
                     self.draw_stars()
-    
-                self.bighex.draw(self.worldsurf)
-                self.smallhex.draw(self.worldsurf)
+                    
+                self.bighex.draw()
+                if self.fortress_exists and not self.fortress.alive:
+                    pass
+                else:
+                    self.smallhex.draw()
                 
                 for shell in self.shell_list:
-                    shell.draw(self.worldsurf)
+                    shell.draw()
                 if self.fortress_exists:
                     if self.fortress.alive:
-                        self.fortress.draw(self.worldsurf)
+                        self.fortress.draw()
                     else:
-                        self.explosion.rect.center = (self.fortress.position.x, self.fortress.position.y)
-                        self.worldsurf.blit(self.explosion.image, self.explosion.rect)
+                        self.explosion_rect.center = (self.fortress.position.x, self.fortress.position.y)
+                        self.explosion.draw(self.explosion_rect.topleft)
                 for missile in self.missile_list:
-                    missile.draw(self.worldsurf)
+                    missile.draw()
                 if self.ship.alive:
-                    self.ship.draw(self.worldsurf)
+                    self.ship.draw()
                 else:
-                    self.explosion_small.rect.center = (self.ship.position.x, self.ship.position.y)
-                    self.worldsurf.blit(self.explosion_small.image, self.explosion_small.rect)
+                    self.explosion_small_rect.center = (self.ship.position.x, self.ship.position.y)
+                    self.explosion_small.draw(self.explosion_small_rect.topleft)
                 self.mine_list.draw()
-                if self.bonus_exists:
-                    if self.bonus.visible:
-                        self.bonus.draw(self.worldsurf)
-                self.screen.blit(self.scoresurf, self.scorerect)
-                self.screen.blit(self.worldsurf, self.worldrect)
+                if self.bonus_exists and self.bonus.visible:
+                    self.bonus.draw()
 
         elif self.state == self.STATE_SCORES:
             self.draw_scores()
 
         self.gameevents.add("display", 'preflip', 'main', False, type='EVENT_SYSTEM')
-        pygame.display.flip()
+        
+        self.end_draw()
 
     def log_world(self):
         """logs current state of world to logfile"""
@@ -1150,62 +1190,56 @@ class Game(object):
 
     def draw_intro(self):
         """display intro scene"""
-        title = self.font1.render(get_psf_version_string(), True, (255, 200, 100))
+        
+        title = pygl2d.font.RenderText(get_psf_version_string(), (255, 200, 100), self.font1)
         title_rect = title.get_rect()
         title_rect.center = (self.SCREEN_WIDTH / 2, self.SCREEN_HEIGHT / 5)
-        vers = self.font2.render('Version: %s' % (__version__), True, (255, 200, 100))
+        title.draw(title_rect.topleft)
+        vers = pygl2d.font.RenderText('Version: %s' % (__version__), (255, 200, 100), self.font2)
         vers_rect = vers.get_rect()
         vers_rect.center = (self.SCREEN_WIDTH / 2, 4 * self.SCREEN_HEIGHT / 5 - self.fh / 2 - 2)
-        copy = self.font2.render('Copyright \xa92011 CogWorks Laboratory, Rensselaer Polytechnic Institute', True, (255, 200, 100))
+        vers.draw(vers_rect.topleft)
+        copy = pygl2d.font.RenderText('Copyright \xa92011 CogWorks Laboratory, Rensselaer Polytechnic Institute', (255, 200, 100), self.font2)
         copy_rect = copy.get_rect()
         copy_rect.center = (self.SCREEN_WIDTH / 2, 4 * self.SCREEN_HEIGHT / 5 + self.fh / 2 + 2)
-        scale = .4 * self.SCREEN_HEIGHT / 128
-        logo = picture.Picture(pkg_resources.resource_stream("resources", 'gfx/psf5.png'), scale)
-        logo.rect.center = (self.SCREEN_WIDTH / 2, self.SCREEN_HEIGHT / 2)
-        self.screen.fill((0, 0, 0))
-        self.screen.blit(title, title_rect)
-        self.screen.blit(vers, vers_rect)
-        self.screen.blit(copy, copy_rect)
-        self.screen.blit(logo.image, logo.rect)
+        copy.draw(copy_rect.topleft)
+        logo = pygl2d.image.Image(pkg_resources.resource_stream("resources", 'gfx/psf5.png'))
+        logo_rect = logo.get_rect()
+        logo_rect.center = (self.SCREEN_WIDTH / 2, self.SCREEN_HEIGHT / 2)
+        logo.scale(.4 * self.SCREEN_HEIGHT / 128)
+        logo.draw(logo_rect.topleft)
 
     def draw_game_number(self):
         """before game begins, present the game number"""
         self.gameevents.add("display_game", self.current_game)
         self.mine_list.generate_foes()
-        self.screen.fill((0, 0, 0))
         title = "Game: %d of %d" % (self.current_game, self.config['General']['games_per_session'])
-        gamesurf = self.f36.render(title, True, (255, 255, 0))
-        gamerect = gamesurf.get_rect()
-        gamerect.centery = self.SCREEN_HEIGHT / 16 * 7
-        gamerect.centerx = self.SCREEN_WIDTH / 2
-        self.screen.blit(gamesurf, gamerect)
-        pygame.draw.line(self.screen, (255, 255, 255), (self.SCREEN_WIDTH / 4 , self.SCREEN_HEIGHT / 16 * 8.5), (self.SCREEN_WIDTH / 4 * 3, self.SCREEN_HEIGHT / 16 * 8.5))
-        pygame.draw.line(self.screen, (255, 255, 255), (self.SCREEN_WIDTH / 4 , self.SCREEN_HEIGHT / 16 * 5.5), (self.SCREEN_WIDTH / 4 * 3, self.SCREEN_HEIGHT / 16 * 5.5))
-
+        title = pygl2d.font.RenderText(title, (255, 255, 0), self.f36)
+        title_rect = title.get_rect()
+        title_rect.center = (self.SCREEN_WIDTH / 2, self.SCREEN_HEIGHT / 16 * 7)
+        title.draw(title_rect.topleft)
+        pygl2d.draw.line((self.SCREEN_WIDTH / 4 , self.SCREEN_HEIGHT / 16 * 8.5), (self.SCREEN_WIDTH / 4 * 3, self.SCREEN_HEIGHT / 16 * 8.5), (255, 255, 255))
+        pygl2d.draw.line((self.SCREEN_WIDTH / 4 , self.SCREEN_HEIGHT / 16 * 5.5), (self.SCREEN_WIDTH / 4 * 3, self.SCREEN_HEIGHT / 16 * 5.5), (255, 255, 255))
+        
     def draw_foe_mines(self):
         """before game begins, present the list of IFF letters to target"""
-        self.screen.fill((0, 0, 0))
-        top = self.f24.render("The Type-2 mines for this session are:", True, (255, 255, 0))
-        top_rect = top.get_rect()
-        top_rect.centerx = self.SCREEN_WIDTH / 2
-        top_rect.centery = 270 * self.aspect_ratio
-        middle = self.f96.render(", ".join(self.mine_list.foe_letters), True, (255, 255, 255))
-        middle_rect = middle.get_rect()
-        middle_rect.centerx = self.SCREEN_WIDTH / 2
-        middle_rect.centery = self.SCREEN_HEIGHT / 2
-        midbot = self.f24.render("Try to memorize them before proceeding", True, (255, 255, 0))
-        midbot_rect = midbot.get_rect()
-        midbot_rect.centerx = self.SCREEN_WIDTH / 2
-        midbot_rect.centery = 500 * self.aspect_ratio
-        bottom = self.f24.render("Press return to begin", True, (255, 255, 0))
-        bottom_rect = bottom.get_rect()
-        bottom_rect.centerx = self.SCREEN_WIDTH / 2
-        bottom_rect.centery = 600 * self.aspect_ratio
-        self.screen.blit(top, top_rect)
-        self.screen.blit(middle, middle_rect)
-        self.screen.blit(midbot, midbot_rect)
-        self.screen.blit(bottom, bottom_rect)
         self.gameevents.add("display_foes", " ".join(self.mine_list.foe_letters), "player")
+        top = pygl2d.font.RenderText("The Type-2 mines for this session are:", (255, 255, 0), self.f24)
+        top_rect = top.get_rect()
+        top_rect.center = (self.SCREEN_WIDTH / 2, 270 * self.aspect_ratio)
+        top.draw(top_rect.topleft)
+        middle = pygl2d.font.RenderText(", ".join(self.mine_list.foe_letters), (255, 255, 255), self.f96)
+        middle_rect = middle.get_rect()
+        middle_rect.center = (self.SCREEN_WIDTH / 2, self.SCREEN_HEIGHT / 2)
+        middle.draw(middle_rect.topleft)
+        midbot = pygl2d.font.RenderText("Try to memorize them before proceeding", (255, 255, 0), self.f24)
+        midbot_rect = midbot.get_rect()
+        midbot_rect.center = (self.SCREEN_WIDTH / 2, 500 * self.aspect_ratio)
+        midbot.draw(midbot_rect.topleft)
+        bottom = pygl2d.font.RenderText("Press return to begin", (255, 255, 0), self.f24)
+        bottom_rect = bottom.get_rect()
+        bottom_rect.center = (self.SCREEN_WIDTH / 2, 600 * self.aspect_ratio)
+        bottom.draw(bottom_rect.topleft)
 
     def draw_old_score(self):
         """shows score for last game and waits to continue"""
@@ -1427,8 +1461,8 @@ class Game(object):
         """ Create the starfield """
         self.stars = []
         for i in range(self.config['Graphics']['max_stars']):
-            star = [randrange(0, self.WORLD_WIDTH - self.linewidth),
-                    randrange(0, self.WORLD_HEIGHT - self.linewidth),
+            star = [randrange(self.world.left, self.world.right),
+                    randrange(self.world.top, self.world.bottom),
                     choice([1, 2, 3])]
             self.stars.append(star)
 

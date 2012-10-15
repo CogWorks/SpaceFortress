@@ -10,6 +10,8 @@ from sftoken import Token
 
 import pkg_resources
 
+import pygl2d
+
 mine_types = ['gfx/clust1.png',
               'gfx/clust2.png',
               'gfx/clust3.png',
@@ -40,13 +42,15 @@ class Mine(Token):
         else:
             self.type = random.choice(range(0, len(mine_types)))
         if self.app.config['Graphics']['fancy']:
-            img = mine_types[self.type]
-            self.mine = picture.Picture(pkg_resources.resource_stream("resources", img), 64 * self.app.aspect_ratio / 128, self.orientation)
+            self.mine = pygl2d.image.Image(pkg_resources.resource_stream("resources", mine_types[self.type]))
+            self.mine_rect = self.mine.get_rect()
+            self.mine.scale(64 * self.app.aspect_ratio / 128)
+            self.mine.rotate(self.orientation)
                 
     def generate_new_position(self):
         """chooses random location to place mine"""
-        self.position.x = random.random() * (self.app.WORLD_WIDTH - 40) + 20
-        self.position.y = random.random() * (self.app.WORLD_HEIGHT - 40) + 20
+        self.position.x = random.randrange(int(self.app.world.left + self.mine.get_width()), int(self.app.world.right - self.mine.get_width()))
+        self.position.y = random.randrange(int(self.app.world.top + self.mine.get_height()), int(self.app.world.bottom - self.mine.get_height()))
         
     def compute(self):
         """calculates new position of mine"""
@@ -55,12 +59,11 @@ class Mine(Token):
         self.position.x += self.velocity.x
         self.position.y += self.velocity.y
         
-    def draw(self, worldsurf):
+    def draw(self):
         """draws mine to worldsurf"""
         if self.app.config['Graphics']['fancy']:
-            self.mine.rect.centerx = self.position.x
-            self.mine.rect.centery = self.position.y
-            worldsurf.blit(self.mine.image, self.mine.rect)
+            self.mine_rect.center = (self.position.x, self.position.y)
+            self.mine.draw(self.mine_rect.topleft)
         else:
             pygame.draw.line(worldsurf, self.color, (self.position.x - 16 * self.app.aspect_ratio, self.position.y), (self.position.x, self.position.y - 24 * self.app.aspect_ratio), self.app.linewidth)
             pygame.draw.line(worldsurf, self.color, (self.position.x, self.position.y - 24 * self.app.aspect_ratio), (self.position.x + 16 * self.app.aspect_ratio, self.position.y), self.app.linewidth)
@@ -116,7 +119,7 @@ class MineList(list):
     def draw(self):
         """draws all mines"""
         for mine in self:
-            mine.draw(self.app.worldsurf)
+            mine.draw()
                 
     def __str__(self):
         s = ''

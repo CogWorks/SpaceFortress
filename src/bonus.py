@@ -2,6 +2,8 @@ import pygame
 import random, os
 from timer import Timer
 
+import pygl2d
+
 class Bonus(object):
     """bonus symbol"""
     def __init__(self, app):
@@ -41,34 +43,35 @@ class Bonus(object):
         
     def set_bonus_location(self):
         if self.app.config['General']['bonus_location'] == 'Random':
-            self.x = random.randint(30, self.app.WORLD_WIDTH - 30)
-            self.y = random.randint(30, self.app.WORLD_HEIGHT - 30)
+            self.x = random.randint(self.app.world.left + 30, self.app.world.right - 30)
+            self.y = random.randint(self.app.world.top + 30, self.app.world.bottom - 30)
         elif self.app.config['General']['bonus_location'] == 'Probabilistic':
-            w = self.app.WORLD_WIDTH / 5
-            h = self.app.WORLD_HEIGHT / 5
+            w = self.app.world.width / 5
+            h = self.app.world.height / 5
             probs = map(float, self.app.config['Bonus']['quadrant_probs'].split(','))
-            if random.random() <= probs[0]:
-                self.x = w
-                self.y = h
-            elif random.random() <= probs[1]:
-                self.x = w * 4
-                self.y = h
-            elif random.random() <= probs[2]:
-                self.x = w
-                self.y = h * 4
+            r
+            if r <= probs[0]:
+                self.x = self.app.world.left + w
+                self.y = self.app.world.top + h
+            elif r <= probs[1]:
+                self.x = self.app.world.left + w * 4
+                self.y = self.app.world.top + h
+            elif r <= probs[2]:
+                self.x = self.app.world.left + w
+                self.y = self.app.world.top + h * 4
             else:
-                self.x = w * 4
-                self.y = h * 4
+                self.x = self.app.world.left + w * 4
+                self.y = self.app.world.top + h * 4
         else:
             self.x = self.app.config['Bonus']['bonus_pos_x'] * self.app.aspect_ratio
             self.y = self.app.config['Bonus']['bonus_pos_y'] * self.app.aspect_ratio
         
-    def draw(self, worldsurf):
+    def draw(self):
         """draws bonus symbol to screen"""
-        bonus = self.font.render("%s" % self.current_symbol, 1, (255, 255, 0))
+        bonus = pygl2d.font.RenderText("%s" % self.current_symbol, (255, 200, 0), self.font)
         bonus_rect = bonus.get_rect()
         bonus_rect.center = (self.x, self.y)
-        worldsurf.blit(bonus, bonus_rect)
+        bonus.draw(bonus_rect.topleft)
     
     def get_new_symbol(self):
         """assigns new bonus symbol"""

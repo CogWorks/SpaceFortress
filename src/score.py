@@ -6,6 +6,8 @@
 #Fall 2010
 import pygame
 
+import pygl2d
+
 class ScoreAttr(object):
     def __init__(self, name, old=False, both=False):
         self.name = name
@@ -146,74 +148,74 @@ class Score(object):
             if isinstance(self.positions[item], float):
                 self.positions[item] = int(self.positions[item])
 
-    def draw(self, scoresurf):
+    def draw(self):
         """draws all score values to screen"""
         #get some floats from adding fractions. Change to int for font rendering
         self.update_score()
         #print self.positions
-        self.p1_surf = self.f.render("%s" % str(self.positions[1]), 0, (255, 255, 0))
-        self.p1_rect = self.p1_surf.get_rect()
-        self.p1_rect.center = self.scores_locations[0]
+        p1_surf = pygl2d.font.RenderText("%s" % str(self.positions[1]), (255, 255, 0), self.f)
+        p1_rect = p1_surf.get_rect()
+        p1_rect.center = self.scores_locations[0]
         if self.app.config['General']['next_gen']:
             time = (self.app.config['General']['game_time'] - self.app.gametimer.elapsed()) / 1000.0
             if (time < 0): time = 0
-            self.p2_surf = self.f.render("%.1f" % (time), 0, (255, 255, 0))
-            self.p2_rect = self.p2_surf.get_rect()
-            self.p2_rect.center = self.scores_locations[1]
+            p2_surf = pygl2d.font.RenderText("%.1f" % (time), (255, 255, 0), self.f)
+            p2_rect = p2_surf.get_rect()
+            p2_rect.center = self.scores_locations[1]
         else:
-            self.p2_surf = self.f.render("%s" % str(self.positions[2]), 0, (255, 255, 0))
-            self.p2_rect = self.p2_surf.get_rect()
-            self.p2_rect.center = self.scores_locations[1]
-        self.p3_surf = self.f.render("%s" % str(self.positions[3]), 0, (255, 255, 0))
-        self.p3_rect = self.p3_surf.get_rect()
-        self.p3_rect.center = self.scores_locations[2]
-        self.p4_surf = self.f.render("%s" % str(self.positions[4]), 0, (255, 255, 0))
-        self.p4_rect = self.p4_surf.get_rect()
-        self.p4_rect.center = self.scores_locations[3]
-        self.p5_surf = self.f.render("%s" % str(self.positions[5]), 0, (255, 255, 0))
-        self.p5_rect = self.p5_surf.get_rect()
-        self.p5_rect.center = self.scores_locations[4]
-        self.p6_surf = self.f.render("%s" % str(self.positions[6]), 0, (255, 255, 0))
-        self.p6_rect = self.p6_surf.get_rect()
-        self.p6_rect.center = self.scores_locations[5]
-        self.p7_surf = self.f.render("%s" % str(self.positions[7]), 0, (255, 255, 0))
-        self.p7_rect = self.p7_surf.get_rect()
-        self.p7_rect.center = self.scores_locations[6]
-        self.p8_surf = self.f.render("%s" % str(self.positions[8]), 0, (255, 255, 0))
-        self.p8_rect = self.p8_surf.get_rect()
-        self.p8_rect.center = self.scores_locations[7]
+            p2_surf = pygl2d.font.RenderText("%s" % str(self.positions[2]), (255, 255, 0), self.f)
+            p2_rect = p2_surf.get_rect()
+            p2_rect.center = self.scores_locations[1]
+        p3_surf = pygl2d.font.RenderText("%s" % str(self.positions[3]), (255, 255, 0), self.f)
+        p3_rect = p3_surf.get_rect()
+        p3_rect.center = self.scores_locations[2]
+        p4_surf = pygl2d.font.RenderText("%s" % str(self.positions[4]), (255, 255, 0), self.f)
+        p4_rect = p4_surf.get_rect()
+        p4_rect.center = self.scores_locations[3]
+        p5_surf = pygl2d.font.RenderText("%s" % str(self.positions[5]), (255, 255, 0), self.f)
+        p5_rect = p5_surf.get_rect()
+        p5_rect.center = self.scores_locations[4]
+        p6_surf = pygl2d.font.RenderText("%s" % str(self.positions[6]), (255, 255, 0), self.f)
+        p6_rect = p6_surf.get_rect()
+        p6_rect.center = self.scores_locations[5]
+        p7_surf = pygl2d.font.RenderText("%s" % str(self.positions[7]), (255, 255, 0), self.f)
+        p7_rect = p7_surf.get_rect()
+        p7_rect.center = self.scores_locations[6]
+        p8_surf = pygl2d.font.RenderText("%s" % str(self.positions[8]), (255, 255, 0), self.f)
+        p8_rect = p8_surf.get_rect()
+        p8_rect.center = self.scores_locations[7]
         if self.app.config['Score']['new_scoring_pos']:
             # Bottom Left
-            self.p1_rect.center = self.scores_locations[0] #320
+            p1_rect.center = self.scores_locations[0] #320
             # Bottom Right
-            self.p2_rect.center = self.scores_locations[1] #660
+            p2_rect.center = self.scores_locations[1] #660
             # Right Top
-            self.p3_rect.center = self.scores_locations[2] #940
+            p3_rect.center = self.scores_locations[2] #940
             # Right Bottom
-            self.p4_rect.center = self.scores_locations[3] #940
+            p4_rect.center = self.scores_locations[3] #940
             # Top Right
-            self.p5_rect.center = self.scores_locations[4] #660
+            p5_rect.center = self.scores_locations[4] #660
             # Top Left
-            self.p6_rect.center = self.scores_locations[5] #320
+            p6_rect.center = self.scores_locations[5] #320
             # Left Bottom
-            self.p7_rect.center = self.scores_locations[6] #80
+            p7_rect.center = self.scores_locations[6] #80
             # Left Tom
-            self.p8_rect.center = self.scores_locations[7] #80
+            p8_rect.center = self.scores_locations[7] #80
 
         if not(self.app.config['Score']['INTRVL_pos'] == 1 and self.intrvl == 0):
-            scoresurf.blit(self.p1_surf, self.p1_rect)
+            p1_surf.draw(p1_rect.topleft)
         if not(self.app.config['Score']['INTRVL_pos'] == 2 and self.intrvl == 0):
-            scoresurf.blit(self.p2_surf, self.p2_rect)
+            p2_surf.draw(p2_rect.topleft)
         if not(self.app.config['Score']['INTRVL_pos'] == 3 and self.intrvl == 0):
-            scoresurf.blit(self.p3_surf, self.p3_rect)
+            p3_surf.draw(p3_rect.topleft)
         if not(self.app.config['Score']['INTRVL_pos'] == 4 and self.intrvl == 0):
-            scoresurf.blit(self.p4_surf, self.p4_rect)
+            p4_surf.draw(p4_rect.topleft)
         if not self.app.config['General']['next_gen']:
             if not(self.app.config['Score']['INTRVL_pos'] == 5 and self.intrvl == 0):
-                scoresurf.blit(self.p5_surf, self.p5_rect)
+                p5_surf.draw(p5_rect.topleft)
             if not(self.app.config['Score']['INTRVL_pos'] == 6 and self.intrvl == 0):
-                scoresurf.blit(self.p6_surf, self.p6_rect)
+                p6_surf.draw(p6_rect.topleft)
         if not(self.app.config['Score']['INTRVL_pos'] == 7 and self.intrvl == 0):
-            scoresurf.blit(self.p7_surf, self.p7_rect)
+            p7_surf.draw(p7_rect.topleft)
         if not(self.app.config['Score']['INTRVL_pos'] == 8 and self.intrvl == 0):
-            scoresurf.blit(self.p8_surf, self.p8_rect)
+            p8_surf.draw(p8_rect.topleft)

@@ -8,14 +8,16 @@ from sftoken import Token
 
 import pkg_resources
 
+import pygl2d
+
 class Ship(Token):
     """represents the fortress object that typically appears in the center of the worldsurf"""
     def __init__(self, app):
         super(Ship, self).__init__()
         self.app = app
         self.collision_radius = self.app.config['Ship']['ship_radius'] * self.app.aspect_ratio
-        self.position.x = self.app.config['Ship']['ship_pos_x'] * self.app.aspect_ratio
-        self.position.y = self.app.config['Ship']['ship_pos_y'] * self.app.aspect_ratio
+        self.position.x = self.app.world.left + self.app.config['Ship']['ship_pos_x'] * self.app.aspect_ratio
+        self.position.y = self.app.world.top + self.app.config['Ship']['ship_pos_y'] * self.app.aspect_ratio
         self.nose = (self.position.x, self.position.y)
         self.velocity.x = self.app.config['Ship']['ship_vel_x']
         self.velocity.y = self.app.config['Ship']['ship_vel_y']
@@ -46,13 +48,18 @@ class Ship(Token):
             self.invert_y = -1.0
         self.color = (255, 255, 0)
         if self.app.config['Graphics']['fancy']:
-            self.ship = picture.Picture(pkg_resources.resource_stream("resources", 'gfx/ship.png'), 48 * self.app.aspect_ratio / 128)
-            self.ship2 = picture.Picture(pkg_resources.resource_stream("resources", 'gfx/ship2.png'), 66 * self.app.aspect_ratio / 175)
+            self.ship = pygl2d.image.Image(pkg_resources.resource_stream("resources", 'gfx/ship.png'))
+            self.ship2 = pygl2d.image.Image(pkg_resources.resource_stream("resources", 'gfx/ship2.png'))
+            self.ship_rect = self.ship.get_rect()
+            self.ship.scale(66 * self.app.aspect_ratio / 175)
+            self.ship2.scale(66 * self.app.aspect_ratio / 175)
             self.shields = []
             for i in range(0, self.start_health):
-                self.shields.append(picture.Picture(pkg_resources.resource_stream("resources", 'gfx/shield.png'),
-                                                    70 * self.app.aspect_ratio / 400,
-                                                    alpha=int(255.0 / (self.start_health - 1) * i)))
+                shield = pygl2d.image.Image(pkg_resources.resource_stream("resources", 'gfx/shield.png'))
+                shield.colorize(255.0, 255.0, 255.0, int(255.0 / (self.start_health - 1) * i))
+                self.shield_rect = shield.get_rect()
+                shield.scale(70 * self.app.aspect_ratio / 400)
+                self.shields.append(shield)
 
 
     def compute(self):
@@ -92,17 +99,17 @@ class Ship(Token):
             self.velocity.y = -self.max_vel
         self.position.x += self.velocity.x
         self.position.y -= self.velocity.y
-        if self.position.x > self.app.WORLD_WIDTH:
-            self.position.x = 0
+        if self.position.x > self.app.world.right:
+            self.position.x = self.app.world.left
             self.app.gameevents.add("warp", "right")
-        if self.position.x < 0:
-            self.position.x = self.app.WORLD_WIDTH
+        if self.position.x < self.app.world.left:
+            self.position.x = self.app.world.right
             self.app.gameevents.add("warp", "left")
-        if self.position.y > self.app.WORLD_HEIGHT:
-            self.position.y = 0
+        if self.position.y > self.app.world.bottom:
+            self.position.y = self.app.world.top
             self.app.gameevents.add("warp", "down")
-        if self.position.y < 0:
-            self.position.y = self.app.WORLD_HEIGHT
+        if self.position.y < self.app.world.top:
+            self.position.y = self.app.world.bottom
             self.app.gameevents.add("warp", "up")
 
     def fire(self):
@@ -127,46 +134,32 @@ class Ship(Token):
                 self.app.score.pnts -= self.app.config['Missile']['missile_penalty']
                 self.app.score.bonus -= self.app.config['Missile']['missile_penalty']
 
-    def draw(self, worldsurf):
+    def draw(self):
         """draw ship to worldsurf"""
-        #ship's nose is x+18 to x-18, wings are 18 back and 18 to the side of 0,0
-        #NewX = (OldX*Cos(Theta)) - (OldY*Sin(Theta))
-        #NewY = -((OldY*Cos(Theta)) + (OldX*Sin(Theta))) - taking inverse because +y is down
-        #these formulae rotate about the origin. Need to translate to origin, rotate, and translate back
-        self.sinphi = math.sin(math.radians((self.orientation) % 360))
-        self.cosphi = math.cos(math.radians((self.orientation) % 360))
-        #old x1 = -18
-        x1 = -18 * self.cosphi * self.app.aspect_ratio + self.position.x
-        y1 = -(-18 * self.sinphi) * self.app.aspect_ratio + self.position.y
-        #old x2 = + 18
-        x2 = 18 * self.cosphi * self.app.aspect_ratio + self.position.x
-        y2 = -(18 * self.sinphi) * self.app.aspect_ratio + self.position.y
-        # nose
-        self.nose = (x2, y2)
-        #x3 will be center point
-        x3 = self.position.x
-        y3 = self.position.y
-        #x4, y4 = -18, 18
-        x4 = (-18 * self.cosphi - 18 * self.sinphi) * self.app.aspect_ratio + self.position.x
-        y4 = (-((18 * self.cosphi) + (-18 * self.sinphi))) * self.app.aspect_ratio + self.position.y
-        #x5, y5 = -18, -18
-        x5 = (-18 * self.cosphi - -18 * self.sinphi) * self.app.aspect_ratio + self.position.x
-        y5 = (-((-18 * self.cosphi) + (-18 * self.sinphi))) * self.app.aspect_ratio + self.position.y
-
         if self.app.config['Graphics']['fancy']:
             if not self.thrust_flag:
-                ship = pygame.transform.rotate(self.ship.image, self.orientation - 90)
+                ship = self.ship
             else:
-                ship = pygame.transform.rotate(self.ship2.image, self.orientation - 90)
-            shiprect = ship.get_rect()
-            shiprect.centerx = self.position.x
-            shiprect.centery = self.position.y
-            worldsurf.blit(ship, shiprect)
-            s = self.health - 1
-            self.shields[s].rect.centerx = self.position.x
-            self.shields[s].rect.centery = self.position.y
-            worldsurf.blit(self.shields[s].image, self.shields[s].rect)
+                ship = self.ship2
+            ship.rotate(self.orientation - 90)
+            self.ship_rect.center = (self.position.x, self.position.y)
+            ship.draw(self.ship_rect.topleft)
+            self.shield_rect.center = (self.position.x, self.position.y)
+            self.shields[self.health - 1].draw(self.shield_rect)
         else:
+            self.sinphi = math.sin(math.radians((self.orientation) % 360))
+            self.cosphi = math.cos(math.radians((self.orientation) % 360))
+            x1 = -18 * self.cosphi * self.app.aspect_ratio + self.position.x
+            y1 = -(-18 * self.sinphi) * self.app.aspect_ratio + self.position.y
+            x2 = 18 * self.cosphi * self.app.aspect_ratio + self.position.x
+            y2 = -(18 * self.sinphi) * self.app.aspect_ratio + self.position.y
+            self.nose = (x2, y2)
+            x3 = self.position.x
+            y3 = self.position.y
+            x4 = (-18 * self.cosphi - 18 * self.sinphi) * self.app.aspect_ratio + self.position.x
+            y4 = (-((18 * self.cosphi) + (-18 * self.sinphi))) * self.app.aspect_ratio + self.position.y
+            x5 = (-18 * self.cosphi - -18 * self.sinphi) * self.app.aspect_ratio + self.position.x
+            y5 = (-((-18 * self.cosphi) + (-18 * self.sinphi))) * self.app.aspect_ratio + self.position.y
             pygame.draw.line(worldsurf, self.color, (x1, y1), (x2, y2), self.app.linewidth)
             pygame.draw.line(worldsurf, self.color, (x3, y3), (x4, y4), self.app.linewidth)
             pygame.draw.line(worldsurf, self.color, (x3, y3), (x5, y5), self.app.linewidth)

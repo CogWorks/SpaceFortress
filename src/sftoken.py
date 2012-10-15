@@ -53,37 +53,11 @@ class Token(object):
         else:
             return False
         
-    # def check_world_wrap(self, width, height):
-    #     """Checks whether the object has exceeded the world boundaries. Returns 1 if wrap or 0 if no wrap"""
-    #     wrap = False
-    #     if self.position.x > width:
-    #         wrap = True
-    #         self.position.x -= width
-    #     elif self.position.x < 0:
-    #         wrap = True
-    #         self.position.x += width
-    #     if self.position.x > height:
-    #         wrap = True
-    #         self.position.y -= height
-    #     elif self.position.y < 0:
-    #         wrap = True
-    #         self.position.y += height    
-    #     return wrap
-    def out_of_bounds(self, width, height):
+    def out_of_bounds(self, rect):
         """check if token is outside world boundaries"""
-        if self.position.x < 0 or self.position.x > width or self.position.y < 0 or self.position.y > height:
+        if self.position.x < rect.left or self.position.x > rect.right or self.position.y < rect.top or self.position.y > rect.bottom:
             return True
         else:
-            return False
-        
-    def FSin(self, value):
-        """takes angle in degrees and returns sin in radians"""
-        return math.sin(value * 0.0174527)  #PI/180
-        
-      
-    def FCos(self, value):
-        """takes angle in degrees and returns cos in radians"""
-        return math.cos(value * 0.0174527)
-        
+            return False        
             
         
