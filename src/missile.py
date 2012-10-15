@@ -18,6 +18,7 @@ class Missile(Token):
             self.orientation = orientation
         else:
             self.orientation = self.app.ship.orientation
+        self.color = (255, 0, 0)
         self.position.x = self.app.ship.position.x
         self.position.y = self.app.ship.position.y
         self.collision_radius = self.app.config['Missile']['missile_radius'] * self.app.aspect_ratio
@@ -42,19 +43,19 @@ class Missile(Token):
             self.missile_rect.center = (self.position.x, self.position.y)
             self.missile.draw(self.missile_rect.topleft)
         else:
-            self.sinphi = math.sin(math.radians((self.orientation) % 360))
-            self.cosphi = math.cos(math.radians((self.orientation) % 360))
-            self.x1 = self.position.x
-            self.y1 = self.position.y
-            self.x2 = -25 * self.cosphi * self.app.aspect_ratio + self.position.x
-            self.y2 = -(-25 * self.sinphi) * self.app.aspect_ratio + self.position.y
-            self.x3 = ((-5 * self.cosphi) - (5 * self.sinphi)) * self.app.aspect_ratio + self.position.x
-            self.y3 = (-((5 * self.cosphi) + (-5 * self.sinphi))) * self.app.aspect_ratio + self.position.y
-            self.x4 = ((-5 * self.cosphi) - (-5 * self.sinphi)) * self.app.aspect_ratio + self.position.x
-            self.y4 = (-((-5 * self.cosphi) + (-5 * self.sinphi))) * self.app.aspect_ratio + self.position.y
-            pygame.draw.line(worldsurf, (255, 0, 0), (self.x1, self.y1), (self.x2, self.y2), self.app.linewidth)
-            pygame.draw.line(worldsurf, (255, 0, 0), (self.x1, self.y1), (self.x3, self.y3), self.app.linewidth)
-            pygame.draw.line(worldsurf, (255, 0, 0), (self.x1, self.y1), (self.x4, self.y4), self.app.linewidth)
+            sinphi = math.sin(math.radians((self.orientation) % 360))
+            cosphi = math.cos(math.radians((self.orientation) % 360))
+            x1 = self.position.x
+            y1 = self.position.y
+            x2 = -25 * cosphi * self.app.aspect_ratio + self.position.x
+            y2 = -(-25 * sinphi) * self.app.aspect_ratio + self.position.y
+            x3 = ((-5 * cosphi) - (5 * sinphi)) * self.app.aspect_ratio + self.position.x
+            y3 = (-((5 * cosphi) + (-5 * sinphi))) * self.app.aspect_ratio + self.position.y
+            x4 = ((-5 * cosphi) - (-5 * sinphi)) * self.app.aspect_ratio + self.position.x
+            y4 = (-((-5 * cosphi) + (-5 * sinphi))) * self.app.aspect_ratio + self.position.y
+            pygl2d.draw.line((x1, y1), (x2, y2), self.color, self.app.linewidth)
+            pygl2d.draw.line((x1, y1), (x3, y3), self.color, self.app.linewidth)
+            pygl2d.draw.line((x1, y1), (x4, y4), self.color, self.app.linewidth)
         
     def __str__(self):
         return '(%.2f,%.2f,%.2f)' % (self.position.x, self.position.y, self.orientation)

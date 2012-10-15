@@ -17,6 +17,7 @@ class Shell(Token):
         self.orientation = orientation
         self.position.x = self.app.fortress.position.x
         self.position.y = self.app.fortress.position.y
+        self.color = (255, 0, 0)
         self.speed = self.app.config['Shell']['shell_speed']
         self.collision_radius = 3 * self.app.aspect_ratio
         self.velocity.x = math.cos(math.radians((self.orientation) % 360)) * self.speed
@@ -48,10 +49,10 @@ class Shell(Token):
             y3 = -(16 * self.sinphi) * self.app.aspect_ratio + self.position.y
             x4 = -(6 * self.sinphi) * self.app.aspect_ratio + self.position.x
             y4 = -(6 * self.cosphi) * self.app.aspect_ratio + self.position.y
-            pygame.draw.line(worldsurf, (255, 0, 0), (x1, y1), (x2, y2), self.app.linewidth)
-            pygame.draw.line(worldsurf, (255, 0, 0), (x2, y2), (x3, y3), self.app.linewidth)
-            pygame.draw.line(worldsurf, (255, 0, 0), (x3, y3), (x4, y4), self.app.linewidth)
-            pygame.draw.line(worldsurf, (255, 0, 0), (x4, y4), (x1, y1), self.app.linewidth)
+            pygl2d.draw.line((x1, y1), (x2, y2), self.color, self.app.linewidth)
+            pygl2d.draw.line((x2, y2), (x3, y3), self.color, self.app.linewidth)
+            pygl2d.draw.line((x3, y3), (x4, y4), self.color, self.app.linewidth)
+            pygl2d.draw.line((x4, y4), (x1, y1), self.color, self.app.linewidth)
         
     def __str__(self):
         return '(%.2f,%.2f,%.2f)' % (self.position.x, self.position.y, self.orientation)

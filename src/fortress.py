@@ -19,6 +19,7 @@ class Fortress(Token):
         self.app = app
         self.position.x = self.app.world.centerx
         self.position.y = self.app.world.centery
+        self.color = (255, 255, 0)
         self.collision_radius = self.app.config['Fortress']['fortress_radius'] * self.app.aspect_ratio
         self.last_orientation = self.orientation 
         self.timer = Timer(self.app.gametimer.elapsed)
@@ -56,23 +57,23 @@ class Fortress(Token):
             self.fortress_rect.center = (self.position.x, self.position.y)
             self.fortress.draw(self.fortress_rect.topleft)
         else:
-            pygame.draw.circle(worldsurf, (0, 0, 0), (self.position.x, self.position.y), int(30 * self.app.aspect_ratio))
-            self.sinphi = math.sin(math.radians((self.orientation) % 360))
-            self.cosphi = math.cos(math.radians((self.orientation) % 360))
-            x1 = 18 * self.cosphi * self.app.aspect_ratio + self.position.x
-            y1 = -(18 * self.sinphi) * self.app.aspect_ratio + self.position.y
-            x2 = 36 * self.cosphi * self.app.aspect_ratio + self.position.x
-            y2 = -(36 * self.sinphi) * self.app.aspect_ratio + self.position.y
-            x3 = (18 * self.cosphi - -18 * self.sinphi) * self.app.aspect_ratio + self.position.x
-            y3 = (-(-18 * self.cosphi + 18 * self.sinphi)) * self.app.aspect_ratio + self.position.y
-            x4 = -(-18 * self.sinphi) * self.app.aspect_ratio + self.position.x
-            y4 = -(-18 * self.cosphi) * self.app.aspect_ratio + self.position.y
-            x5 = (18 * self.cosphi - 18 * self.sinphi) * self.app.aspect_ratio + self.position.x
-            y5 = (-(18 * self.cosphi + 18 * self.sinphi)) * self.app.aspect_ratio + self.position.y
-            x6 = -(18 * self.sinphi) * self.app.aspect_ratio + self.position.x
-            y6 = -(18 * self.cosphi) * self.app.aspect_ratio + self.position.y
-            pygame.draw.line(worldsurf, (255, 255, 0), (x1, y1), (x2, y2), self.app.linewidth)
-            pygame.draw.line(worldsurf, (255, 255, 0), (x3, y3), (x5, y5), self.app.linewidth)
-            pygame.draw.line(worldsurf, (255, 255, 0), (x3, y3), (x4, y4), self.app.linewidth)
-            pygame.draw.line(worldsurf, (255, 255, 0), (x5, y5), (x6, y6), self.app.linewidth)
+            #pygame.draw.circle(worldsurf, (0, 0, 0), (self.position.x, self.position.y), int(30 * self.app.aspect_ratio))
+            sinphi = math.sin(math.radians((self.orientation) % 360))
+            cosphi = math.cos(math.radians((self.orientation) % 360))
+            x1 = 18 * cosphi * self.app.aspect_ratio + self.position.x
+            y1 = -(18 * sinphi) * self.app.aspect_ratio + self.position.y
+            x2 = 36 * cosphi * self.app.aspect_ratio + self.position.x
+            y2 = -(36 * sinphi) * self.app.aspect_ratio + self.position.y
+            x3 = (18 * cosphi - -18 * sinphi) * self.app.aspect_ratio + self.position.x
+            y3 = (-(-18 * cosphi + 18 * sinphi)) * self.app.aspect_ratio + self.position.y
+            x4 = -(-18 * sinphi) * self.app.aspect_ratio + self.position.x
+            y4 = -(-18 * cosphi) * self.app.aspect_ratio + self.position.y
+            x5 = (18 * cosphi - 18 * sinphi) * self.app.aspect_ratio + self.position.x
+            y5 = (-(18 * cosphi + 18 * sinphi)) * self.app.aspect_ratio + self.position.y
+            x6 = -(18 * sinphi) * self.app.aspect_ratio + self.position.x
+            y6 = -(18 * cosphi) * self.app.aspect_ratio + self.position.y
+            pygl2d.draw.line((x1, y1), (x2, y2), self.color, self.app.linewidth)
+            pygl2d.draw.line((x3, y3), (x5, y5), self.color, self.app.linewidth)
+            pygl2d.draw.line((x3, y3), (x4, y4), self.color, self.app.linewidth)
+            pygl2d.draw.line((x5, y5), (x6, y6), self.color, self.app.linewidth)
         

@@ -147,19 +147,19 @@ class Ship(Token):
             self.shield_rect.center = (self.position.x, self.position.y)
             self.shields[self.health - 1].draw(self.shield_rect)
         else:
-            self.sinphi = math.sin(math.radians((self.orientation) % 360))
-            self.cosphi = math.cos(math.radians((self.orientation) % 360))
-            x1 = -18 * self.cosphi * self.app.aspect_ratio + self.position.x
-            y1 = -(-18 * self.sinphi) * self.app.aspect_ratio + self.position.y
-            x2 = 18 * self.cosphi * self.app.aspect_ratio + self.position.x
-            y2 = -(18 * self.sinphi) * self.app.aspect_ratio + self.position.y
+            sinphi = math.sin(math.radians((self.orientation) % 360))
+            cosphi = math.cos(math.radians((self.orientation) % 360))
+            x1 = -18 * cosphi * self.app.aspect_ratio + self.position.x
+            y1 = -(-18 * sinphi) * self.app.aspect_ratio + self.position.y
+            x2 = 18 * cosphi * self.app.aspect_ratio + self.position.x
+            y2 = -(18 * sinphi) * self.app.aspect_ratio + self.position.y
             self.nose = (x2, y2)
             x3 = self.position.x
             y3 = self.position.y
-            x4 = (-18 * self.cosphi - 18 * self.sinphi) * self.app.aspect_ratio + self.position.x
-            y4 = (-((18 * self.cosphi) + (-18 * self.sinphi))) * self.app.aspect_ratio + self.position.y
-            x5 = (-18 * self.cosphi - -18 * self.sinphi) * self.app.aspect_ratio + self.position.x
-            y5 = (-((-18 * self.cosphi) + (-18 * self.sinphi))) * self.app.aspect_ratio + self.position.y
-            pygame.draw.line(worldsurf, self.color, (x1, y1), (x2, y2), self.app.linewidth)
-            pygame.draw.line(worldsurf, self.color, (x3, y3), (x4, y4), self.app.linewidth)
-            pygame.draw.line(worldsurf, self.color, (x3, y3), (x5, y5), self.app.linewidth)
+            x4 = (-18 * cosphi - 18 * sinphi) * self.app.aspect_ratio + self.position.x
+            y4 = (-((18 * cosphi) + (-18 * sinphi))) * self.app.aspect_ratio + self.position.y
+            x5 = (-18 * cosphi - -18 * sinphi) * self.app.aspect_ratio + self.position.x
+            y5 = (-((-18 * cosphi) + (-18 * sinphi))) * self.app.aspect_ratio + self.position.y
+            pygl2d.draw.line((x1, y1), (x2, y2), self.color, self.app.linewidth)
+            pygl2d.draw.line((x3, y3), (x4, y4), self.color, self.app.linewidth)
+            pygl2d.draw.line((x3, y3), (x5, y5), self.color, self.app.linewidth)
