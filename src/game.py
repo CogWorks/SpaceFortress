@@ -30,7 +30,6 @@ from ship import Ship
 from bonus import Bonus
 from fortress import Fortress
 
-import picture
 import defaults
 
 get_time = time.time
@@ -92,7 +91,6 @@ class Game(object):
         self.bonus_captured = False
 
         self.stars = []
-        self.starfield_orientation = randrange(0, 359)
 
         self.modifier = pygame.KMOD_CTRL
         if plat.system() == 'Darwin':
@@ -146,6 +144,7 @@ class Game(object):
                 best_mode = mode_list[0]
         self.SCREEN_WIDTH = best_mode[0]
         self.SCREEN_HEIGHT = best_mode[1]
+        self.screen_size = (self.SCREEN_WIDTH, self.SCREEN_HEIGHT)
 
         if self.config['Logging']['logging']:
             d = datetime.datetime.now().timetuple()
@@ -254,6 +253,7 @@ class Game(object):
             self.screen = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT), pygame.NOFRAME | pygame.DOUBLEBUF | pygame.OPENGL)
         else:
             self.screen = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT), pygame.DOUBLEBUF | pygame.OPENGL)
+            
         self.init_gl()
         self.gameevents.add("display", 'setmode', (self.SCREEN_WIDTH, self.SCREEN_HEIGHT, self.aspect_ratio), type='EVENT_SYSTEM')
 
@@ -270,18 +270,18 @@ class Game(object):
         self.gameevents.add("score8", self.score.scores_locations[7][0], self.score.scores_locations[7][1], type='EVENT_SYSTEM')
 
         if self.config['Graphics']['fancy']:
-            self.explosion = pygl2d.image.Image(pkg_resources.resource_stream("resources", 'gfx/exp2.png'))
+            self.explosion = pygl2d.image.Image(self.screen_size, pkg_resources.resource_stream("resources", 'gfx/exp2.png'))
             self.explosion_rect = self.explosion.get_rect()
             self.explosion.scale(182 * self.aspect_ratio / 344)
             self.explosion.colorize(255.0, 255.0, 255.0, 204)
-            self.explosion_small = pygl2d.image.Image(pkg_resources.resource_stream("resources", 'gfx/exp3.png'))
+            self.explosion_small = pygl2d.image.Image(self.screen_size, pkg_resources.resource_stream("resources", 'gfx/exp3.png'))
             self.explosion_small_rect = self.explosion_small.get_rect()
             self.explosion_small.scale(70 * self.aspect_ratio / 85)
             self.explosion_small.colorize(255.0, 255.0, 255.0, 204)
         else:
-            self.explosion = pygl2d.image.Image(pkg_resources.resource_stream("resources", 'gfx/exp.png'))
+            self.explosion = pygl2d.image.Image(self.screen_size, pkg_resources.resource_stream("resources", 'gfx/exp.png'))
             self.explosion_rect = self.explosion.get_rect()
-            self.explosion_small = pygl2d.image.Image(pkg_resources.resource_stream("resources", 'gfx/exp.png'))
+            self.explosion_small = pygl2d.image.Image(self.screen_size, pkg_resources.resource_stream("resources", 'gfx/exp.png'))
             self.explosion_small_rect = self.explosion_small.get_rect()
 
         self.gametimer = Timer(get_time_ms)
@@ -308,9 +308,6 @@ class Game(object):
 
         self.dmod = -1
         self.smod = -1
-
-        if self.config['Graphics']['show_starfield']:
-            self.init_stars()
 
         self.gameevents.add("session", "ready", type='EVENT_SYSTEM')
 
@@ -359,9 +356,17 @@ class Game(object):
         self.gametimer.reset()
         self.flighttimer.reset()
         self.mine_list.timer.reset()
+        if self.config['Graphics']['parallax_mode'] == 'Fortress':
+            self.starfield_orientation = self.fortress.orientation
+        else:
+            self.starfield_orientation = randrange(0, 359)
+        self.star_velocty_x = math.cos(math.radians(self.starfield_orientation - 180)) * self.config['Graphics']['star_speed']
+        self.star_velocty_y = math.sin(math.radians(self.starfield_orientation)) * self.config['Graphics']['star_speed']
+        if self.config['Graphics']['show_starfield']:
+            self.init_stars()
 
     def draw_pause_overlay(self):
-        pause = pygl2d.font.RenderText("Paused!", (255, 255, 255), self.f96)
+        pause = pygl2d.font.RenderText(self.screen_size, "Paused!", (255, 255, 255), self.f96)
         pause_rect = pause.get_rect()
         pause_rect.center = (self.SCREEN_WIDTH / 2, self.SCREEN_HEIGHT / 2)
         pause.draw(pause_rect.topleft)
@@ -941,15 +946,10 @@ class Game(object):
         self.ship.orientation = self.config['Ship']['ship_orientation']
 
     def draw_stars(self):
-
         for star in self.stars:
             if self.state == self.STATE_PLAY:
-                if self.config['Graphics']['parallax_mode'] == 'Fortress':
-                    orientation = self.fortress.orientation
-                else:
-                    orientation = self.starfield_orientation
-                star[0] += star[2] * math.cos(math.radians(orientation - 180)) * self.config['Graphics']['star_speed']
-                star[1] += star[2] * math.sin(math.radians(orientation)) * self.config['Graphics']['star_speed']
+                star[0] += star[2] * self.star_velocty_x
+                star[1] += star[2] * self.star_velocty_y
                 if star[0] >= self.world.right - self.linewidth:
                     star[0] = self.world.left + self.linewidth
                     star[1] = randrange(self.world.top + self.linewidth, self.world.bottom - self.linewidth)
@@ -972,7 +972,7 @@ class Game(object):
                 color = (190, 190, 190)
             elif star[2] == 3:
                 color = (255, 255, 255)
-            pygl2d.draw.rect((star[0], star[1], star[2], star[2]), color)
+            pygl2d.draw.rect(self.screen_size, (star[0], star[1], star[2], star[2]), color)
             
     def init_gl(self):
         glEnable(GL_BLEND)
@@ -1191,19 +1191,19 @@ class Game(object):
     def draw_intro(self):
         """display intro scene"""
         
-        title = pygl2d.font.RenderText(get_psf_version_string(), (255, 200, 100), self.font1)
+        title = pygl2d.font.RenderText(self.screen_size, get_psf_version_string(), (255, 200, 100), self.font1)
         title_rect = title.get_rect()
         title_rect.center = (self.SCREEN_WIDTH / 2, self.SCREEN_HEIGHT / 5)
         title.draw(title_rect.topleft)
-        vers = pygl2d.font.RenderText('Version: %s' % (__version__), (255, 200, 100), self.font2)
+        vers = pygl2d.font.RenderText(self.screen_size, 'Version: %s' % (__version__), (255, 200, 100), self.font2)
         vers_rect = vers.get_rect()
         vers_rect.center = (self.SCREEN_WIDTH / 2, 4 * self.SCREEN_HEIGHT / 5 - self.fh / 2 - 2)
         vers.draw(vers_rect.topleft)
-        copy = pygl2d.font.RenderText('Copyright \xa92011 CogWorks Laboratory, Rensselaer Polytechnic Institute', (255, 200, 100), self.font2)
+        copy = pygl2d.font.RenderText(self.screen_size, 'Copyright \xa92011 CogWorks Laboratory, Rensselaer Polytechnic Institute', (255, 200, 100), self.font2)
         copy_rect = copy.get_rect()
         copy_rect.center = (self.SCREEN_WIDTH / 2, 4 * self.SCREEN_HEIGHT / 5 + self.fh / 2 + 2)
         copy.draw(copy_rect.topleft)
-        logo = pygl2d.image.Image(pkg_resources.resource_stream("resources", 'gfx/psf5.png'))
+        logo = pygl2d.image.Image(self.screen_size, pkg_resources.resource_stream("resources", 'gfx/psf5.png'))
         logo_rect = logo.get_rect()
         logo_rect.center = (self.SCREEN_WIDTH / 2, self.SCREEN_HEIGHT / 2)
         logo.scale(.4 * self.SCREEN_HEIGHT / 128)
@@ -1214,29 +1214,29 @@ class Game(object):
         self.gameevents.add("display_game", self.current_game)
         self.mine_list.generate_foes()
         title = "Game: %d of %d" % (self.current_game, self.config['General']['games_per_session'])
-        title = pygl2d.font.RenderText(title, (255, 255, 0), self.f36)
+        title = pygl2d.font.RenderText(self.screen_size, title, (255, 255, 0), self.f36)
         title_rect = title.get_rect()
         title_rect.center = (self.SCREEN_WIDTH / 2, self.SCREEN_HEIGHT / 16 * 7)
         title.draw(title_rect.topleft)
-        pygl2d.draw.line((self.SCREEN_WIDTH / 4 , self.SCREEN_HEIGHT / 16 * 8.5), (self.SCREEN_WIDTH / 4 * 3, self.SCREEN_HEIGHT / 16 * 8.5), (255, 255, 255))
-        pygl2d.draw.line((self.SCREEN_WIDTH / 4 , self.SCREEN_HEIGHT / 16 * 5.5), (self.SCREEN_WIDTH / 4 * 3, self.SCREEN_HEIGHT / 16 * 5.5), (255, 255, 255))
+        pygl2d.draw.line(self.screen_size, (self.SCREEN_WIDTH / 4 , self.SCREEN_HEIGHT / 16 * 8.5), (self.SCREEN_WIDTH / 4 * 3, self.SCREEN_HEIGHT / 16 * 8.5), (255, 255, 255))
+        pygl2d.draw.line(self.screen_size, (self.SCREEN_WIDTH / 4 , self.SCREEN_HEIGHT / 16 * 5.5), (self.SCREEN_WIDTH / 4 * 3, self.SCREEN_HEIGHT / 16 * 5.5), (255, 255, 255))
         
     def draw_foe_mines(self):
         """before game begins, present the list of IFF letters to target"""
         self.gameevents.add("display_foes", " ".join(self.mine_list.foe_letters), "player")
-        top = pygl2d.font.RenderText("The Type-2 mines for this session are:", (255, 255, 0), self.f24)
+        top = pygl2d.font.RenderText(self.screen_size, "The Type-2 mines for this session are:", (255, 255, 0), self.f24)
         top_rect = top.get_rect()
         top_rect.center = (self.SCREEN_WIDTH / 2, 270 * self.aspect_ratio)
         top.draw(top_rect.topleft)
-        middle = pygl2d.font.RenderText(", ".join(self.mine_list.foe_letters), (255, 255, 255), self.f96)
+        middle = pygl2d.font.RenderText(self.screen_size, ", ".join(self.mine_list.foe_letters), (255, 255, 255), self.f96)
         middle_rect = middle.get_rect()
         middle_rect.center = (self.SCREEN_WIDTH / 2, self.SCREEN_HEIGHT / 2)
         middle.draw(middle_rect.topleft)
-        midbot = pygl2d.font.RenderText("Try to memorize them before proceeding", (255, 255, 0), self.f24)
+        midbot = pygl2d.font.RenderText(self.screen_size, "Try to memorize them before proceeding", (255, 255, 0), self.f24)
         midbot_rect = midbot.get_rect()
         midbot_rect.center = (self.SCREEN_WIDTH / 2, 500 * self.aspect_ratio)
         midbot.draw(midbot_rect.topleft)
-        bottom = pygl2d.font.RenderText("Press return to begin", (255, 255, 0), self.f24)
+        bottom = pygl2d.font.RenderText(self.screen_size, "Press return to begin", (255, 255, 0), self.f24)
         bottom_rect = bottom.get_rect()
         bottom_rect.center = (self.SCREEN_WIDTH / 2, 600 * self.aspect_ratio)
         bottom.draw(bottom_rect.topleft)

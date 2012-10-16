@@ -1,8 +1,6 @@
 from __future__ import division
 from vector2D import Vector2D
 import math, os
-import pygame
-import picture
 from sftoken import Token
 
 import pkg_resources
@@ -23,7 +21,7 @@ class Shell(Token):
         self.velocity.x = math.cos(math.radians((self.orientation) % 360)) * self.speed
         self.velocity.y = -math.sin(math.radians((self.orientation) % 360)) * self.speed
         if self.app.config['Graphics']['fancy']:
-            self.shell = pygl2d.image.Image(pkg_resources.resource_stream("resources", 'gfx/plasmaredbig.png'))
+            self.shell = pygl2d.image.Image(self.app.screen_size, pkg_resources.resource_stream("resources", 'gfx/plasmaredbig.png'))
             self.shell_rect = self.shell.get_rect()
             self.shell.scale(24 * self.app.aspect_ratio / 43)
             self.shell.rotate(self.orientation - 90)
@@ -49,10 +47,10 @@ class Shell(Token):
             y3 = -(16 * self.sinphi) * self.app.aspect_ratio + self.position.y
             x4 = -(6 * self.sinphi) * self.app.aspect_ratio + self.position.x
             y4 = -(6 * self.cosphi) * self.app.aspect_ratio + self.position.y
-            pygl2d.draw.line((x1, y1), (x2, y2), self.color, self.app.linewidth)
-            pygl2d.draw.line((x2, y2), (x3, y3), self.color, self.app.linewidth)
-            pygl2d.draw.line((x3, y3), (x4, y4), self.color, self.app.linewidth)
-            pygl2d.draw.line((x4, y4), (x1, y1), self.color, self.app.linewidth)
+            pygl2d.draw.line(self.app.screen_size, (x1, y1), (x2, y2), self.color, self.app.linewidth)
+            pygl2d.draw.line(self.app.screen_size, (x2, y2), (x3, y3), self.color, self.app.linewidth)
+            pygl2d.draw.line(self.app.screen_size, (x3, y3), (x4, y4), self.color, self.app.linewidth)
+            pygl2d.draw.line(self.app.screen_size, (x4, y4), (x1, y1), self.color, self.app.linewidth)
         
     def __str__(self):
         return '(%.2f,%.2f,%.2f)' % (self.position.x, self.position.y, self.orientation)

@@ -1,7 +1,6 @@
 import math, os
 import missile
 import pygame
-import picture
 from timer import Timer
 from gameevent import GameEvent
 from sftoken import Token
@@ -48,14 +47,14 @@ class Ship(Token):
             self.invert_y = -1.0
         self.color = (255, 255, 0)
         if self.app.config['Graphics']['fancy']:
-            self.ship = pygl2d.image.Image(pkg_resources.resource_stream("resources", 'gfx/ship.png'))
-            self.ship2 = pygl2d.image.Image(pkg_resources.resource_stream("resources", 'gfx/ship2.png'))
+            self.ship = pygl2d.image.Image(self.app.screen_size, pkg_resources.resource_stream("resources", 'gfx/ship.png'))
+            self.ship2 = pygl2d.image.Image(self.app.screen_size, pkg_resources.resource_stream("resources", 'gfx/ship2.png'))
             self.ship_rect = self.ship.get_rect()
             self.ship.scale(66 * self.app.aspect_ratio / 175)
             self.ship2.scale(66 * self.app.aspect_ratio / 175)
             self.shields = []
             for i in range(0, self.start_health):
-                shield = pygl2d.image.Image(pkg_resources.resource_stream("resources", 'gfx/shield.png'))
+                shield = pygl2d.image.Image(self.app.screen_size, pkg_resources.resource_stream("resources", 'gfx/shield.png'))
                 shield.colorize(255.0, 255.0, 255.0, int(255.0 / (self.start_health - 1) * i))
                 self.shield_rect = shield.get_rect()
                 shield.scale(70 * self.app.aspect_ratio / 400)
@@ -160,6 +159,6 @@ class Ship(Token):
             y4 = (-((18 * cosphi) + (-18 * sinphi))) * self.app.aspect_ratio + self.position.y
             x5 = (-18 * cosphi - -18 * sinphi) * self.app.aspect_ratio + self.position.x
             y5 = (-((-18 * cosphi) + (-18 * sinphi))) * self.app.aspect_ratio + self.position.y
-            pygl2d.draw.line((x1, y1), (x2, y2), self.color, self.app.linewidth)
-            pygl2d.draw.line((x3, y3), (x4, y4), self.color, self.app.linewidth)
-            pygl2d.draw.line((x3, y3), (x5, y5), self.color, self.app.linewidth)
+            pygl2d.draw.line(self.app.screen_size, (x1, y1), (x2, y2), self.color, self.app.linewidth)
+            pygl2d.draw.line(self.app.screen_size, (x3, y3), (x4, y4), self.color, self.app.linewidth)
+            pygl2d.draw.line(self.app.screen_size, (x3, y3), (x5, y5), self.color, self.app.linewidth)

@@ -61,7 +61,7 @@ class Hex(Token):
     def draw(self):
         """draws hex"""
         for i in range(6):
-            pygl2d.draw.line((self.points_x[i], self.points_y[i]), (self.points_x[(i + 1) % 6], self.points_y[(i + 1) % 6]), self.color, self.app.linewidth)
+            pygl2d.draw.line(self.app.screen_size, (self.points_x[i], self.points_y[i]), (self.points_x[(i + 1) % 6], self.points_y[(i + 1) % 6]), self.color, self.app.linewidth)
             
     def collide(self, ship):
         """tests if point is within convex polygon"""
