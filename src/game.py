@@ -972,7 +972,7 @@ class Game(object):
                 color = (190, 190, 190)
             elif star[2] == 3:
                 color = (255, 255, 255)
-            pygl2d.draw.rect(self.screen_size, (star[0], star[1], star[2], star[2]), color)
+            pygl2d.draw.point(self.screen_size, (star[0], star[1]), color, star[2])
             
     def init_gl(self):
         glEnable(GL_BLEND)
