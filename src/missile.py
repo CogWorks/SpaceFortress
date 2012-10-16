@@ -25,7 +25,7 @@ class Missile(Token):
         self.velocity.x = math.cos(math.radians((self.orientation) % 360)) * self.speed
         self.velocity.y = -math.sin(math.radians((self.orientation) % 360)) * self.speed
         if self.app.config['Graphics']['fancy']:
-            self.missile = pygl2d.image.Image(self.app.screen_size, pkg_resources.resource_stream("resources", 'gfx/plasmabluesmall.png'))
+            self.missile = pygl2d.image.Image(pkg_resources.resource_stream("resources", 'gfx/plasmabluesmall.png'))
             self.missile_rect = self.missile.get_rect()
             self.missile.scale(25 * self.app.aspect_ratio / 29)
             self.missile.rotate(self.orientation - 90)
@@ -52,9 +52,9 @@ class Missile(Token):
             y3 = (-((5 * cosphi) + (-5 * sinphi))) * self.app.aspect_ratio + self.position.y
             x4 = ((-5 * cosphi) - (-5 * sinphi)) * self.app.aspect_ratio + self.position.x
             y4 = (-((-5 * cosphi) + (-5 * sinphi))) * self.app.aspect_ratio + self.position.y
-            pygl2d.draw.line(self.app.screen_size, (x1, y1), (x2, y2), self.color, self.app.linewidth)
-            pygl2d.draw.line(self.app.screen_size, (x1, y1), (x3, y3), self.color, self.app.linewidth)
-            pygl2d.draw.line(self.app.screen_size, (x1, y1), (x4, y4), self.color, self.app.linewidth)
+            pygl2d.draw.line((x1, y1), (x2, y2), self.color, self.app.linewidth)
+            pygl2d.draw.line((x1, y1), (x3, y3), self.color, self.app.linewidth)
+            pygl2d.draw.line((x1, y1), (x4, y4), self.color, self.app.linewidth)
         
     def __str__(self):
         return '(%.2f,%.2f,%.2f)' % (self.position.x, self.position.y, self.orientation)

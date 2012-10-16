@@ -41,7 +41,7 @@ class Mine(Token):
         else:
             self.type = random.choice(range(0, len(mine_types)))
         if self.app.config['Graphics']['fancy']:
-            self.mine = pygl2d.image.Image(self.app.screen_size, pkg_resources.resource_stream("resources", mine_types[self.type]))
+            self.mine = pygl2d.image.Image(pkg_resources.resource_stream("resources", mine_types[self.type]))
             self.mine_rect = self.mine.get_rect()
             self.mine.scale(64 * self.app.aspect_ratio / 128)
             self.mine.rotate(self.orientation)
@@ -64,10 +64,10 @@ class Mine(Token):
             self.mine_rect.center = (self.position.x, self.position.y)
             self.mine.draw(self.mine_rect.topleft)
         else:
-            pygl2d.draw.line(self.app.screen_size, (self.position.x - 16 * self.app.aspect_ratio, self.position.y), (self.position.x, self.position.y - 24 * self.app.aspect_ratio), self.color, self.app.linewidth)
-            pygl2d.draw.line(self.app.screen_size, (self.position.x, self.position.y - 24 * self.app.aspect_ratio), (self.position.x + 16 * self.app.aspect_ratio, self.position.y), self.color, self.app.linewidth)
-            pygl2d.draw.line(self.app.screen_size, (self.position.x + 16 * self.app.aspect_ratio, self.position.y), (self.position.x, self.position.y + 24 * self.app.aspect_ratio), self.color, self.app.linewidth)
-            pygl2d.draw.line(self.app.screen_size, (self.position.x, self.position.y + 24 * self.app.aspect_ratio), (self.position.x - 16 * self.app.aspect_ratio, self.position.y), self.color, self.app.linewidth)
+            pygl2d.draw.line((self.position.x - 16 * self.app.aspect_ratio, self.position.y), (self.position.x, self.position.y - 24 * self.app.aspect_ratio), self.color, self.app.linewidth)
+            pygl2d.draw.line((self.position.x, self.position.y - 24 * self.app.aspect_ratio), (self.position.x + 16 * self.app.aspect_ratio, self.position.y), self.color, self.app.linewidth)
+            pygl2d.draw.line((self.position.x + 16 * self.app.aspect_ratio, self.position.y), (self.position.x, self.position.y + 24 * self.app.aspect_ratio), self.color, self.app.linewidth)
+            pygl2d.draw.line((self.position.x, self.position.y + 24 * self.app.aspect_ratio), (self.position.x - 16 * self.app.aspect_ratio, self.position.y), self.color, self.app.linewidth)
 
     def __str__(self):
         return '(%.2f,%.2f,%d,%.2f)' % (self.position.x, self.position.y, self.type, self.orientation)

@@ -3,4 +3,6 @@
 from game import Game
 
 if __name__ == '__main__':
-    Game().run()
+    import cProfile
+    cProfile.run('Game().run()','psf5.prof')
+    #Game().run()

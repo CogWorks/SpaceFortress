@@ -27,7 +27,7 @@ class Fortress(Token):
         self.reset_timer = Timer(self.app.gametimer.elapsed)
         self.alive = True
         if self.app.config['Graphics']['fancy']:
-            self.fortress = pygl2d.image.Image(self.app.screen_size, pkg_resources.resource_stream("resources", 'gfx/psf5.png'))
+            self.fortress = pygl2d.image.Image(pkg_resources.resource_stream("resources", 'gfx/psf5.png'))
             self.fortress_rect = self.fortress.get_rect()
             self.fortress.scale((72 * self.app.aspect_ratio) / 128)
   
@@ -71,8 +71,8 @@ class Fortress(Token):
             y5 = (-(18 * cosphi + 18 * sinphi)) * self.app.aspect_ratio + self.position.y
             x6 = -(18 * sinphi) * self.app.aspect_ratio + self.position.x
             y6 = -(18 * cosphi) * self.app.aspect_ratio + self.position.y
-            pygl2d.draw.line(self.app.screen_size, (x1, y1), (x2, y2), self.color, self.app.linewidth)
-            pygl2d.draw.line(self.app.screen_size, (x3, y3), (x5, y5), self.color, self.app.linewidth)
-            pygl2d.draw.line(self.app.screen_size, (x3, y3), (x4, y4), self.color, self.app.linewidth)
-            pygl2d.draw.line(self.app.screen_size, (x5, y5), (x6, y6), self.color, self.app.linewidth)
+            pygl2d.draw.line((x1, y1), (x2, y2), self.color, self.app.linewidth)
+            pygl2d.draw.line((x3, y3), (x5, y5), self.color, self.app.linewidth)
+            pygl2d.draw.line((x3, y3), (x4, y4), self.color, self.app.linewidth)
+            pygl2d.draw.line((x5, y5), (x6, y6), self.color, self.app.linewidth)
         

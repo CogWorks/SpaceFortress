@@ -68,7 +68,7 @@ class Bonus(object):
         
     def draw(self):
         """draws bonus symbol to screen"""
-        bonus = pygl2d.font.RenderText(self.app.screen_size, "%s" % self.current_symbol, (255, 200, 0), self.font)
+        bonus = pygl2d.font.RenderText("%s" % self.current_symbol, (255, 200, 0), self.font)
         bonus_rect = bonus.get_rect()
         bonus_rect.center = (self.x, self.y)
         bonus.draw(bonus_rect.topleft)
