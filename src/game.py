@@ -254,7 +254,7 @@ class Game(object):
         else:
             self.screen = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT), pygame.DOUBLEBUF | pygame.OPENGL)
             
-        self.init_gl()
+        pygl2d.window.init_gl()
         self.gameevents.add("display", 'setmode', (self.SCREEN_WIDTH, self.SCREEN_HEIGHT, self.aspect_ratio), type='EVENT_SYSTEM')
 
         self.frame = Frame(self)
@@ -971,49 +971,11 @@ class Game(object):
         pygl2d.draw.points(self.screen_size, stars[0], (100, 100, 100), 1)
         pygl2d.draw.points(self.screen_size, stars[1], (190, 190, 190), 2)
         pygl2d.draw.points(self.screen_size, stars[2], (255, 255, 255), 3)
-            
-    def init_gl(self):
-        glEnable(GL_BLEND)
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-        glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE)
-        glEnable(GL_TEXTURE_2D)
-        glShadeModel(GL_SMOOTH)
-        glClearColor(0.0, 0.0, 0.0, 0.0)
-        glClearDepth(1.0)
-        glEnable(GL_DEPTH_TEST)
-        glEnable(GL_ALPHA_TEST)
-        glDepthFunc(GL_LEQUAL)
-        glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST)
-        glAlphaFunc(GL_NOTEQUAL, 0.0)
-            
-    def enable2D(self, rect):
-        glMatrixMode(GL_PROJECTION)
-        glPushMatrix()
-        glLoadIdentity()
-        glOrtho(rect[0], rect[0] + rect[1], rect[2], rect[2] + rect[3], -1, 1)
-        glMatrixMode(GL_MODELVIEW)
-        glPushMatrix()
-        glLoadIdentity()
-
-    def disable2D(self):
-        glMatrixMode(GL_PROJECTION)
-        glPopMatrix()
-        glMatrixMode(GL_MODELVIEW)
-        glPopMatrix()
-        
-    def begin_draw(self):
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-        glLoadIdentity()
-        self.enable2D((0, self.SCREEN_WIDTH, 0, self.SCREEN_HEIGHT))
-        
-    def end_draw(self):
-        self.disable2D()
-        pygame.display.flip()
 
     def draw(self):
         """draws the world"""
         
-        self.begin_draw()
+        pygl2d.window.begin_draw(self.screen_size)
         
         if self.state == self.STATE_INTRO:
             self.draw_intro()
@@ -1063,7 +1025,7 @@ class Game(object):
 
         self.gameevents.add("display", 'preflip', 'main', False, type='EVENT_SYSTEM')
         
-        self.end_draw()
+        pygl2d.window.end_draw()
 
     def log_world(self):
         """logs current state of world to logfile"""
