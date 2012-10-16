@@ -67,12 +67,13 @@ class Game(object):
         self.STATE_INTRO = 1
         self.STATE_SETUP = 2
         self.STATE_GAMENO = 3
-        self.STATE_IFF = 4
-        self.STATE_PREPARE = 5
-        self.STATE_PLAY = 6
-        self.STATE_PAUSED = 7
-        self.STATE_SCORES = 8
-        self.STATE_DONE = 9
+        self.STATE_SETUP_IFF = 4
+        self.STATE_IFF = 5
+        self.STATE_PREPARE = 6
+        self.STATE_PLAY = 7
+        self.STATE_PAUSED = 8
+        self.STATE_SCORES = 9
+        self.STATE_DONE = 10
 
         self.state = self.STATE_INTRO
 
@@ -308,6 +309,27 @@ class Game(object):
 
         self.dmod = -1
         self.smod = -1
+        
+        self.intro_title = pygl2d.font.RenderText(get_psf_version_string(), (255, 200, 100), self.font1)
+        self.intro_title_rect = self.intro_title.get_rect()
+        self.intro_title_rect.center = (self.SCREEN_WIDTH / 2, self.SCREEN_HEIGHT / 5)
+        
+        self.intro_vers = pygl2d.font.RenderText('Version: %s' % (__version__), (255, 200, 100), self.font2)
+        self.intro_vers_rect = self.intro_vers.get_rect()
+        self.intro_vers_rect.center = (self.SCREEN_WIDTH / 2, 4 * self.SCREEN_HEIGHT / 5 - self.fh / 2 - 2)
+        
+        self.intro_copy = pygl2d.font.RenderText('Copyright \xa92011 CogWorks Laboratory, Rensselaer Polytechnic Institute', (255, 200, 100), self.font2)
+        self.intro_copy_rect = self.intro_copy.get_rect()
+        self.intro_copy_rect.center = (self.SCREEN_WIDTH / 2, 4 * self.SCREEN_HEIGHT / 5 + self.fh / 2 + 2)
+        
+        self.intro_logo = pygl2d.image.Image(pkg_resources.resource_stream("resources", 'gfx/psf5.png'))
+        self.intro_logo_rect = self.intro_logo.get_rect()
+        self.intro_logo_rect.center = (self.SCREEN_WIDTH / 2, self.SCREEN_HEIGHT / 2)
+        self.intro_logo.scale(.4 * self.SCREEN_HEIGHT / 128)
+
+        self.pause = pygl2d.font.RenderText("Paused!", (255, 255, 255), self.f96)
+        self.pause_rect = self.pause.get_rect()
+        self.pause_rect.center = (self.SCREEN_WIDTH / 2, self.SCREEN_HEIGHT / 2)
 
         self.gameevents.add("session", "ready", type='EVENT_SYSTEM')
 
@@ -366,10 +388,7 @@ class Game(object):
             self.init_stars()
 
     def draw_pause_overlay(self):
-        pause = pygl2d.font.RenderText("Paused!", (255, 255, 255), self.f96)
-        pause_rect = pause.get_rect()
-        pause_rect.center = (self.SCREEN_WIDTH / 2, self.SCREEN_HEIGHT / 2)
-        pause.draw(pause_rect.topleft)
+        self.pause.draw(self.pause_rect.topleft)
 
     def process_input(self):
         """creates game events based on pygame events"""
@@ -416,7 +435,7 @@ class Game(object):
 
                         elif self.state == self.STATE_GAMENO:
                             if self.mine_exists:
-                                self.state = self.STATE_IFF
+                                self.state = self.STATE_SETUP_IFF
                             else:
                                 self.state = self.STATE_PREPARE
 
@@ -477,12 +496,32 @@ class Game(object):
         if self.state == self.STATE_SETUP:
             if self.current_game < self.config['General']['games_per_session']:
                 self.current_game += 1
-                self.state += 1
-                self.mine_list.generate_foes()
+                self.state = self.STATE_GAMENO
+                self.game_title = "Game: %d of %d" % (self.current_game, self.config['General']['games_per_session'])
+                self.game_title = pygl2d.font.RenderText(self.game_title, (255, 255, 0), self.f36)
+                self.game_title_rect = self.game_title.get_rect()
+                self.game_title_rect.center = (self.SCREEN_WIDTH / 2, self.SCREEN_HEIGHT / 16 * 7)
+                self.gameevents.add("display_game", self.current_game)
             else:
                 self.state = self.STATE_DONE
                 self.ret = 0
                 self.lc.stop()
+        elif self.state == self.STATE_SETUP_IFF:
+            self.mine_list.generate_foes()
+            self.gameevents.add("display_foes", " ".join(self.mine_list.foe_letters), "player")
+            self.foe_top = pygl2d.font.RenderText("The Type-2 mines for this session are:", (255, 255, 0), self.f24)
+            self.foe_top_rect = self.foe_top.get_rect()
+            self.foe_top_rect.center = (self.SCREEN_WIDTH / 2, 270 * self.aspect_ratio)
+            self.foe_middle = pygl2d.font.RenderText(", ".join(self.mine_list.foe_letters), (255, 255, 255), self.f96)
+            self.foe_middle_rect = self.foe_middle.get_rect()
+            self.foe_middle_rect.center = (self.SCREEN_WIDTH / 2, self.SCREEN_HEIGHT / 2)
+            self.foe_midbot = pygl2d.font.RenderText("Try to memorize them before proceeding", (255, 255, 0), self.f24)
+            self.foe_midbot_rect = self.foe_midbot.get_rect()
+            self.foe_midbot_rect.center = (self.SCREEN_WIDTH / 2, 500 * self.aspect_ratio)
+            self.foe_bottom = pygl2d.font.RenderText("Press return to begin", (255, 255, 0), self.f24)
+            self.foe_bottom_rect = self.foe_bottom.get_rect()
+            self.foe_bottom_rect.center = (self.SCREEN_WIDTH / 2, 600 * self.aspect_ratio)
+            self.state = self.STATE_IFF
         elif self.state == self.STATE_PREPARE:
             self.gameevents.add("game", "ready", type='EVENT_SYSTEM')
             self.setup_world()
@@ -1150,56 +1189,23 @@ class Game(object):
 
     def draw_intro(self):
         """display intro scene"""
-        
-        title = pygl2d.font.RenderText(get_psf_version_string(), (255, 200, 100), self.font1)
-        title_rect = title.get_rect()
-        title_rect.center = (self.SCREEN_WIDTH / 2, self.SCREEN_HEIGHT / 5)
-        title.draw(title_rect.topleft)
-        vers = pygl2d.font.RenderText('Version: %s' % (__version__), (255, 200, 100), self.font2)
-        vers_rect = vers.get_rect()
-        vers_rect.center = (self.SCREEN_WIDTH / 2, 4 * self.SCREEN_HEIGHT / 5 - self.fh / 2 - 2)
-        vers.draw(vers_rect.topleft)
-        copy = pygl2d.font.RenderText('Copyright \xa92011 CogWorks Laboratory, Rensselaer Polytechnic Institute', (255, 200, 100), self.font2)
-        copy_rect = copy.get_rect()
-        copy_rect.center = (self.SCREEN_WIDTH / 2, 4 * self.SCREEN_HEIGHT / 5 + self.fh / 2 + 2)
-        copy.draw(copy_rect.topleft)
-        logo = pygl2d.image.Image(pkg_resources.resource_stream("resources", 'gfx/psf5.png'))
-        logo_rect = logo.get_rect()
-        logo_rect.center = (self.SCREEN_WIDTH / 2, self.SCREEN_HEIGHT / 2)
-        logo.scale(.4 * self.SCREEN_HEIGHT / 128)
-        logo.draw(logo_rect.topleft)
+        self.intro_title.draw(self.intro_title_rect.topleft)
+        self.intro_vers.draw(self.intro_vers_rect.topleft)
+        self.intro_copy.draw(self.intro_copy_rect.topleft)
+        self.intro_logo.draw(self.intro_logo_rect.topleft)
 
     def draw_game_number(self):
-        """before game begins, present the game number"""
-        self.gameevents.add("display_game", self.current_game)
-        self.mine_list.generate_foes()
-        title = "Game: %d of %d" % (self.current_game, self.config['General']['games_per_session'])
-        title = pygl2d.font.RenderText(title, (255, 255, 0), self.f36)
-        title_rect = title.get_rect()
-        title_rect.center = (self.SCREEN_WIDTH / 2, self.SCREEN_HEIGHT / 16 * 7)
-        title.draw(title_rect.topleft)
+        """before game begins, present the game number"""        
+        self.game_title.draw(self.game_title_rect.topleft)
         pygl2d.draw.line((self.SCREEN_WIDTH / 4 , self.SCREEN_HEIGHT / 16 * 8.5), (self.SCREEN_WIDTH / 4 * 3, self.SCREEN_HEIGHT / 16 * 8.5), (255, 255, 255))
         pygl2d.draw.line((self.SCREEN_WIDTH / 4 , self.SCREEN_HEIGHT / 16 * 5.5), (self.SCREEN_WIDTH / 4 * 3, self.SCREEN_HEIGHT / 16 * 5.5), (255, 255, 255))
         
     def draw_foe_mines(self):
         """before game begins, present the list of IFF letters to target"""
-        self.gameevents.add("display_foes", " ".join(self.mine_list.foe_letters), "player")
-        top = pygl2d.font.RenderText("The Type-2 mines for this session are:", (255, 255, 0), self.f24)
-        top_rect = top.get_rect()
-        top_rect.center = (self.SCREEN_WIDTH / 2, 270 * self.aspect_ratio)
-        top.draw(top_rect.topleft)
-        middle = pygl2d.font.RenderText(", ".join(self.mine_list.foe_letters), (255, 255, 255), self.f96)
-        middle_rect = middle.get_rect()
-        middle_rect.center = (self.SCREEN_WIDTH / 2, self.SCREEN_HEIGHT / 2)
-        middle.draw(middle_rect.topleft)
-        midbot = pygl2d.font.RenderText("Try to memorize them before proceeding", (255, 255, 0), self.f24)
-        midbot_rect = midbot.get_rect()
-        midbot_rect.center = (self.SCREEN_WIDTH / 2, 500 * self.aspect_ratio)
-        midbot.draw(midbot_rect.topleft)
-        bottom = pygl2d.font.RenderText("Press return to begin", (255, 255, 0), self.f24)
-        bottom_rect = bottom.get_rect()
-        bottom_rect.center = (self.SCREEN_WIDTH / 2, 600 * self.aspect_ratio)
-        bottom.draw(bottom_rect.topleft)
+        self.foe_top.draw(self.foe_top_rect.topleft)
+        self.foe_middle.draw(self.foe_middle_rect.topleft)
+        self.foe_midbot.draw(self.foe_midbot_rect.topleft)
+        self.foe_bottom.draw(self.foe_bottom_rect.topleft)
 
     def draw_old_score(self):
         """shows score for last game and waits to continue"""
