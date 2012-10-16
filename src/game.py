@@ -946,6 +946,7 @@ class Game(object):
         self.ship.orientation = self.config['Ship']['ship_orientation']
 
     def draw_stars(self):
+        stars = [[],[],[]]
         for star in self.stars:
             if self.state == self.STATE_PLAY:
                 star[0] += star[2] * self.star_velocty_x
@@ -966,13 +967,10 @@ class Game(object):
                     star[1] = self.world.bottom - self.linewidth
                     star[0] = randrange(self.world.left + self.linewidth, self.world.right - self.linewidth)
                     star[2] = choice([1, 2, 3])
-            if star[2] == 1:
-                color = (100, 100, 100)
-            elif star[2] == 2:
-                color = (190, 190, 190)
-            elif star[2] == 3:
-                color = (255, 255, 255)
-            pygl2d.draw.point(self.screen_size, (star[0], star[1]), color, star[2])
+            stars[star[2]-1].append((star[0],star[1]))
+        pygl2d.draw.points(self.screen_size, stars[0], (100, 100, 100), 1)
+        pygl2d.draw.points(self.screen_size, stars[1], (190, 190, 190), 2)
+        pygl2d.draw.points(self.screen_size, stars[2], (255, 255, 255), 3)
             
     def init_gl(self):
         glEnable(GL_BLEND)
