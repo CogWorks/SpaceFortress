@@ -249,13 +249,12 @@ class Game(object):
         self.snd_empty = Sound(self, pkg_resources.resource_stream("resources", "sounds/emptychamber.wav"))
         
         if self.config['Display']['display_mode'] == 'Fullscreen' or self.config['Display']['display_mode'] == 'Current':
-            self.screen = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT), pygame.FULLSCREEN | pygame.DOUBLEBUF | pygame.OPENGL)
+            self.screen = pygl2d.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT), pygame.FULLSCREEN | pygame.DOUBLEBUF)
         elif self.config['Display']['display_mode'] == 'Fake Fullscreen':
-            self.screen = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT), pygame.NOFRAME | pygame.DOUBLEBUF | pygame.OPENGL)
+            self.screen = pygl2d.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT), pygame.NOFRAME | pygame.DOUBLEBUF)
         else:
-            self.screen = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT), pygame.DOUBLEBUF | pygame.OPENGL)
-            
-        pygl2d.window.init_gl()
+            self.screen = pygl2d.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT), pygame.DOUBLEBUF)
+
         self.gameevents.add("display", 'setmode', (self.SCREEN_WIDTH, self.SCREEN_HEIGHT, self.aspect_ratio), type='EVENT_SYSTEM')
 
         self.frame = Frame(self)
@@ -1014,7 +1013,7 @@ class Game(object):
     def draw(self):
         """draws the world"""
         
-        pygl2d.window.begin_draw(self.screen_size)
+        pygl2d.display.begin_draw(self.screen_size)
         
         if self.state == self.STATE_INTRO:
             self.draw_intro()
@@ -1064,7 +1063,7 @@ class Game(object):
 
         self.gameevents.add("display", 'preflip', 'main', False, type='EVENT_SYSTEM')
         
-        pygl2d.window.end_draw()
+        pygl2d.display.end_draw()
 
     def log_world(self):
         """logs current state of world to logfile"""
