@@ -208,12 +208,19 @@ class Game(object):
         
         self.fp = pkg_resources.resource_stream('resources', 'fonts/freesansbold.ttf')
         self.font1 = pygame.font.Font(self.fp, int(self.SCREEN_HEIGHT / 10))
+        self.fp.seek(0)
         self.font2 = pygame.font.Font(self.fp, self.fh)
+        self.fp.seek(0)
         self.f = pygame.font.Font(self.fp, int(14 * self.aspect_ratio))
+        self.fp.seek(0)
         self.f6 = pygame.font.Font(self.fp, int(12 * self.aspect_ratio))
+        self.fp.seek(0)
         self.f24 = pygame.font.Font(self.fp, int(20 * self.aspect_ratio))
+        self.fp.seek(0)
         self.f28 = pygame.font.Font(self.fp, int(28 * self.aspect_ratio))
+        self.fp.seek(0)
         self.f96 = pygame.font.Font(self.fp, int(72 * self.aspect_ratio))
+        self.fp.seek(0)
         self.f36 = pygame.font.Font(self.fp, int(36 * self.aspect_ratio))
 
         self.joystick = None
