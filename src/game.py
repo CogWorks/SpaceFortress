@@ -16,6 +16,7 @@ from OpenGL.GLU import *
 import pygame
 from pygame.locals import *
 import pygl2d
+from pygl2d.display import scissor_box
 
 from gameevent import GameEvent, GameEventList
 from frame import Frame
@@ -1010,6 +1011,35 @@ class Game(object):
         pygl2d.draw.points(stars[1], (190, 190, 190), 2)
         pygl2d.draw.points(stars[2], (255, 255, 255), 3)
 
+    def draw_world(self):
+        if self.config['Graphics']['max_stars']:
+            self.draw_stars()
+            
+        self.bighex.draw()
+        if self.fortress_exists and not self.fortress.alive:
+            pass
+        else:
+            self.smallhex.draw()
+        
+        for shell in self.shell_list:
+            shell.draw()
+        if self.fortress_exists:
+            if self.fortress.alive:
+                self.fortress.draw()
+            else:
+                self.explosion_rect.center = (self.fortress.position.x, self.fortress.position.y)
+                self.explosion.draw(self.explosion_rect.topleft)
+        for missile in self.missile_list:
+            missile.draw()
+        if self.ship.alive:
+            self.ship.draw()
+        else:
+            self.explosion_small_rect.center = (self.ship.position.x, self.ship.position.y)
+            self.explosion_small.draw(self.explosion_small_rect.topleft)
+        self.mine_list.draw()
+        if self.bonus_exists and self.bonus.visible:
+            self.bonus.draw()
+
     def draw(self):
         """draws the world"""
         
@@ -1030,33 +1060,9 @@ class Game(object):
             else:
                 self.frame.draw()
                 self.score.draw()
-                if self.config['Graphics']['max_stars']:
-                    self.draw_stars()
-                    
-                self.bighex.draw()
-                if self.fortress_exists and not self.fortress.alive:
-                    pass
-                else:
-                    self.smallhex.draw()
+                with scissor_box(self.screen_size, self.world):
+                    self.draw_world()
                 
-                for shell in self.shell_list:
-                    shell.draw()
-                if self.fortress_exists:
-                    if self.fortress.alive:
-                        self.fortress.draw()
-                    else:
-                        self.explosion_rect.center = (self.fortress.position.x, self.fortress.position.y)
-                        self.explosion.draw(self.explosion_rect.topleft)
-                for missile in self.missile_list:
-                    missile.draw()
-                if self.ship.alive:
-                    self.ship.draw()
-                else:
-                    self.explosion_small_rect.center = (self.ship.position.x, self.ship.position.y)
-                    self.explosion_small.draw(self.explosion_small_rect.topleft)
-                self.mine_list.draw()
-                if self.bonus_exists and self.bonus.visible:
-                    self.bonus.draw()
 
         elif self.state == self.STATE_SCORES:
             self.draw_scores()
@@ -1503,7 +1509,6 @@ class Game(object):
             self.draw()
             if self.config['Logging']['logging'] and self.config['Logging']['logDriver'] == 'Default':
                 self.log_world()
-
 
     def start(self):
         self.lc = LoopingCall(self.refresh)
