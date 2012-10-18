@@ -97,6 +97,7 @@ class Frame(object):
 
     def draw(self):
         """Draws the game boundaries and 'table' to hold the scores"""
+        pygl2d.draw.rect(self.app.world, (0, 0, 0))
         pygl2d.draw.rect(self.app.world, (0, 255, 0), self.app.linewidth)
         
         if not self.app.config['Score']['new_scoring_pos']: #draw frame along bottom of gameworld
@@ -113,6 +114,9 @@ class Frame(object):
         else: #draw frame in "eye-tracker-friendly" format
             half_width = self.app.SCREEN_WIDTH / 2
             if self.app.config['General']['next_gen']:
+                pygl2d.draw.rect((half_width - 523 * self.app.aspect_ratio, 70 * self.app.aspect_ratio, 130 * self.app.aspect_ratio, 683 * self.app.aspect_ratio), (0, 0, 0), 0)
+                pygl2d.draw.rect((half_width + 394 * self.app.aspect_ratio, 70 * self.app.aspect_ratio, 130 * self.app.aspect_ratio, 683 * self.app.aspect_ratio), (0, 0, 0), 0)
+                pygl2d.draw.rect((half_width - 383 * self.app.aspect_ratio, 5 * self.app.aspect_ratio, 767 * self.app.aspect_ratio, 57 * self.app.aspect_ratio), (0, 0, 0), 0)
                 pygl2d.draw.rect((half_width - 523 * self.app.aspect_ratio, 70 * self.app.aspect_ratio, 130 * self.app.aspect_ratio, 683 * self.app.aspect_ratio), (0, 255, 0), self.app.linewidth)
                 pygl2d.draw.rect((half_width + 394 * self.app.aspect_ratio, 70 * self.app.aspect_ratio, 130 * self.app.aspect_ratio, 683 * self.app.aspect_ratio), (0, 255, 0), self.app.linewidth)
                 pygl2d.draw.rect((half_width - 383 * self.app.aspect_ratio, 5 * self.app.aspect_ratio, 767 * self.app.aspect_ratio, 57 * self.app.aspect_ratio), (0, 255, 0), self.app.linewidth)

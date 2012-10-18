@@ -16,7 +16,7 @@ from OpenGL.GLU import *
 import pygame
 from pygame.locals import *
 import pygl2d
-from pygl2d.display import scissor_box
+from pygl2d.display import scissor_box, subspace
 
 from gameevent import GameEvent, GameEventList
 from frame import Frame
@@ -262,7 +262,7 @@ class Game(object):
             self.screen = pygl2d.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT), pygame.NOFRAME | pygame.DOUBLEBUF)
         else:
             self.screen = pygl2d.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT), pygame.DOUBLEBUF)
-
+        self.screen_rect = self.screen.get_rect()
         self.gameevents.add("display", 'setmode', (self.SCREEN_WIDTH, self.SCREEN_HEIGHT, self.aspect_ratio), type='EVENT_SYSTEM')
 
         self.frame = Frame(self)
@@ -337,7 +337,8 @@ class Game(object):
         self.pause = pygl2d.font.RenderText("Paused!", (255, 255, 255), self.f96)
         self.pause_rect = self.pause.get_rect()
         self.pause_rect.center = (self.SCREEN_WIDTH / 2, self.SCREEN_HEIGHT / 2)
-
+        
+        self.happy = pygl2d.image.load_xbm(pkg_resources.resource_stream("resources", "gfx/fill1.xbm"))
         self.gameevents.add("session", "ready", type='EVENT_SYSTEM')
 
     def set_aspect_ratio(self):
@@ -1018,7 +1019,7 @@ class Game(object):
         pygl2d.draw.points(stars[1], (190, 190, 190), 2)
         pygl2d.draw.points(stars[2], (255, 255, 255), 3)
 
-    def draw_world(self):
+    def draw_world(self):       
         if self.config['Graphics']['max_stars']:
             self.draw_stars()
             
@@ -1065,11 +1066,11 @@ class Game(object):
             if self.state == self.STATE_PAUSED and self.config['Display']['pause_overlay']:
                 self.draw_pause_overlay()            
             else:
+                pygl2d.draw.polygon([self.screen_rect.topleft, self.screen_rect.topright, self.screen_rect.bottomright, self.screen_rect.bottomleft], (64, 64, 64), stipple_pattern=self.happy[::-1])
                 self.frame.draw()
                 self.score.draw()
-                with scissor_box(self.screen_size, self.world):
+                with scissor_box(self.world):
                     self.draw_world()
-                
 
         elif self.state == self.STATE_SCORES:
             self.draw_scores()
