@@ -265,6 +265,9 @@ class Game(object):
         self.screen_rect = self.screen.get_rect()
         self.gameevents.add("display", 'setmode', (self.SCREEN_WIDTH, self.SCREEN_HEIGHT, self.aspect_ratio), type='EVENT_SYSTEM')
 
+        self.gametimer = Timer(get_time_ms)
+        self.flighttimer = Timer(self.gametimer.elapsed)
+
         self.frame = Frame(self)
         self.score = Score(self)
 
@@ -291,9 +294,6 @@ class Game(object):
             self.explosion_rect = self.explosion.get_rect()
             self.explosion_small = pygl2d.image.Image(pkg_resources.resource_stream("resources", 'gfx/exp.png'))
             self.explosion_small_rect = self.explosion_small.get_rect()
-
-        self.gametimer = Timer(get_time_ms)
-        self.flighttimer = Timer(self.gametimer.elapsed)
         
         self.world = pygame.rect.Rect(0, 0, self.WORLD_WIDTH, self.WORLD_HEIGHT)
         self.world.center = (self.SCREEN_WIDTH / 2, self.SCREEN_HEIGHT / 2)

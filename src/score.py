@@ -53,7 +53,7 @@ class Score(object):
         for key in ('VLNER_pos', 'IFF_pos', 'INTRVL_pos', 'SHOTS_pos',
                     'PNTS_pos', 'CNTRL_pos', 'VLCTY_pos', 'SPEED_pos'):
             self.position_map[key] = self.app.config['Score'][key]
-        num_positions = max(self.position_map.values()) + 1
+        num_positions = max(self.position_map.values())
         self.positions = [0] * num_positions
         self.old_positions = not self.app.config['Score']['new_scoring_pos']
         if self.old_positions:
@@ -119,39 +119,58 @@ class Score(object):
             self.scores_locations.append((self.OLD_SCORE_X_P7, self.OLD_SCORE_Y_BASE))
             self.scores_locations.append((self.OLD_SCORE_X_P8, self.OLD_SCORE_Y_BASE))
 
+        self.scores_texts = [None] * num_positions
+        self.scores_rects = [None] * num_positions
+        self.update_score()
+
     def update_score(self):
         """updates positions list to reflect current scores"""
+        positions = [0] * 8
         if self.app.config['General']['next_gen']:
-            self.positions[1] = self.pnts
-            self.positions[3] = self.shots
-            self.positions[4] = self.intrvl
-            self.positions[7] = self.iff
-            self.positions[8] = self.vlner
+            time = (self.app.config['General']['game_time'] - self.app.gametimer.elapsed()) / 1000.0
+            if (time < 0): time = 0
+            positions[1] = "%.1f" % time
+            positions[0] = "%d" % self.pnts
+            positions[2] = self.shots
+            if self.intrvl == 0:
+                positions[3] = ""
+            else:
+                positions[3] = "%d" % self.intrvl
+            positions[6] = self.iff
+            positions[7] = "%d" % self.vlner
         else:
-            self.positions[self.position_map["SHOTS_pos"]] = self.shots
-            self.positions[self.position_map["VLNER_pos"]] = self.vlner
-            self.positions[self.position_map["IFF_pos"]] = self.iff
-            self.positions[self.position_map["INTRVL_pos"]] = self.intrvl
+            positions[self.position_map["SHOTS_pos"]-1] = self.shots
+            positions[self.position_map["VLNER_pos"]-1] = self.vlner
+            positions[self.position_map["IFF_pos"]-1] = self.iff
+            positions[self.position_map["INTRVL_pos"]-1] = self.intrvl
             if self.app.config['Score']['new_scoring']:
                 #use Flight, Fortress, Mines, Bonus
-                self.positions[self.position_map["PNTS_pos"]] = self.flight
-                self.positions[self.position_map["VLCTY_pos"]] = self.mines
-                self.positions[self.position_map["CNTRL_pos"]] = self.fortress
-                self.positions[self.position_map["SPEED_pos"]] = self.bonus
+                positions[self.position_map["PNTS_pos"]-1] = self.flight
+                positions[self.position_map["VLCTY_pos"]-1] = self.mines
+                positions[self.position_map["CNTRL_pos"]-1] = self.fortress
+                positions[self.position_map["SPEED_pos"]-1] = self.bonus
             else:
                 #use PNTS, VLCTY, CNTRL, SPEED
-                self.positions[self.position_map["PNTS_pos"]] = self.pnts
-                self.positions[self.position_map["VLCTY_pos"]] = self.vlcty
-                self.positions[self.position_map["CNTRL_pos"]] = self.cntrl
-                self.positions[self.position_map["SPEED_pos"]] = self.speed
-        for item in range(1, 9):
-            if isinstance(self.positions[item], float):
-                self.positions[item] = int(self.positions[item])
+                positions[self.position_map["PNTS_pos"]-1] = self.pnts
+                positions[self.position_map["VLCTY_pos"]-1] = self.vlcty
+                positions[self.position_map["CNTRL_pos"]-1] = self.cntrl
+                positions[self.position_map["SPEED_pos"]-1] = self.speed
+
+        for i,v in enumerate(positions):
+            if positions[i] != self.positions[i]:
+                self.positions[i] = positions[i] 
+                self.scores_texts[i] = pygl2d.font.RenderText("%s" % str(self.positions[i]), (255, 255, 0), self.f)
+                self.scores_rects[i] = self.scores_texts[i].get_rect()
+                self.scores_rects[i].center = self.scores_locations[i]
 
     def draw(self):
         """draws all score values to screen"""
         #get some floats from adding fractions. Change to int for font rendering
         self.update_score()
+        for i,v in enumerate(self.scores_texts):
+            if v: v.draw(self.scores_rects[i].topleft)
+        
+        return
         #print self.positions
         p1_surf = pygl2d.font.RenderText("%s" % str(self.positions[1]), (255, 255, 0), self.f)
         p1_rect = p1_surf.get_rect()
