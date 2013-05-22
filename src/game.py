@@ -1,5 +1,7 @@
 from __future__ import division
 
+import numpy as np
+
 from twisted.internet import reactor
 from twisted.internet.task import LoopingCall
 
@@ -1015,9 +1017,9 @@ class Game(object):
                     star[0] = randrange(self.world.left + self.linewidth, self.world.right - self.linewidth)
                     star[2] = choice([1, 2, 3])
             stars[star[2] - 1].append((star[0], star[1]))
-        pygl2d.draw.points(stars[0], (100, 100, 100), 1)
-        pygl2d.draw.points(stars[1], (190, 190, 190), 2)
-        pygl2d.draw.points(stars[2], (255, 255, 255), 3)
+        pygl2d.draw.points2(stars[0], (100, 100, 100), 1)
+        pygl2d.draw.points2(stars[1], (190, 190, 190), 2)
+        pygl2d.draw.points2(stars[2], (255, 255, 255), 3)
 
     def draw_world(self):       
         if self.config['Graphics']['max_stars']:
