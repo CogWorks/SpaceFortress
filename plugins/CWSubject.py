@@ -34,7 +34,7 @@ try:
 
                     if self.app.config['CogWorks Exp']['subject_window']:
 
-                        self.subjectInfo = getSubjectInfo(minimal=True)
+                        self.subjectInfo = getSubjectInfo([])
                         if self.subjectInfo:
                             eid = rin2id(self.subjectInfo['rin'])
                             self.app.config.update_setting_value("General", "id", eid[:8])
