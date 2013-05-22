@@ -6,8 +6,8 @@ try:
     import json
     import pygame
     import numpy as np
-    from pyviewx import iViewXClient, Dispatcher
-    from pyviewx.pygamesupport import Calibrator
+    from pyviewx.client import iViewXClient, Dispatcher
+    from pyviewx.pygame import Calibrator
 
     class SF5Plugin(object):
     
