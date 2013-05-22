@@ -9,8 +9,8 @@ try:
     from PySide.QtCore import *
     from PySide.QtGui import *
 
-    from pycogworks.cwsubject import *
-    from pycogworks.util import rin2id
+    from pycogworks.gui import *
+    from pycogworks.crypto import rin2id
 
     class SF5Plugin(object):
 
