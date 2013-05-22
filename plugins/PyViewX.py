@@ -7,7 +7,7 @@ try:
     import pygame
     import numpy as np
     from pyviewx.client import iViewXClient, Dispatcher
-    from pyviewx.pygame import Calibrator
+    from calibratorGL import CalibratorGL as Calibrator
 
     class SF5Plugin(object):
     
@@ -53,7 +53,7 @@ try:
                 return self.null_data
     
         @d.listen('ET_SPL')
-        def iViewXEvent(self, inSender, inEvent, inResponse):
+        def iViewXEvent(self, inResponse):
             self.eye_data = inResponse
             if self.app.config['Logging']['logging'] and self.app.config['Logging']['logDriver'] == 'PyViewX:Samples':
                 self.app.log_world()

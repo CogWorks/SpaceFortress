@@ -10,7 +10,7 @@ try:
     from PySide.QtGui import *
 
     from pycogworks.gui import *
-    from pycogworks.crypto import rin2id
+    from pycogworks.logging import *
 
     class SF5Plugin(object):
 
@@ -36,10 +36,9 @@ try:
 
                         self.subjectInfo = getSubjectInfo([])
                         if self.subjectInfo:
-                            eid = rin2id(self.subjectInfo['rin'])
-                            self.app.config.update_setting_value("General", "id", eid[:8])
+                            self.app.config.update_setting_value("General", "id", self.subjectInfo['encrypted_rin'])
                             if self.app.config['CogWorks Exp']['subdir']:
-                                self.app.config.update_setting_value('Logging', 'logdir', os.path.join(self.app.config[ 'Logging']['logdir'], eid[:8]))
+                                self.app.config.update_setting_value('Logging', 'logdir', os.path.join(self.app.config[ 'Logging']['logdir'], self.subjectInfo['encrypted_rin'][:8]))
                         else:
                             sys.exit()
 
@@ -49,9 +48,6 @@ try:
 
                 if args[4] == 'basename' and args[5] == 'ready':
                     if self.app.config['CogWorks Exp']['subject_window'] and self.subjectInfo:
-                        eid = rin2id(self.subjectInfo['rin'])
-                        self.subjectInfo['encrypted_rin'] = eid
-                        self.subjectInfo['cipher'] = 'AES/CBC (RIJNDAEL) - 16Byte Key'
                         writeHistoryFile(self.app.log_basename, self.subjectInfo)
 
                 elif args[4] == 'header' and args[5] == 'ready':
