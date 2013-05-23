@@ -59,7 +59,7 @@ class Score(object):
         if self.old_positions:
             self.f = self.app.f
         else:
-            self.f = self.app.f28
+            self.f = self.app.f6
         self.vlner = 0
         self.intrvl = 0
         self.pnts = 0
