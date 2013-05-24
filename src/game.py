@@ -354,16 +354,16 @@ class Game(object):
         
         self.gametimer.reset()
         
-        if self.config['Bonus']['bonus_exists']:
-            self.bonus = Bonus(self)
-            self.bonus_exists = True
-        else:
-            self.bonus_exists = False
         if self.config['Fortress']['fortress_exists']:
             self.fortress = Fortress(self)
             self.fortress_exists = True
         else:
             self.fortress_exists = False
+        if self.config['Bonus']['bonus_exists']:
+            self.bonus = Bonus(self)
+            self.bonus_exists = True
+        else:
+            self.bonus_exists = False       
 
         self.destroyedFortresses = 0
         self.totalMines = 0
@@ -1132,8 +1132,8 @@ class Game(object):
             bonus_isi = 'NA'
         if self.bonus and self.bonus.visible:
             bonus_no = self.bonus.bonus_count
-            bonus_cur_x = self.bonus.x
-            bonus_cur_y = self.bonus.y
+            bonus_cur_x = self.bonus.position.x
+            bonus_cur_y = self.bonus.position.y
         else:
             bonus_no = "NA"
             bonus_cur_x = "NA"
