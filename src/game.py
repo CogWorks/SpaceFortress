@@ -351,6 +351,9 @@ class Game(object):
         self.missile_list = MissileList(self)
         self.shell_list = ShellList(self)
         self.ship = Ship(self)
+        
+        self.gametimer.reset()
+        
         if self.config['Bonus']['bonus_exists']:
             self.bonus = Bonus(self)
             self.bonus_exists = True
@@ -381,7 +384,7 @@ class Game(object):
         self.score.bonus = 0
         self.score.vlner = 0
         self.score.shots = self.config['Missile']['missile_num']
-        self.gametimer.reset()
+        
         self.flighttimer.reset()
         self.mine_list.timer.reset()
         if self.config['Graphics']['parallax_mode'] == 'Fortress':
