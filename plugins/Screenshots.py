@@ -9,6 +9,15 @@ try:
     from pycogworks import getDateTimeStamp
     import pygame
     
+    PYGAME_KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0',
+               'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p',
+               'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l',
+               'z', 'x', 'c', 'v', 'b', 'n', 'm', 'SPACE',
+               'BACKSPACE', 'TAB', 'RETURN', 'COMMA', 'MINUS', 'PERIOD',
+               'SLASH', 'SEMICOLON', 'QUOTE', 'LEFTBRACKET', 'RIGHTBRACKET',
+               'BACKSLASH', 'EQUALS', 'BACKQUOTE', 'UP', 'DOWN', 'RIGHT', 'LEFT',
+               'F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12']
+    
     class SF5Plugin(object):
         
         def __init__(self, app):
@@ -24,9 +33,9 @@ try:
             
             if args[3] == 'config' and args[4] == 'load':
                 if args[5] == 'defaults':
-                    self.app.config.add_setting('Screenshots', 'screenshot_dir', 'screenshots', alias='Screenshot Folder', type=CT_LINEEDIT)
-                    self.app.config.add_setting('Screenshots', 'screenshot_format', 'JPEG', alias='Screenshot Format', type=CT_COMBO, options=['PNG'])
-                    self.app.config.add_setting('Keybindings', 'screenshot_key', 'SLASH', alias='Screenshot', type=CT_COMBO, options=PYGAME_KEYS)
+                    self.app.config.add_setting('Screenshots', 'screenshot_dir', 'screenshots', alias='Screenshot Folder', type=3)
+                    self.app.config.add_setting('Screenshots', 'screenshot_format', 'JPEG', alias='Screenshot Format', type=1, options=['PNG'])
+                    self.app.config.add_setting('Keybindings', 'screenshot_key', 'SLASH', alias='Screenshot', type=1, options=PYGAME_KEYS)
             
             if args[3] == 'press' and args[5] == 'user' and args[4] == self.screenshot_key:
                 filename = os.path.join(self.app.config['Screenshots']['screenshot_dir'], "%s.jpg" % getDateTimeStamp())
