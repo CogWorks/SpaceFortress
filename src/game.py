@@ -1294,74 +1294,75 @@ class Game(object):
         finalrect.centery = self.SCREEN_HEIGHT / 16 * 14
         self.screen.blit(finalsurf, finalrect)
 
+
     def draw_ng_score(self, time):
         pygame.event.get() #clear event list? Otherwise it skips
-        self.screen.fill((0, 0, 0))
-        gamesurf = self.f36.render("Game %d Stats" % (self.current_game), True, (255, 255, 0))
+        #self.screen.fill((0, 0, 0))
+        gamesurf = pygl2d.font.RenderText("Game %d Stats" % (self.current_game), (255, 255, 0), self.f36)
         gamerect = gamesurf.get_rect()
         gamerect.centery = self.SCREEN_HEIGHT / 16 * 2
         gamerect.centerx = self.SCREEN_WIDTH / 2
-        self.screen.blit(gamesurf, gamerect)
-        pygame.draw.line(self.screen, (255, 255, 255), (self.SCREEN_WIDTH / 4 , self.SCREEN_HEIGHT / 16 * 3), (self.SCREEN_WIDTH / 4 * 3, self.SCREEN_HEIGHT / 16 * 3))
-        pntssurf = self.f24.render("Points:", True, (255, 255, 0))
+        gamesurf.draw(gamerect.topleft)
+        pygl2d.draw.line((self.SCREEN_WIDTH / 4 , self.SCREEN_HEIGHT / 16 * 3), (self.SCREEN_WIDTH / 4 * 3, self.SCREEN_HEIGHT / 16 * 3), (255, 255, 255))
+        pntssurf = pygl2d.font.RenderText("Points:", (255, 255, 0), self.f24)
         pntsrect = pntssurf.get_rect()
         pntsrect.left = self.SCREEN_WIDTH / 3
         pntsrect.centery = self.SCREEN_HEIGHT / 16 * 4
-        self.screen.blit(pntssurf, pntsrect)
-        pntsnsurf = self.f24.render("%d" % self.score.pnts, True, (255, 255, 255))
+        pntssurf.draw(pntsrect.topleft)
+        pntsnsurf = pygl2d.font.RenderText("%d" % self.score.pnts, (255, 255, 255), self.f24)
         pntsnrect = pntsnsurf.get_rect()
         pntsnrect.right = self.SCREEN_WIDTH / 3 * 2
         pntsnrect.centery = self.SCREEN_HEIGHT / 16 * 4
-        self.screen.blit(pntsnsurf, pntsnrect)
-        deathsurf = self.f24.render("Deaths:", True, (255, 255, 0))
+        pntsnsurf.draw(pntsnrect.topleft)      
+        deathsurf = pygl2d.font.RenderText("Deaths:", (255, 255, 0), self.f24)
         deathrect = deathsurf.get_rect()
         deathrect.left = self.SCREEN_WIDTH / 3
         deathrect.centery = self.SCREEN_HEIGHT / 16 * 5.5
-        self.screen.blit(deathsurf, deathrect)
-        deathnsurf = self.f24.render("%d" % (self.deaths), True, (255, 255, 255))
+        deathsurf.draw(deathrect.topleft)
+        deathnsurf = pygl2d.font.RenderText("%d" % (self.deaths), (255, 255, 255), self.f24)
         deathnrect = deathnsurf.get_rect()
         deathnrect.right = self.SCREEN_WIDTH / 3 * 2
         deathnrect.centery = self.SCREEN_HEIGHT / 16 * 5.5
-        self.screen.blit(deathnsurf, deathnrect)
-        cntrlsurf = self.f24.render("Destroyed fortresses:", True, (255, 255, 0))
+        deathnsurf.draw(deathnrect.topleft)
+        cntrlsurf = pygl2d.font.RenderText("Destroyed fortresses:", (255, 255, 0), self.f24)
         cntrlrect = cntrlsurf.get_rect()
         cntrlrect.left = self.SCREEN_WIDTH / 3
         cntrlrect.centery = self.SCREEN_HEIGHT / 16 * 7
-        self.screen.blit(cntrlsurf, cntrlrect)
-        cntrlnsurf = self.f24.render("%d" % (self.destroyedFortresses), True, (255, 255, 255))
+        cntrlsurf.draw(cntrlrect.topleft)
+        cntrlnsurf = pygl2d.font.RenderText("%d" % (self.destroyedFortresses), (255, 255, 255), self.f24)
         cntrlnrect = cntrlnsurf.get_rect()
         cntrlnrect.right = self.SCREEN_WIDTH / 3 * 2
         cntrlnrect.centery = self.SCREEN_HEIGHT / 16 * 7
-        self.screen.blit(cntrlnsurf, cntrlnrect)
-        vlctysurf = self.f24.render("Destroyed mines:", True, (255, 255, 0))
+        cntrlnsurf.draw(cntrlnrect.topleft)
+        vlctysurf = pygl2d.font.RenderText("Destroyed mines:", (255, 255, 0), self.f24)
         vlctyrect = vlctysurf.get_rect()
         vlctyrect.left = self.SCREEN_WIDTH / 3
         vlctyrect.centery = self.SCREEN_HEIGHT / 16 * 8.5
-        self.screen.blit(vlctysurf, vlctyrect)
-        vlctynsurf = self.f24.render("%d of %d" % (self.destroyedMines, self.totalMines), True, (255, 255, 255))
+        vlctysurf.draw(vlctyrect.topleft)
+        vlctynsurf = pygl2d.font.RenderText("%d of %d" % (self.destroyedMines, self.totalMines), (255, 255, 255), self.f24)
         vlctynrect = vlctynsurf.get_rect()
         vlctynrect.right = self.SCREEN_WIDTH / 3 * 2
         vlctynrect.centery = self.SCREEN_HEIGHT / 16 * 8.5
-        self.screen.blit(vlctynsurf, vlctynrect)
-        speedsurf = self.f24.render("Captured bonuses:", True, (255, 255, 0))
+        vlctynsurf.draw(vlctynrect.topleft)
+        speedsurf = pygl2d.font.RenderText("Captured bonuses:", (255, 255, 0), self.f24)
         speedrect = speedsurf.get_rect()
         speedrect.left = self.SCREEN_WIDTH / 3
         speedrect.centery = self.SCREEN_HEIGHT / 16 * 10
-        self.screen.blit(speedsurf, speedrect)
-        speednsurf = self.f24.render("%d of %d" % (self.capturedBonuses, self.totalBonuses), True, (255, 255, 255))
+        speedsurf.draw(speedrect.topleft)
+        speednsurf = pygl2d.font.RenderText("%d of %d" % (self.capturedBonuses, self.totalBonuses), (255, 255, 255), self.f24)
         speednrect = speednsurf.get_rect()
         speednrect.right = self.SCREEN_WIDTH / 3 * 2
         speednrect.centery = self.SCREEN_HEIGHT / 16 * 10
-        self.screen.blit(speednsurf, speednrect)
-        pygame.draw.line(self.screen, (255, 255, 255), (self.SCREEN_WIDTH / 4 , self.SCREEN_HEIGHT / 16 * 11), (self.SCREEN_WIDTH / 4 * 3, self.SCREEN_HEIGHT / 16 * 11))
+        speednsurf.draw(speednrect.topleft)
+        pygl2d.draw.line((self.SCREEN_WIDTH / 4 , self.SCREEN_HEIGHT / 16 * 11), (self.SCREEN_WIDTH / 4 * 3, self.SCREEN_HEIGHT / 16 * 11), (255, 255, 255))
         if self.current_game == self.config['General']['games_per_session']:
-            finalsurf = self.f24.render("You're done! Press return to exit", True, (0, 255, 0))
+            finalsurf = pygl2d.font.RenderText("You're done! Press return to exit", (0, 255, 0), self.f24)
         else:
-            finalsurf = self.f24.render("Press return for next game", True, (0, 255, 0))
+            finalsurf = pygl2d.font.RenderText("Press return for next game", (0, 255, 0), self.f24)
         finalrect = finalsurf.get_rect()
         finalrect.centerx = self.SCREEN_WIDTH / 2
         finalrect.centery = self.SCREEN_HEIGHT / 16 * 14
-        self.screen.blit(finalsurf, finalrect)
+        finalsurf.draw(finalrect.topleft)
 
     def draw_new_score(self):
         """shows score for last game and waits to continue"""
