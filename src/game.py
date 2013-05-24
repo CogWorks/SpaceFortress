@@ -305,11 +305,7 @@ class Game(object):
             self.world.top = 70 * self.aspect_ratio
 
         self.bighex = Hex(self, self.config['Hexagon']['big_hex'])
-        if self.config['Hexagon']['hide_big_hex']:
-            self.bighex.color = (0, 0, 0)
         self.smallhex = Hex(self, self.config['Hexagon']['small_hex'])
-        if self.config['Hexagon']['hide_small_hex']:
-            self.smallhex.color = (0, 0, 0)
         if self.config['Mine']['mine_exists']:
             self.mine_exists = True
         else:
@@ -1025,11 +1021,13 @@ class Game(object):
         if self.config['Graphics']['max_stars']:
             self.draw_stars()
             
-        self.bighex.draw()
+        if not self.config['Hexagon']['hide_big_hex']:
+            self.bighex.draw()
         if self.fortress_exists and not self.fortress.alive:
             pass
         else:
-            self.smallhex.draw()
+            if not self.config['Hexagon']['hide_small_hex']:
+                self.smallhex.draw()
         
         for shell in self.shell_list:
             shell.draw()
