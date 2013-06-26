@@ -472,6 +472,8 @@ class Game(object):
                             self.gameevents.add("press", "pnts", type='EVENT_USER')
                         elif event.key == self.pause_key and self.config['General']['allow_pause']:
                                 self.gameevents.add("press", "pause", type='EVENT_USER')
+                        else:
+                            self.gameevents.add("press", event.key, "user", type='EVENT_SYSTEM')
                                 
                     elif self.state == self.STATE_PAUSED and event.key == self.pause_key:
                         self.gameevents.add("press", "unpause", type='EVENT_USER')
