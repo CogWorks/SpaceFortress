@@ -12,7 +12,7 @@ Run the game:
 Run the config editor:
 ::
 
-  python syc/configeditor.py
+  python src/configeditor.py
 
 Controls:
 
