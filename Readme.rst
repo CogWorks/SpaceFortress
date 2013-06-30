@@ -36,7 +36,7 @@ Running
 Run the game:
 ::
 
-  python sys/spacefortress5.py
+  python src/spacefortress5.py
 
 
 Run the config editor:
