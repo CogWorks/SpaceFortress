@@ -42,5 +42,5 @@ Run the game:
 Run the config editor:
 ::
 
-  python sys/configeditor.py
+  python src/configeditor.py
 
