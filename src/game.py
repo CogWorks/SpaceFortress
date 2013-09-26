@@ -8,6 +8,12 @@ from twisted.internet.task import LoopingCall
 import os, sys, math, copy, time, datetime, pkg_resources
 from random import randrange, choice
 
+ACTR6 = True 
+try:
+    from actr6_jni import Dispatcher, JNI_Server, VisualChunk, Twisted_MPClock  
+except ImportError:
+    ACTR6 = False
+
 import platform as plat
 
 os.environ['SDL_VIDEO_WINDOW_POS'] = 'center'
@@ -58,8 +64,15 @@ release_build = False
 
 class Game(object):
     """Main game application"""
+    d = Dispatcher()
     def __init__(self):
         super(Game, self).__init__()
+
+        if ACTR6: ###acttr
+            self.actr = JNI_Server(self)
+            self.actr.addDispatcher(self.d)
+            reactor.listenTCP(5555, self.actr)
+
 
         self.ret = 1
 
@@ -77,6 +90,9 @@ class Game(object):
         self.STATE_PAUSED = 8
         self.STATE_SCORES = 9
         self.STATE_DONE = 10
+        self.STATE_WAIT_CONNECT = 11
+        self.STATE_WAIT_MODEL = 12
+        
 
         self.state = self.STATE_INTRO
 
@@ -102,6 +118,7 @@ class Game(object):
         self.plugins = {}
         #self.plugins = defaults.load_plugins(self, pkg_resources.resource_stream(__name__,  'plugins'), self.plugins)
         self.plugins = defaults.load_plugins(self, defaults.get_plugin_home(), self.plugins)
+        print('plugins=', self.plugins, defaults.get_plugin_home() )
         for name in self.plugins:
             if hasattr(self.plugins[name], 'eventCallback'):
                 self.gameevents.addCallback(self.plugins[name].eventCallback)
@@ -131,13 +148,13 @@ class Game(object):
             if self.config['Display']['screen_width'] > 0 and self.config['Display']['screen_height'] > 0:
                 best_mode = (self.config['Display']['screen_width'], self.config['Display']['screen_height'])
             else:
-    			for mode in mode_list:
-    				tmp = mode[0] / 2
-    				for m in mode_list:
-    					if tmp == m[0]:
-    						mode_list.remove(mode)
-    						break
-    			best_mode = mode_list[1]
+                for mode in mode_list:
+                    tmp = mode[0] / 2
+                    for m in mode_list:
+                        if tmp == m[0]:
+                            mode_list.remove(mode)
+                            break
+                best_mode = mode_list[1]
         else:
             if self.config['Display']['display_mode'] == 'Current':
                 info = pygame.display.Info()
@@ -332,6 +349,11 @@ class Game(object):
         self.intro_logo_rect.center = (self.SCREEN_WIDTH / 2, self.SCREEN_HEIGHT / 2)
         self.intro_logo.scale(.4 * self.SCREEN_HEIGHT / 128)
 
+
+        self.actr_waiting = pygl2d.font.RenderText('Waiting for ACT-R', (255, 200, 100), self.font2)
+        self.actr_waiting_rect = self.actr_waiting.get_rect()
+        self.actr_waiting_rect.center = (self.SCREEN_WIDTH / 2, self.SCREEN_HEIGHT / 2)
+
         self.pause = pygl2d.font.RenderText("Paused!", (255, 255, 255), self.f96)
         self.pause_rect = self.pause.get_rect()
         self.pause_rect.center = (self.SCREEN_WIDTH / 2, self.SCREEN_HEIGHT / 2)
@@ -446,10 +468,10 @@ class Game(object):
                             if self.mine_exists:
                                 self.state = self.STATE_SETUP_IFF
                             else:
-                                self.state = self.STATE_PREPARE
+                                self.state = self.STATE_WAIT_CONNECT #self.STATE_PREPARE
 
                         elif self.state == self.STATE_IFF:
-                            self.state = self.STATE_PREPARE
+                            self.state = self.STATE_WAIT_CONNECT #self.STATE_PREPARE
 
                         elif self.state == self.STATE_SCORES:
                             self.state = self.STATE_SETUP
@@ -1066,6 +1088,9 @@ class Game(object):
             
         elif self.state == self.STATE_IFF:
             self.draw_foe_mines()
+
+        elif self.state == self.STATE_WAIT_CONNECT:
+            self.draw_actr_wait_msg()
             
         elif self.state == self.STATE_PLAY or self.state == self.STATE_PAUSED:
             if self.state == self.STATE_PAUSED and self.config['Display']['pause_overlay']:
@@ -1211,6 +1236,10 @@ class Game(object):
         self.intro_vers.draw(self.intro_vers_rect.topleft)
         self.intro_copy.draw(self.intro_copy_rect.topleft)
         self.intro_logo.draw(self.intro_logo_rect.topleft)
+
+    def draw_actr_wait_msg(self):
+        """Display Waiting for ACT-R msg"""
+        self.actr_waiting.draw(self.actr_waiting_rect.topleft)
 
     def draw_game_number(self):
         """before game begins, present the game number"""        
@@ -1532,3 +1561,46 @@ class Game(object):
     def run(self):
         reactor.callLater(0, self.start)
         reactor.run()
+
+    if ACTR6:
+        @d.listen('connectionMade')
+        def ACTR6_JNI_Event(self, model, params):
+            print("Connection Made")
+            self.state = self.STATE_WAIT_MODEL 
+            
+        @d.listen('connectionLost')
+        def ACTR6_JNI_Event(self, model, params):       
+           self.state = self.STATE_WAIT_CONNECT
+           
+        @d.listen('reset')
+        def ACTR6_JNI_Event(self, model, params):
+            self.state = self.STATE_WAIT_MODEL
+    
+        @d.listen('model-run')
+        def ACTR6_JNI_Event(self, model, params):
+            print ("model-run") 
+            self.state = self.STATE_PREPARE
+            self.actr_running = True
+    
+        @d.listen('model-stop')
+        def ACTR6_JNI_Event(self, model, params):
+            print("model-stop")
+        #self.state = self.STATE_SCORES
+    
+        @d.listen('keypress')
+        def ACTR6_JNI_Event(self, model, params):
+            print("keypress",  params['keycode'], chr(params['keycode']))
+  #          self.handle_key_press(params['keycode'], chr(params['keycode']))
+    
+        @d.listen('mousemotion')
+        def ACTR6_JNI_Event(self, model, params):
+            # Store "ACT-R" cursor in variable since we are
+            # not going to move the real mouse
+            self.fake_cursor = params[0]
+    
+        @d.listen('mouseclick')
+        def ACTR6_JNI_Event(self, model, params):
+            # Simulate a button press using the "ACT-R" cursor loc
+            pass
+ #           self.handle_mouse_event(self.fake_cursor)
+    

@@ -5,6 +5,18 @@ from timer import Timer
 from gameevent import GameEvent
 from sftoken import Token
 
+from actr6_jni import VisualChunk
+
+class SFChunk(VisualChunk):
+    def get_visual_location( self ):
+        chunk = super(SFChunk, self).get_visual_location()
+        for s, v in self.slots.iteritems():
+            if s in ["vel_x,", "vel_y", "fortress_exist"]:
+                chunk["slots"][s] = v
+        chunk["isa"] = "sf-visual-location"
+        return chunk
+
+
 import pkg_resources
 
 import pygl2d
@@ -133,10 +145,16 @@ class Ship(Token):
                 self.app.score.pnts -= self.app.config['Missile']['missile_penalty']
                 self.app.score.bonus -= self.app.config['Missile']['missile_penalty']
 
+    def ShiptoChunk(self):
+        rad = self.app.config['Ship']['ship_radius'] 
+        return SFChunk(None,"Ship",self.position.x, self.position.y, value = self.orientation,
+                           width = rad, height = rad, color=':yellow', vel_x = self.velocity.x ,vel_y = self.velocity.y,
+                           fortress_exist = self.app.fortress_exists)
+
     def draw(self):
         """draw ship to worldsurf"""
         if self.app.config['Graphics']['fancy']:
-            if not self.thrust_flag:
+            if not self.thrust_flag:    
                 ship = self.ship
             else:
                 ship = self.ship2
