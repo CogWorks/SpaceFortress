@@ -10,6 +10,7 @@ if __name__ == '__main__':
     cfg.set_user_file(defaults.get_user_file())
     editor = ConfigEditor(app, cfg, 'Space Fortress Config Editor')
     plugins = {}
+    plugins = defaults.load_plugins(editor, 'plugins', plugins)
     plugins = defaults.load_plugins(editor, defaults.get_plugin_home(), plugins)
     for name in plugins:
         try:

@@ -5,18 +5,6 @@ from timer import Timer
 from gameevent import GameEvent
 from sftoken import Token
 
-from actr6_jni import VisualChunk
-
-class SFChunk(VisualChunk):
-    def get_visual_location( self ):
-        chunk = super(SFChunk, self).get_visual_location()
-        for s, v in self.slots.iteritems():
-            if s in ["vel_x,", "vel_y", "fortress_exist"]:
-                chunk["slots"][s] = v
-        chunk["isa"] = "sf-visual-location"
-        return chunk
-
-
 import pkg_resources
 
 import pygl2d
@@ -71,7 +59,37 @@ class Ship(Token):
                 self.shield_rect = shield.get_rect()
                 shield.scale(70 * self.app.aspect_ratio / 400)
                 self.shields.append(shield)
+        else:
+            self.calculate_vector_points()
+            
+    def get_width(self):
+        if self.app.config['Graphics']['fancy']:
+            return self.ship_rect.width
+        else:
+            s = [self.x1,self.x2,self.x3,self.x4,self.x5]
+            return abs(max(s) - min(s))
 
+    def get_height(self):
+        if self.app.config['Graphics']['fancy']:
+            return self.ship_rect.height
+        else:
+            s = [self.y1,self.y2,self.y3,self.y4,self.y5]
+            return abs(max(s) - min(s))
+
+    def calculate_vector_points(self):
+        sinphi = math.sin(math.radians((self.orientation) % 360))
+        cosphi = math.cos(math.radians((self.orientation) % 360))
+        self.x1 = -18 * cosphi * self.app.aspect_ratio + self.position.x
+        self.y1 = -(-18 * sinphi) * self.app.aspect_ratio + self.position.y
+        self.x2 = 18 * cosphi * self.app.aspect_ratio + self.position.x
+        self.y2 = -(18 * sinphi) * self.app.aspect_ratio + self.position.y
+        self.nose = (self.x2, self.y2)
+        self.x3 = self.position.x
+        self.y3 = self.position.y
+        self.x4 = (-18 * cosphi - 18 * sinphi) * self.app.aspect_ratio + self.position.x
+        self.y4 = (-((18 * cosphi) + (-18 * sinphi))) * self.app.aspect_ratio + self.position.y
+        self.x5 = (-18 * cosphi - -18 * sinphi) * self.app.aspect_ratio + self.position.x
+        self.y5 = (-((-18 * cosphi) + (-18 * sinphi))) * self.app.aspect_ratio + self.position.y
 
     def compute(self):
         """updates ship"""
@@ -145,12 +163,6 @@ class Ship(Token):
                 self.app.score.pnts -= self.app.config['Missile']['missile_penalty']
                 self.app.score.bonus -= self.app.config['Missile']['missile_penalty']
 
-    def ShiptoChunk(self):
-        rad = self.app.config['Ship']['ship_radius'] 
-        return SFChunk(None,"Ship",self.position.x, self.position.y, value = self.orientation,
-                           width = rad, height = rad, color=':yellow', vel_x = self.velocity.x ,vel_y = self.velocity.y,
-                           fortress_exist = self.app.fortress_exists)
-
     def draw(self):
         """draw ship to worldsurf"""
         if self.app.config['Graphics']['fancy']:
@@ -164,19 +176,7 @@ class Ship(Token):
             self.shield_rect.center = (self.position.x, self.position.y)
             self.shields[self.health - 1].draw(self.shield_rect)
         else:
-            sinphi = math.sin(math.radians((self.orientation) % 360))
-            cosphi = math.cos(math.radians((self.orientation) % 360))
-            x1 = -18 * cosphi * self.app.aspect_ratio + self.position.x
-            y1 = -(-18 * sinphi) * self.app.aspect_ratio + self.position.y
-            x2 = 18 * cosphi * self.app.aspect_ratio + self.position.x
-            y2 = -(18 * sinphi) * self.app.aspect_ratio + self.position.y
-            self.nose = (x2, y2)
-            x3 = self.position.x
-            y3 = self.position.y
-            x4 = (-18 * cosphi - 18 * sinphi) * self.app.aspect_ratio + self.position.x
-            y4 = (-((18 * cosphi) + (-18 * sinphi))) * self.app.aspect_ratio + self.position.y
-            x5 = (-18 * cosphi - -18 * sinphi) * self.app.aspect_ratio + self.position.x
-            y5 = (-((-18 * cosphi) + (-18 * sinphi))) * self.app.aspect_ratio + self.position.y
-            pygl2d.draw.line((x1, y1), (x2, y2), self.color, self.app.linewidth)
-            pygl2d.draw.line((x3, y3), (x4, y4), self.color, self.app.linewidth)
-            pygl2d.draw.line((x3, y3), (x5, y5), self.color, self.app.linewidth)
+            self.calculate_vector_points()
+            pygl2d.draw.line((self.x1, self.y1), (self.x2, self.y2), self.color, self.app.linewidth)
+            pygl2d.draw.line((self.x3, self.y3), (self.x4, self.y4), self.color, self.app.linewidth)
+            pygl2d.draw.line((self.x3, self.y3), (self.x5, self.y5), self.color, self.app.linewidth)

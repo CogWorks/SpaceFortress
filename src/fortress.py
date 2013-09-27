@@ -7,8 +7,6 @@ from gameevent import GameEvent
 from timer import Timer
 from sftoken import Token
 
-from actr6_jni import VisualChunk
-
 import pkg_resources
 
 import pygl2d
@@ -50,11 +48,6 @@ class Fortress(Token):
     def fire(self):
         self.app.snd_shell_fired.play()
         self.app.shell_list.append(shell.Shell(self.app, self.to_target_orientation(self.app.ship)))
-
-    def FortresstoChunk(self):
-        rad = self.app.config['Fortress']['fortress_radius']
-        return VisualChunk(None, "Fortress", self.position.x, self.position.y, value = self.orientation,
-                               width = rad, height = rad, color=':yellow')
         
     def draw(self):
         """draws fortress to worldsurf"""

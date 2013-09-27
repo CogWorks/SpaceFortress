@@ -8,12 +8,6 @@ from twisted.internet.task import LoopingCall
 import os, sys, math, copy, time, datetime, pkg_resources
 from random import randrange, choice
 
-ACTR6 = True 
-try:
-    from actr6_jni import Dispatcher, JNI_Server, VisualChunk, Twisted_MPClock  
-except ImportError:
-    ACTR6 = False
-
 import platform as plat
 
 os.environ['SDL_VIDEO_WINDOW_POS'] = 'center'
@@ -64,21 +58,17 @@ release_build = False
 
 class Game(object):
     """Main game application"""
-    d = Dispatcher()
+
     def __init__(self):
         super(Game, self).__init__()
-
-        if ACTR6: ###acttr
-            self.actr = JNI_Server(self)
-            self.actr.addDispatcher(self.d)
-            reactor.listenTCP(5555, self.actr)
-
 
         self.ret = 1
 
         self.reactor = reactor
-
-        self.STATE_UNKNOWN = -1
+        
+        self.STATE_UNKNOWN = -3
+        self.STATE_WAIT_CONNECT = -2
+        self.STATE_WAIT_MODEL = -1
         self.STATE_CALIBRATE = 0
         self.STATE_INTRO = 1
         self.STATE_SETUP = 2
@@ -90,11 +80,6 @@ class Game(object):
         self.STATE_PAUSED = 8
         self.STATE_SCORES = 9
         self.STATE_DONE = 10
-        self.STATE_WAIT_CONNECT = 11
-        self.STATE_WAIT_MODEL = 12
-        
-
-        self.state = self.STATE_INTRO
 
         self.ship = None
         self.bonus = None
@@ -110,15 +95,16 @@ class Game(object):
         self.header = {}
         self.bonus_captured = False
 
+        self.gameevents = GameEventList(self)
+        self.setState(self.STATE_INTRO)
+
         self.modifier = pygame.KMOD_CTRL
         if plat.system() == 'Darwin':
             self.modifier = pygame.KMOD_META
 
-        self.gameevents = GameEventList(self)
         self.plugins = {}
-        #self.plugins = defaults.load_plugins(self, pkg_resources.resource_stream(__name__,  'plugins'), self.plugins)
+        self.plugins = defaults.load_plugins(self, 'plugins', self.plugins)
         self.plugins = defaults.load_plugins(self, defaults.get_plugin_home(), self.plugins)
-        print('plugins=', self.plugins, defaults.get_plugin_home() )
         for name in self.plugins:
             if hasattr(self.plugins[name], 'eventCallback'):
                 self.gameevents.addCallback(self.plugins[name].eventCallback)
@@ -349,17 +335,16 @@ class Game(object):
         self.intro_logo_rect.center = (self.SCREEN_WIDTH / 2, self.SCREEN_HEIGHT / 2)
         self.intro_logo.scale(.4 * self.SCREEN_HEIGHT / 128)
 
-
-        self.actr_waiting = pygl2d.font.RenderText('Waiting for ACT-R', (255, 200, 100), self.font2)
-        self.actr_waiting_rect = self.actr_waiting.get_rect()
-        self.actr_waiting_rect.center = (self.SCREEN_WIDTH / 2, self.SCREEN_HEIGHT / 2)
-
         self.pause = pygl2d.font.RenderText("Paused!", (255, 255, 255), self.f96)
         self.pause_rect = self.pause.get_rect()
         self.pause_rect.center = (self.SCREEN_WIDTH / 2, self.SCREEN_HEIGHT / 2)
         
         self.happy = pygl2d.image.load_xbm(pkg_resources.resource_stream("resources", "gfx/fill1.xbm"))
         self.gameevents.add("session", "ready", type='EVENT_SYSTEM')
+
+    def setState(self, state):
+        self.state = state
+        self.gameevents.add("game", "setstate", self.state, type='EVENT_SYSTEM')
 
     def set_aspect_ratio(self):
         self.aspect_ratio = self.SCREEN_HEIGHT / 768
@@ -451,6 +436,7 @@ class Game(object):
             else:
 
                 if event.type == pygame.KEYDOWN:
+                    print "keydown!"
 
                     if (pygame.key.get_mods() & self.modifier):
                         if event.key == pygame.K_q:
@@ -459,22 +445,22 @@ class Game(object):
                     if event.key == pygame.K_RETURN:
 
                         if self.state == self.STATE_INTRO:
-                            self.state = self.STATE_SETUP
+                            self.setState(self.STATE_SETUP)
 
                         elif self.state == self.STATE_SETUP:
-                            self.state = self.STATE_GAMENO
+                            self.setState(self.STATE_GAMENO)
 
                         elif self.state == self.STATE_GAMENO:
                             if self.mine_exists:
-                                self.state = self.STATE_SETUP_IFF
+                                self.setState(self.STATE_SETUP_IFF)
                             else:
-                                self.state = self.STATE_WAIT_CONNECT #self.STATE_PREPARE
+                                self.setState(self.STATE_PREPARE)
 
                         elif self.state == self.STATE_IFF:
-                            self.state = self.STATE_WAIT_CONNECT #self.STATE_PREPARE
+                            self.setState(self.STATE_PREPARE)
 
                         elif self.state == self.STATE_SCORES:
-                            self.state = self.STATE_SETUP
+                            self.setState(self.STATE_SETUP)
 
                     elif self.state == self.STATE_PLAY:
 
@@ -504,6 +490,7 @@ class Game(object):
                         self.gameevents.add("press", event.key, "user", type='EVENT_SYSTEM')
 
                 elif event.type == pygame.KEYUP:
+                    print "keyup!"
 
                     if self.state == self.STATE_PLAY:
 
@@ -529,14 +516,14 @@ class Game(object):
         if self.state == self.STATE_SETUP:
             if self.current_game < self.config['General']['games_per_session']:
                 self.current_game += 1
-                self.state = self.STATE_GAMENO
                 self.game_title = "Game: %d of %d" % (self.current_game, self.config['General']['games_per_session'])
                 self.game_title = pygl2d.font.RenderText(self.game_title, (255, 255, 0), self.f36)
                 self.game_title_rect = self.game_title.get_rect()
                 self.game_title_rect.center = (self.SCREEN_WIDTH / 2, self.SCREEN_HEIGHT / 16 * 7)
+                self.setState(self.STATE_GAMENO)
                 self.gameevents.add("display_game", self.current_game)
             else:
-                self.state = self.STATE_DONE
+                self.setState(self.STATE_DONE)
                 self.ret = 0
                 self.lc.stop()
         elif self.state == self.STATE_SETUP_IFF:
@@ -545,20 +532,29 @@ class Game(object):
             self.foe_top = pygl2d.font.RenderText("The Type-2 mines for this session are:", (255, 255, 0), self.f24)
             self.foe_top_rect = self.foe_top.get_rect()
             self.foe_top_rect.center = (self.SCREEN_WIDTH / 2, 270 * self.aspect_ratio)
-            self.foe_middle = pygl2d.font.RenderText(", ".join(self.mine_list.foe_letters), (255, 255, 255), self.f96)
-            self.foe_middle_rect = self.foe_middle.get_rect()
-            self.foe_middle_rect.center = (self.SCREEN_WIDTH / 2, self.SCREEN_HEIGHT / 2)
+
+            self.foe_letters = []
+            for foe in self.mine_list.foe_letters:
+                f = pygl2d.font.RenderText(" ".join(foe), (255, 255, 255), self.f96)
+                fr = f.get_rect()
+                self.foe_letters.append([f,fr])
+            n = len(self.foe_letters)
+            w = math.ceil(sum([l[0].get_width() for l in self.foe_letters])/n)
+            s = (self.SCREEN_WIDTH - (n + (n-1)/2) * w) / 2 + w/2
+            for i in range(0,n):
+                self.foe_letters[i][1].center = (s + i*1.5*w,self.SCREEN_HEIGHT / 2)
+            
             self.foe_midbot = pygl2d.font.RenderText("Try to memorize them before proceeding", (255, 255, 0), self.f24)
             self.foe_midbot_rect = self.foe_midbot.get_rect()
             self.foe_midbot_rect.center = (self.SCREEN_WIDTH / 2, 500 * self.aspect_ratio)
             self.foe_bottom = pygl2d.font.RenderText("Press return to begin", (255, 255, 0), self.f24)
             self.foe_bottom_rect = self.foe_bottom.get_rect()
             self.foe_bottom_rect.center = (self.SCREEN_WIDTH / 2, 600 * self.aspect_ratio)
-            self.state = self.STATE_IFF
+            self.setState(self.STATE_IFF)
         elif self.state == self.STATE_PREPARE:
             self.gameevents.add("game", "ready", type='EVENT_SYSTEM')
             self.setup_world()
-            self.state = self.STATE_PLAY
+            self.setState(self.STATE_PLAY)
             self.gameevents.add("game", "start", type='EVENT_SYSTEM')
         elif self.state == self.STATE_PLAY:
             self.ship.compute()
@@ -625,7 +621,7 @@ class Game(object):
 
             if self.gametimer.elapsed() > self.config['General']['game_time']:
                 self.gameevents.add("game", "over", type='EVENT_SYSTEM')
-                self.state = self.STATE_SCORES
+                self.setState(self.STATE_SCORES)
 
     def process_events(self):
         """processes internal list of game events for this frame"""
@@ -646,9 +642,9 @@ class Game(object):
             if command == "press":
                 if obj == "pause":
                     self.gametimer.pause()
-                    self.state = self.STATE_PAUSED
+                    self.setState(self.STATE_PAUSED)
                 elif obj == "unpause":
-                    self.state = self.STATE_PLAY
+                    self.setState(self.STATE_PLAY)
                     self.gametimer.unpause()
                 elif obj == "quit":
                     self.lc.stop()
@@ -1088,9 +1084,6 @@ class Game(object):
             
         elif self.state == self.STATE_IFF:
             self.draw_foe_mines()
-
-        elif self.state == self.STATE_WAIT_CONNECT:
-            self.draw_actr_wait_msg()
             
         elif self.state == self.STATE_PLAY or self.state == self.STATE_PAUSED:
             if self.state == self.STATE_PAUSED and self.config['Display']['pause_overlay']:
@@ -1237,10 +1230,6 @@ class Game(object):
         self.intro_copy.draw(self.intro_copy_rect.topleft)
         self.intro_logo.draw(self.intro_logo_rect.topleft)
 
-    def draw_actr_wait_msg(self):
-        """Display Waiting for ACT-R msg"""
-        self.actr_waiting.draw(self.actr_waiting_rect.topleft)
-
     def draw_game_number(self):
         """before game begins, present the game number"""        
         self.game_title.draw(self.game_title_rect.topleft)
@@ -1250,7 +1239,8 @@ class Game(object):
     def draw_foe_mines(self):
         """before game begins, present the list of IFF letters to target"""
         self.foe_top.draw(self.foe_top_rect.topleft)
-        self.foe_middle.draw(self.foe_middle_rect.topleft)
+        for foe in self.foe_letters:
+            foe[0].draw(foe[1].topleft)
         self.foe_midbot.draw(self.foe_midbot_rect.topleft)
         self.foe_bottom.draw(self.foe_bottom_rect.topleft)
 
@@ -1561,46 +1551,4 @@ class Game(object):
     def run(self):
         reactor.callLater(0, self.start)
         reactor.run()
-
-    if ACTR6:
-        @d.listen('connectionMade')
-        def ACTR6_JNI_Event(self, model, params):
-            print("Connection Made")
-            self.state = self.STATE_WAIT_MODEL 
-            
-        @d.listen('connectionLost')
-        def ACTR6_JNI_Event(self, model, params):       
-           self.state = self.STATE_WAIT_CONNECT
-           
-        @d.listen('reset')
-        def ACTR6_JNI_Event(self, model, params):
-            self.state = self.STATE_WAIT_MODEL
-    
-        @d.listen('model-run')
-        def ACTR6_JNI_Event(self, model, params):
-            print ("model-run") 
-            self.state = self.STATE_PREPARE
-            self.actr_running = True
-    
-        @d.listen('model-stop')
-        def ACTR6_JNI_Event(self, model, params):
-            print("model-stop")
-        #self.state = self.STATE_SCORES
-    
-        @d.listen('keypress')
-        def ACTR6_JNI_Event(self, model, params):
-            print("keypress",  params['keycode'], chr(params['keycode']))
-  #          self.handle_key_press(params['keycode'], chr(params['keycode']))
-    
-        @d.listen('mousemotion')
-        def ACTR6_JNI_Event(self, model, params):
-            # Store "ACT-R" cursor in variable since we are
-            # not going to move the real mouse
-            self.fake_cursor = params[0]
-    
-        @d.listen('mouseclick')
-        def ACTR6_JNI_Event(self, model, params):
-            # Simulate a button press using the "ACT-R" cursor loc
-            pass
- #           self.handle_mouse_event(self.fake_cursor)
     
