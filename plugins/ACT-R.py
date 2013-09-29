@@ -145,15 +145,52 @@ try:
 		def ACTR6_JNI_Event(self, model, params):
 			print("model-stop")
 			#self.state = self.STATE_SCORES
-	
-		@d.listen('keypress')
+
+		@d.listen('hold-finger')
 		def ACTR6_JNI_Event(self, model, params):
-			print("keypress",  params['keycode'], chr(params['keycode']))
-			key = params['keycode']
-			if key == 10:
-				key = 13
-			pygame.event.post(pygame.event.Event(pygame.KEYDOWN, {"key":key}))
-			self.app.reactor.callLater(.02, pygame.event.post, pygame.event.Event(pygame.KEYUP, {"key":key}))
+			hand = params['hand']
+			finger = params['finger']
+			if hand == "left":
+				if finger == "middle":
+					pygame.event.post(pygame.event.Event(pygame.KEYDOWN, {"key":ord('w')}))
+				elif finger == "ring":
+					pygame.event.post(pygame.event.Event(pygame.KEYDOWN, {"key":ord('a')}))
+				elif finger == "index":
+					pygame.event.post(pygame.event.Event(pygame.KEYDOWN, {"key":ord('d')}))
+			elif hand == "right":
+				if finger == "index":
+					pygame.event.post(pygame.event.Event(pygame.KEYDOWN, {"key":ord('j')}))
+				elif finger == "middle":
+					pygame.event.post(pygame.event.Event(pygame.KEYDOWN, {"key":ord('k')}))
+				elif finger == "ring":
+					pygame.event.post(pygame.event.Event(pygame.KEYDOWN, {"key":ord('l')}))
+				elif finger == "pinky":
+					pygame.event.post(pygame.event.Event(pygame.KEYDOWN, {"key":ord('\r')}))
+				elif finger == "thumb":
+					pygame.event.post(pygame.event.Event(pygame.KEYDOWN, {"key":ord(' ')}))
+					
+		@d.listen('release-finger')
+		def ACTR6_JNI_Event(self, model, params):
+			hand = params['hand']
+			finger = params['finger']
+			if hand == "left":
+				if finger == "middle":
+					pygame.event.post(pygame.event.Event(pygame.KEYUP, {"key":ord('w')}))
+				elif finger == "ring":
+					pygame.event.post(pygame.event.Event(pygame.KEYUP, {"key":ord('a')}))
+				elif finger == "index":
+					pygame.event.post(pygame.event.Event(pygame.KEYUP, {"key":ord('d')}))
+			elif hand == "right":
+				if finger == "index":
+					pygame.event.post(pygame.event.Event(pygame.KEYUP, {"key":ord('j')}))
+				elif finger == "middle":
+					pygame.event.post(pygame.event.Event(pygame.KEYUP, {"key":ord('k')}))
+				elif finger == "ring":
+					pygame.event.post(pygame.event.Event(pygame.KEYUP, {"key":ord('l')}))
+				elif finger == "pinky":
+					pygame.event.post(pygame.event.Event(pygame.KEYUP, {"key":ord('\r')}))
+				elif finger == "thumb":
+					pygame.event.post(pygame.event.Event(pygame.KEYUP, {"key":ord(' ')}))
 	
 		@d.listen('mousemotion')
 		def ACTR6_JNI_Event(self, model, params):

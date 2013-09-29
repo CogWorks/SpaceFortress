@@ -25,6 +25,14 @@
      :mp 1
      )
 
+;;; Goals for SpaceFortress
+(chunk-type shoot-fortress subgoal)
+(chunk-type shoot-mine subgoal)
+(chunk-type avoid-shells subgoal)
+(chunk-type avoid-fortress subgoal)
+(chunk-type avoid-warping subgoal)
+(chunk-type avoid-mine subgoal)
+
 (chunk-type task goal subgoal)
 (chunk-type iffletter letter)
 
