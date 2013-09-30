@@ -35,7 +35,6 @@ class Token(object):
     #utility methods
     
     def get_velocity(self):
-
         return math.sqrt(self.velocity.y**2 + self.velocity.x**2)
     
     def to_target_orientation(self, target):
