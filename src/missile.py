@@ -29,12 +29,39 @@ class Missile(Token):
             self.missile_rect = self.missile.get_rect()
             self.missile.scale(25 * self.app.aspect_ratio / 29)
             self.missile.rotate(self.orientation - 90)
-        
+        else:
+            self.calculate_vector_points()
+
+    def get_width(self):
+        if self.app.config['Graphics']['fancy']:
+            return self.missile_rect.width
+        else:
+            s = [self.x1,self.x2,self.x3,self.x4]
+            return abs(max(s) - min(s))
+
+    def get_height(self):
+        if self.app.config['Graphics']['fancy']:
+            return self.missile_rect.height
+        else:
+            s = [self.y1,self.y2,self.y3,self.y4]
+            return abs(max(s) - min(s))
+
+    def calculate_vector_points(self):
+        sinphi = math.sin(math.radians((self.orientation) % 360))
+        cosphi = math.cos(math.radians((self.orientation) % 360))
+        self.x1 = self.position.x
+        self.y1 = self.position.y
+        self.x2 = -25 * cosphi * self.app.aspect_ratio + self.position.x
+        self.y2 = -(-25 * sinphi) * self.app.aspect_ratio + self.position.y
+        self.x3 = ((-5 * cosphi) - (5 * sinphi)) * self.app.aspect_ratio + self.position.x
+        self.y3 = (-((5 * cosphi) + (-5 * sinphi))) * self.app.aspect_ratio + self.position.y
+        self.x4 = ((-5 * cosphi) - (-5 * sinphi)) * self.app.aspect_ratio + self.position.x
+        self.y4 = (-((-5 * cosphi) + (-5 * sinphi))) * self.app.aspect_ratio + self.position.y
+
     def compute(self):
         """calculates new position of ship's missile"""
         self.position.x += self.velocity.x
         self.position.y += self.velocity.y
-        
         
     def draw(self):
         """draws ship's missile to worldsurf"""
@@ -42,19 +69,10 @@ class Missile(Token):
             self.missile_rect.center = (self.position.x, self.position.y)
             self.missile.draw(self.missile_rect.topleft)
         else:
-            sinphi = math.sin(math.radians((self.orientation) % 360))
-            cosphi = math.cos(math.radians((self.orientation) % 360))
-            x1 = self.position.x
-            y1 = self.position.y
-            x2 = -25 * cosphi * self.app.aspect_ratio + self.position.x
-            y2 = -(-25 * sinphi) * self.app.aspect_ratio + self.position.y
-            x3 = ((-5 * cosphi) - (5 * sinphi)) * self.app.aspect_ratio + self.position.x
-            y3 = (-((5 * cosphi) + (-5 * sinphi))) * self.app.aspect_ratio + self.position.y
-            x4 = ((-5 * cosphi) - (-5 * sinphi)) * self.app.aspect_ratio + self.position.x
-            y4 = (-((-5 * cosphi) + (-5 * sinphi))) * self.app.aspect_ratio + self.position.y
-            pygl2d.draw.line((x1, y1), (x2, y2), self.color, self.app.linewidth)
-            pygl2d.draw.line((x1, y1), (x3, y3), self.color, self.app.linewidth)
-            pygl2d.draw.line((x1, y1), (x4, y4), self.color, self.app.linewidth)
+            self.calculate_vector_points()
+            pygl2d.draw.line((self.x1, self.y1), (self.x2, self.y2), self.color, self.app.linewidth)
+            pygl2d.draw.line((self.x1, self.y1), (self.x3, self.y3), self.color, self.app.linewidth)
+            pygl2d.draw.line((self.x1, self.y1), (self.x4, self.y4), self.color, self.app.linewidth)
         
     def __str__(self):
         return '(%.2f,%.2f,%.2f)' % (self.position.x, self.position.y, self.orientation)

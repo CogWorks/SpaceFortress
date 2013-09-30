@@ -2,9 +2,15 @@ from __future__ import division
 from vector2D import Vector2D
 import math
 
+from itertools import count
+
 class Token(object):
+    
+    _ids = count(0)
+    
     """Base class for all visible Space Fortress tokens (objects)"""
     def __init__(self):
+        self._id = self._ids.next()
         self.position = Vector2D()
         self.start_position = Vector2D()
         self.last_position = Vector2D()
@@ -27,6 +33,10 @@ class Token(object):
             self.health = self.start_health
             
     #utility methods
+    
+    def get_velocity(self):
+
+        return math.sqrt(self.velocity.y**2 + self.velocity.x**2)
     
     def to_target_orientation(self, target):
         """find the correct orientation to pursue target"""

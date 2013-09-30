@@ -436,7 +436,6 @@ class Game(object):
             else:
 
                 if event.type == pygame.KEYDOWN:
-                    print "keydown!"
 
                     if (pygame.key.get_mods() & self.modifier):
                         if event.key == pygame.K_q:
@@ -490,7 +489,6 @@ class Game(object):
                         self.gameevents.add("press", event.key, "user", type='EVENT_SYSTEM')
 
                 elif event.type == pygame.KEYUP:
-                    print "keyup!"
 
                     if self.state == self.STATE_PLAY:
 
@@ -840,6 +838,7 @@ class Game(object):
             self.smallhex.small_hex_flag = True
         elif obj == "shell":
             #remove shell, target is index of shell in shell_list
+            self.gameevents.add("shell", "removed", self.shell_list[target]._id)
             del self.shell_list[target]
             self.gameevents.add("score-", "pnts", self.config['Score']['shell_hit_penalty'])
             self.gameevents.add("score-", "fortress", self.config['Score']['shell_hit_penalty'])
@@ -997,6 +996,7 @@ class Game(object):
                 self.gameevents.add("bounds_remove", "missile")
         for i, shell in enumerate(self.shell_list):
             if shell.out_of_bounds(self.world):
+                self.gameevents.add("shell", "removed", self.shell_list[i]._id)
                 del self.shell_list[i]
                 self.gameevents.add("bounds_remove", "shell")
 
