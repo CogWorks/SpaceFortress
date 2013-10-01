@@ -6,18 +6,24 @@ events and register new config options.
 try:
 
 	import sys
-	from actr6_jni import Dispatcher, JNI_Server, VisualChunk
+	from actr6_jni import Dispatcher, JNI_Server, Chunk, VisualChunk
 	import pygame
 	import pygl2d
 	import webcolors
 	
 	class TokenChunk(VisualChunk):
-		
 		def get_visual_location(self):
-			chunk = super(TokenChunk, self).get_visual_location()
-			chunk["isa"] = "token-location"
+			chunk = super(TokenChunk, self).get_visual_location("token-location")
 			for s, v in self.slots.iteritems():
 				if s in ["orientation", "velocity"]:
+					chunk["slots"][s] = v
+			return chunk
+		
+	class RectChunk(VisualChunk):
+		def get_visual_location(self):
+			chunk = super(RectChunk, self).get_visual_location("rect-location")
+			for s, v in self.slots.iteritems():
+				if s in ["top","bottom","left","right"]:
 					chunk["slots"][s] = v
 			return chunk
 	
@@ -51,6 +57,11 @@ try:
 						mine.get_width(), mine.get_height(), color="red",
 						orientation=mine.orientation, velocity=mine.get_velocity())
 		
+	def RectToChunk(rect, name, isa, color):
+		return RectChunk(name, isa, rect.centerx, rect.centery, rect.width, rect.height,
+						top=rect.top, bottom=rect.bottom, left=rect.left, right=rect.right,
+						color=color)
+		
 	class SF5Plugin(object):
 	
 		d = Dispatcher()
@@ -81,7 +92,6 @@ try:
 					self.app.config.add_setting(self.name, 'enabled', False, type=2, alias="Enable", about='Enable ACT-R model support')
 					self.app.config.add_setting(self.name, 'port', '5555', type=3, alias="Incoming Port", about='ACT-R JNI Port')
 			
-			
 			if self.actr:
 			
 				if args[3] == 'session':
@@ -110,7 +120,10 @@ try:
 							self.actr.display_new(chunks)
 						elif args[5] == self.app.STATE_PLAY:
 							if not self.resume:
-								chunks = [ShipToChunk(self.app.ship)]
+								chunks = [
+										RectToChunk(self.app.world, "world-border", "world-border", "green"),
+										ShipToChunk(self.app.ship)
+										]
 								if self.app.fortress_exists:
 									chunks.append(FortressToChunk(self.app.fortress))
 								self.actr.display_new(chunks)
@@ -196,6 +209,7 @@ try:
 				self.app.setState(self.app.STATE_PLAY)
 				self.app.gametimer.unpause()
 			else:
+				self.actr.add_dm(Chunk("game-settings","game-settings",mines=self.app.mine_exists))
 				self.resume = False
 				self.app.setState(self.app.STATE_SETUP)
 	

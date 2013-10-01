@@ -1,3 +1,7 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Helper functions
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (defmacro defp (&rest body)
   `(p-fct ',body))
 
@@ -14,6 +18,10 @@
 
 (defun point-on-line (px py x1 y1 x2 y2)
   (= (- py y1) (* (/ (- y2 y1) (- x2 x1)) (- px x1))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Model initialization
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (clear-all)
 
@@ -35,6 +43,7 @@
      )
 
 ;;; Goals
+(chunk-type study-mine-letters)
 (chunk-type monitor)
 (chunk-type shoot-fortress subgoal)
 (chunk-type shoot-mine subgoal)
@@ -44,6 +53,7 @@
 (chunk-type avoid-mine subgoal)
 
 ;;; New chunk types
+(chunk-type game-settings mines)
 (chunk-type (token-location (:include visual-location)) orientation velocity)
 (chunk-type (token-object (:include visual-object)) orientation velocity)
 (chunk-type (ship (:include token-object)))
@@ -51,163 +61,133 @@
 (chunk-type (mine (:include token-object)))
 (chunk-type (shell (:include token-object)))
 (chunk-type (missile (:include token-object)))
+(chunk-type (rect-location (:include visual-location)) top bottom left right)
+(chunk-type (rect-object (:include visual-object)) top bottom left right)
+(chunk-type (world-border (:include rect-object)))
 
-;;; Old chunk types
-(chunk-type task goal subgoal)
-(chunk-type iffletter letter)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Productions
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defp **start-game?
+(defp **start**
   ?goal> buffer empty
-  ?visual-location> buffer empty
+  ?retrieval> buffer empty state free
   ==>
-  +visual-location> isa visual-location kind text
+  +retrieval> isa game-settings
   )
 
-(defp **start-game!
+(defp **study-mine-letters**
   ?goal> buffer empty
-  =visual-location> isa visual-location kind text
-  ?manual> state free
+  =retrieval> isa game-settings - mines nil
+  ?finger-check> right-pinkie free
   ==>
-  +goal> isa task goal "does-game-have-mines"
+  =retrieval>
+  +goal> isa study-mine-letters
   +manual> isa delayed-punch hand right finger pinky
   )
 
-(defp **does-game-have-mines?
-  =goal> isa task goal "does-game-have-mines"
-  ?visual-location> buffer empty
-  ?manual> state free
+(defp **play-game**
+  ?goal> buffer empty
+  =retrieval> isa game-settings mines nil
+  ?finger-check> right-pinkie free
   ==>
-  +visual-location> isa visual-location kind text color "yellow" value "The Type-2 mines for this session are:"
-  )
-
-(defp **does-game-have-mines??
-  =goal> isa task goal "does-game-have-mines"
-  =visual-location> isa visual-location kind text - color "yellow" - value "The Type-2 mines for this session are:"
-  ?manual> state free
-  ==>
-  +visual-location> isa visual-location kind text color "yellow" value "The Type-2 mines for this session are:"
-  )
-
-(defp **does-game-have-mines!
-  =goal> isa task goal "does-game-have-mines"
-  =visual-location> isa visual-location kind text color "yellow" value "The Type-2 mines for this session are:"
-  ?manual> state free
-  ==>
-  +goal> isa task goal "study-iff-letters"
-  )
-	
-(defp **find-iff-letter?
-  =goal> isa task goal "study-iff-letters"
-  ?visual-location> buffer empty - state error
-  ?visual> buffer empty
-  ?imaginal> state free
-  ?manual> state free
-  ==>
-  +visual-location> isa visual-location kind text color "white" :attended nil
-  )
-	
-(defp **find-iff-letter!
-  =goal> isa task goal "study-iff-letters"
-  ?visual-location> buffer full
-  =visual-location> isa visual-location kind text color "white"
-  ?visual> buffer empty state free
-  ?imaginal> state free
-  ?manual> state free
-  ==>
-  =visual-location>
-  +visual> isa move-attention screen-pos =visual-location
-  )
-
-(defp **attend-iff-letter
-  =goal> isa task goal "study-iff-letters"
-  =visual> isa text value =letter
-  ?manual> state free
-  ==>
-  +imaginal> isa iffletter letter =letter
-  -visual>
-  -visual-location>
-  )
-
-(defp **done-finding-iff-letters
-  =goal> isa task goal "study-iff-letters"
-  ?visual-location> buffer empty state error
-  ?visual> buffer empty
-  ?imaginal> state free
-  ?manual> state free
-  ==>
+  =retrieval>
   +goal> isa monitor
-  +visual-location> isa visual-location kind text :attended nil
   +manual> isa delayed-punch hand right finger pinky
   )
 
-(defp **attend-ship
+(defp **attend-ship**
   =goal> isa monitor
   =visual-location> isa visual-location - kind ship
   ==>
   +visual-location> isa visual-location kind ship
   )
 
-(defp **initial-thrust-fast
+(defp **initial-thrust**
   =goal> isa monitor
-  =visual-location> isa visual-location kind ship velocity nil
-  ?manual> state free
+  =retrieval> isa game-settings
+  =visual-location> isa visual-location kind ship velocity 0
+  ?finger-check> left-middle free
   ==>
-  +manual> isa delayed-punch hand left finger middle delay fast 
+  -retrieval>
+  +manual> isa delayed-punch hand left finger middle delay .15
+  +goal> isa shoot-fortress
+  +goal> isa avoid-fortress
+  +goal> isa avoid-shells
+  +goal> isa avoid-warping
   )
 
-(defp **initial-thrust-slow
-  =goal> isa monitor
-  =visual-location> isa visual-location kind ship velocity nil
-  ?manual> state free
+(defp **attend-border**
+  =goal> isa avoid-warping subgoal nil
+  ?imaginal> buffer empty
+  ?visual-location> buffer empty
   ==>
-  +manual> isa delayed-punch hand left finger middle delay slow 
+  +visual-location> isa visual-location kind world-border
   )
 
-;(defp **attend-shell
-;  =goal> isa monitor
-;  =visual-location> isa visual-location - kind shell
-;  ==>
-;  +visual-location> isa visual-location kind shell
-;  )
-
-;(defp **detect-shell-collision-course?
-;  =goal> isa monitor
-;  =visual-location> isa visual-location kind shell screenx =x
-;  )
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defp **do-nothing
-  =goal> isa avoid-fortress
+(defp **imagine-border**
+  =goal> isa avoid-warping subgoal nil
+  ?imaginal> buffer empty
+  =visual-location> isa visual-location kind world-border
   ==>
-  =goal>
+  +imaginal> =visual-location
+  +visual-location> isa visual-location kind ship
   )
-(pdisable **do-nothing)
 
-(defp **ship-thrust
-  =goal> isa avoid-fortress
-  ?manual> state free
+(defp **avoid-border-top-yes**
+  =goal> isa avoid-warping subgoal nil
+  =imaginal> isa visual-location kind world-border top =top
+  =visual-location> isa visual-location kind ship screen-y =shipy
+  !eval! (< (abs (- =top =shipy)) 150)
   ==>
-  =goal>
-  +manual> isa delayed-punch hand left finger middle
+  =goal> subgoal "avoid-top-turn"
+  =visual-location>
   )
-(pdisable **ship-thrust)
- 
-(defp **ship-turn-left
-  =goal> isa avoid-fortress
-  ?manual> state free
-  ==>
-  =goal>
-  +manual> isa delayed-punch hand left finger ring
-  )
-(pdisable **ship-turn-left)
 
-(defp **ship-turn-right
-  =goal> isa avoid-fortress
-  ?manual> state free
+(defp **avoid-border-top-no**
+  =goal> isa avoid-warping subgoal nil
+  =imaginal> isa visual-location kind world-border top =top
+  =visual-location> isa visual-location kind ship screen-y =shipy
+  !eval! (> (abs (- =top =shipy)) 150)
   ==>
-  =goal>
-  +manual> isa delayed-punch hand left finger index
+  -imaginal>
+  -visual-location>
   )
-(pdisable **ship-turn-right)
+
+(defp **avoid-top-border-perpendicular**
+  =goal> isa avoid-warping subgoal "avoid-top-turn"
+  =visual-location> isa visual-location kind ship orientation 90
+  ?finger-check> left-index free
+  ==>
+  !eval! (buffer-chunk visual-location)
+  +manual> isa delayed-punch hand left finger index delay .125
+  +visual-location> isa visual-location kind ship
+  )
+
+(defp **avoid-top-border-turn-right**
+  =goal> isa avoid-warping subgoal "avoid-top-turn"
+  =visual-location> isa visual-location kind ship < orientation 90 > orientation 0
+  ?finger-check> left-index free
+  ==>
+  +manual> isa delayed-punch hand left finger index delay .125
+  +visual-location> isa visual-location kind ship
+  )
+
+(defp **avoid-top-border-turn-left**
+  =goal> isa avoid-warping subgoal "avoid-top-turn"
+  =visual-location> isa visual-location kind ship > orientation 90 < orientation 180
+  ?finger-check> left-index free
+  ==>
+  +manual> isa delayed-punch hand left finger index delay .125
+  +visual-location> isa visual-location kind ship
+  )
+
+(defp **avoid-top-border-thrust**
+  =goal> isa avoid-warping subgoal "avoid-top-turn"
+  =visual-location> isa visual-location kind ship > orientation 180 < orientation 360
+  ?finger-check> left-middle free
+  ==>
+  +manual> isa delayed-punch hand left finger middle delay .2
+  +visual-location> isa visual-location kind ship
+  =goal> subgoal nil
+  )

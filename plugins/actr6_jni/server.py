@@ -68,6 +68,9 @@ class JNI_Server(Factory):
 		self.p = ACTR_Protocol()
 		self.p.factory = self
 		return self.p
+	
+	def add_dm(self, chunk):
+		self.p.sendCommand(self.model, "add-dm", chunk=chunk.get_chunk())
 
 	def update_display(self, chunks, clear=False):
 		visual_locations = [chunk.get_visual_location() for chunk in chunks]

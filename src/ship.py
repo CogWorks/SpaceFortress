@@ -165,6 +165,7 @@ class Ship(Token):
 
     def draw(self):
         """draw ship to worldsurf"""
+        print "Ship orientation: %f" % self.orientation
         if self.app.config['Graphics']['fancy']:
             if not self.thrust_flag:    
                 ship = self.ship
