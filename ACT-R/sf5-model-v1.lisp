@@ -43,7 +43,7 @@
      )
 
 ;;; Goals
-(chunk-type study-mine-letters)
+(chunk-type study-mine-letters state)
 (chunk-type monitor)
 (chunk-type shoot-fortress subgoal)
 (chunk-type shoot-mine subgoal)
@@ -64,6 +64,8 @@
 (chunk-type (rect-location (:include visual-location)) top bottom left right)
 (chunk-type (rect-object (:include visual-object)) top bottom left right)
 (chunk-type (world-border (:include rect-object)))
+
+(chunk-type mine-letters letter1 letter2 letter3)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Productions
@@ -191,3 +193,61 @@
   +visual-location> isa visual-location kind ship
   =goal> subgoal nil
   )
+
+(defp find-mine-letters
+ =goal> isa study-mine-letters state nil
+==> 
+ +visual-location> isa visual-location :attended nil kind text color "white"
+ +imaginal> isa mine-letters
+ =goal> state find
+ !eval! (print-visicon)
+ )
+
+(defp wait-for-letters
+ =goal> isa study-mine-letters state find
+ ?visual-location> state error
+==>
+ !eval! (print-visicon)
+ +visual-location> isa visual-location :attended nil kind text color "white")
+
+(defp read-letter
+ =goal> isa study-mine-letters state find
+ =visual-location> isa visual-location kind text
+ ?visual> state free
+==>
+ +visual> isa move-attention screen-pos =visual-location
+ =goal> state attend)
+
+(defp attend-letter1
+ =goal> isa study-mine-letters state attend
+ =visual> isa text value =l
+ =imaginal> isa mine-letters letter1 nil
+==>
+ +visual-location> isa visual-location kind text :attended nil color "white"
+ =imaginal> letter1 =l
+ =goal> state find)
+
+(defp attend-letter2
+ =goal> isa study-mine-letters state attend
+ =visual> isa text value =l
+ =imaginal> isa mine-letters letter1 =v letter2 nil
+==>
+ +visual-location> isa visual-location kind text :attended nil color "white"
+ =imaginal> letter2 =l
+ =goal> state find)
+
+(defp attend-letter3
+ =goal> isa study-mine-letters state attend
+ =visual> isa text value =l screen-pos =loc
+ =imaginal> isa mine-letters letter1 =v letter2 =b letter3 nil
+ ?finger-check> right-pinkie free
+==>
+ =imaginal> letter3 =l
+ -imaginal>
+ +manual> isa delayed-punch hand right finger pinky
+ -goal>)
+
+
+ 
+
+ 
