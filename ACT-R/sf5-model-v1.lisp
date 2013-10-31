@@ -197,7 +197,7 @@
 (defp find-mine-letters
  =goal> isa study-mine-letters state nil
 ==> 
- +visual-location> isa visual-location :attended nil kind text color "white"
+ +visual-location> isa visual-location :attended nil kind text color "white"  < width 50
  +imaginal> isa mine-letters
  =goal> state find
  !eval! (print-visicon)
@@ -208,7 +208,7 @@
  ?visual-location> state error
 ==>
  !eval! (print-visicon)
- +visual-location> isa visual-location :attended nil kind text color "white")
+ +visual-location> isa visual-location :attended nil kind text color "white"  < width 50)
 
 (defp read-letter
  =goal> isa study-mine-letters state find
@@ -223,7 +223,7 @@
  =visual> isa text value =l
  =imaginal> isa mine-letters letter1 nil
 ==>
- +visual-location> isa visual-location kind text :attended nil color "white"
+ +visual-location> isa visual-location kind text :attended nil color "white" < width 50
  =imaginal> letter1 =l
  =goal> state find)
 
@@ -232,7 +232,7 @@
  =visual> isa text value =l
  =imaginal> isa mine-letters letter1 =v letter2 nil
 ==>
- +visual-location> isa visual-location kind text :attended nil color "white"
+ +visual-location> isa visual-location kind text :attended nil color "white"  < width 50
  =imaginal> letter2 =l
  =goal> state find)
 
@@ -245,7 +245,7 @@
  =imaginal> letter3 =l
  -imaginal>
  +manual> isa delayed-punch hand right finger pinky
- -goal>)
+ +goal> isa monitor)
 
 
  
