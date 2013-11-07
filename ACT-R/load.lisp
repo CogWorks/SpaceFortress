@@ -1,3 +1,3 @@
-(asdf:load-system 'actr6 :force t)
+(asdf:load-system 'actr6 :force nil)
 (load (concatenate 'string (directory-namestring (current-pathname)) "sf5-model-v1.lisp"))
-(run-full-time 5 :real-time t)
+(run-full-time 10 :real-time t)

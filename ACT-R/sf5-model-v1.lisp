@@ -129,7 +129,7 @@
 
 (defp **imagine-border**
   =goal> isa avoid-warping subgoal nil
-  ?imaginal> buffer empty
+  ?imaginal> buffer empty state free
   =visual-location> isa visual-location kind world-border
   ==>
   +imaginal> =visual-location
@@ -196,6 +196,7 @@
 
 (defp find-mine-letters
  =goal> isa study-mine-letters state nil
+
 ==> 
  +visual-location> isa visual-location :attended nil kind text color "white"  < width 50
  +imaginal> isa mine-letters
@@ -207,12 +208,12 @@
  =goal> isa study-mine-letters state find
  ?visual-location> state error
 ==>
- !eval! (print-visicon)
+ 
  +visual-location> isa visual-location :attended nil kind text color "white"  < width 50)
 
 (defp read-letter
  =goal> isa study-mine-letters state find
- =visual-location> isa visual-location kind text
+ =visual-location> isa visual-location kind text color "white" < width 50
  ?visual> state free
 ==>
  +visual> isa move-attention screen-pos =visual-location
@@ -223,6 +224,7 @@
  =visual> isa text value =l
  =imaginal> isa mine-letters letter1 nil
 ==>
+ 
  +visual-location> isa visual-location kind text :attended nil color "white" < width 50
  =imaginal> letter1 =l
  =goal> state find)
@@ -232,6 +234,8 @@
  =visual> isa text value =l
  =imaginal> isa mine-letters letter1 =v letter2 nil
 ==>
+ !eval! (show-buffers)
+ !eval! (buffer-status)
  +visual-location> isa visual-location kind text :attended nil color "white"  < width 50
  =imaginal> letter2 =l
  =goal> state find)
@@ -242,6 +246,8 @@
  =imaginal> isa mine-letters letter1 =v letter2 =b letter3 nil
  ?finger-check> right-pinkie free
 ==>
+ !eval! (show-buffers)
+ !eval! (buffer-status)
  =imaginal> letter3 =l
  -imaginal>
  +manual> isa delayed-punch hand right finger pinky
