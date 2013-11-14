@@ -1,3 +1,4 @@
+*.xfasl
 dist
 sf-dist
 ce-dist
