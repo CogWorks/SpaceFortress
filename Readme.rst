@@ -24,7 +24,9 @@ System Requirements
 
 * Python 2.6 or 2.7
 * pygame
-* PyOpengl
+* pyopengl
+* pyopengl-accelerate
+* pygl2d
 * twisted
 * PIL
 
